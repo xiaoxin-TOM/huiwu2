@@ -58,9 +58,11 @@ model RegistrationType {
 model Registration {
   id           String           @id @default(cuid())
   userId       String
-  user         User             @relation(fields: [userId], references: [id])
+  // Restrict: deleting a User with registrations is blocked
+  user         User             @relation(fields: [userId], references: [id], onDelete: Restrict)
   typeId       String
-  type         RegistrationType @relation(fields: [typeId], references: [id])
+  // Restrict: deleting a RegistrationType with registrations is blocked
+  type         RegistrationType @relation(fields: [typeId], references: [id], onDelete: Restrict)
   fullName     String
   organization String           @default("")
   title        String           @default("")
@@ -72,7 +74,8 @@ model Registration {
 model Submission {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  // Restrict: deleting a User with submissions is blocked
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   title     String
   authors   String
   abstract  String
@@ -126,9 +129,11 @@ model Hotel {
 model HotelBooking {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  // Restrict: deleting a User with hotel bookings is blocked
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   hotelId   String
-  hotel     Hotel    @relation(fields: [hotelId], references: [id])
+  // Restrict: deleting a Hotel with bookings is blocked
+  hotel     Hotel    @relation(fields: [hotelId], references: [id], onDelete: Restrict)
   checkIn   String
   checkOut  String
   rooms     Int      @default(1)

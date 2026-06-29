@@ -1,14 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { prisma } from "../src/lib/prisma";
 import { hashPassword } from "../src/lib/password";
-
-function createPrismaClient(): PrismaClient {
-  const url = process.env.DATABASE_URL ?? "file:./dev.db";
-  const adapter = new PrismaLibSql({ url });
-  return new PrismaClient({ adapter });
-}
-
-const prisma = createPrismaClient();
 
 async function main() {
   await prisma.siteConfig.upsert({

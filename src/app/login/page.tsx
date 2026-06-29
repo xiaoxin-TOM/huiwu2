@@ -17,7 +17,8 @@ export default function LoginPage() {
       redirect: false,
     });
     if (res?.error) setError("邮箱或密码错误");
-    else router.push("/me");
+    // TODO Phase 2: 个人中心 /me
+    else router.push("/");
   }
   return (
     <div className="mx-auto max-w-sm py-12">
@@ -26,7 +27,7 @@ export default function LoginPage() {
         <input name="email" type="email" placeholder="邮箱" required className="w-full rounded border px-3 py-2" />
         <input name="password" type="password" placeholder="密码" required className="w-full rounded border px-3 py-2" />
         {error && <p className="text-sm text-red-600">{error}</p>}
-        <button className="w-full rounded bg-sky-700 py-2 text-white">登录</button>
+        <button type="submit" className="w-full rounded bg-sky-700 py-2 text-white">登录</button>
       </form>
       <p className="mt-4 text-sm">还没有账号?<Link href="/register" className="text-sky-700">去注册</Link></p>
     </div>

@@ -10,20 +10,24 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     const fd = new FormData(e.currentTarget);
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: fd.get("name"),
-        email: fd.get("email"),
-        password: fd.get("password"),
-        phone: fd.get("phone"),
-        organization: fd.get("organization"),
-      }),
-    });
-    const data = await res.json();
-    if (!data.ok) setError(data.error);
-    else router.push("/login");
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: fd.get("name"),
+          email: fd.get("email"),
+          password: fd.get("password"),
+          phone: fd.get("phone"),
+          organization: fd.get("organization"),
+        }),
+      });
+      const data = await res.json();
+      if (!data.ok) setError(data.error);
+      else router.push("/login");
+    } catch {
+      setError("网络错误,请稍后重试");
+    }
   }
   return (
     <div className="mx-auto max-w-sm py-12">
@@ -35,7 +39,7 @@ export default function RegisterPage() {
         <input name="phone" placeholder="手机号(选填)" className="w-full rounded border px-3 py-2" />
         <input name="organization" placeholder="单位(选填)" className="w-full rounded border px-3 py-2" />
         {error && <p className="text-sm text-red-600">{error}</p>}
-        <button className="w-full rounded bg-sky-700 py-2 text-white">注册</button>
+        <button type="submit" className="w-full rounded bg-sky-700 py-2 text-white">注册</button>
       </form>
       <p className="mt-4 text-sm">已有账号?<Link href="/login" className="text-sky-700">去登录</Link></p>
     </div>

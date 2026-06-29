@@ -31,7 +31,8 @@ export default async function SiteHeader() {
         </nav>
         <div className="ml-auto text-sm">
           {session?.user ? (
-            <Link href="/me" className="text-sky-700">个人中心</Link>
+            // TODO Phase 2: 个人中心 /me
+            <Link href="/" className="text-sky-700">个人中心</Link>
           ) : (
             <Link href="/login" className="text-sky-700">登录 / 注册</Link>
           )}
