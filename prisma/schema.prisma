@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  passwordHash String
+  phone        String?
+  organization String?
+  role         String         @default("USER") // USER | ADMIN
+  createdAt    DateTime       @default(now())
+  registrations Registration[]
+  submissions   Submission[]
+  bookings      HotelBooking[]
+}
+
+model SiteConfig {
+  id           Int      @id @default(1)
+  confName     String   @default("")
+  confDate     String   @default("")
+  confLocation String   @default("")
+  logoUrl      String?
+  welcomeHtml  String   @default("")
+  liveUrl      String?
+  contactHtml  String   @default("")
+  updatedAt    DateTime @updatedAt
+}
+
+model Page {
+  slug        String   @id // welcome | venue | contact ...
+  title       String
+  contentHtml String   @default("")
+  updatedAt   DateTime @updatedAt
+}
+
+model Notice {
+  id          String   @id @default(cuid())
+  title       String
+  contentHtml String   @default("")
+  isPublished Boolean  @default(true)
+  publishedAt DateTime @default(now())
+}
+
+model RegistrationType {
+  id            String         @id @default(cuid())
+  name          String
+  fee           Int            @default(0)
+  description   String         @default("")
+  registrations Registration[]
+}
+
+model Registration {
+  id           String           @id @default(cuid())
+  userId       String
+  user         User             @relation(fields: [userId], references: [id])
+  typeId       String
+  type         RegistrationType @relation(fields: [typeId], references: [id])
+  fullName     String
+  organization String           @default("")
+  title        String           @default("")
+  phone        String           @default("")
+  status       String           @default("PENDING") // PENDING | APPROVED | REJECTED
+  createdAt    DateTime         @default(now())
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  authors   String
+  abstract  String
+  fileUrl   String?
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+}
+
+model Speaker {
+  id           String           @id @default(cuid())
+  name         String
+  title        String           @default("")
+  organization String           @default("")
+  bio          String           @default("")
+  photoUrl     String?
+  isModerator  Boolean          @default(false)
+  sessions     SessionSpeaker[]
+}
+
+model Session {
+  id        String           @id @default(cuid())
+  day       String // 日期 YYYY-MM-DD
+  startTime String
+  endTime   String
+  room      String           @default("")
+  title     String
+  isBrief   Boolean          @default(false)
+  speakers  SessionSpeaker[]
+}
+
+model SessionSpeaker {
+  sessionId String
+  speakerId String
+  role      String  @default("SPEAKER") // SPEAKER | MODERATOR
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  speaker   Speaker @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+  @@id([sessionId, speakerId, role])
+}
+
+model Hotel {
+  id          String         @id @default(cuid())
+  name        String
+  description String         @default("")
+  price       Int            @default(0)
+  address     String         @default("")
+  imageUrl    String?
+  distance    String         @default("")
+  bookings    HotelBooking[]
+}
+
+model HotelBooking {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  hotelId   String
+  hotel     Hotel    @relation(fields: [hotelId], references: [id])
+  checkIn   String
+  checkOut  String
+  rooms     Int      @default(1)
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+}
+
+model Album {
+  id       String  @id @default(cuid())
+  title    String
+  date     String  @default("")
+  coverUrl String?
+  photos   Photo[]
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  albumId   String
+  album     Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  url       String
+  caption   String   @default("")
+  createdAt DateTime @default(now())
+}
