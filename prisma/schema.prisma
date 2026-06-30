@@ -57,7 +57,8 @@ model RegistrationType {
 
 model Registration {
   id           String           @id @default(cuid())
-  userId       String
+  // @unique: 每个用户仅一条报名(DB 级原子约束,防并发重复)
+  userId       String           @unique
   // Restrict: deleting a User with registrations is blocked
   user         User             @relation(fields: [userId], references: [id], onDelete: Restrict)
   typeId       String
