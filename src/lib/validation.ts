@@ -29,3 +29,16 @@ export type SubmissionInput = z.infer<typeof submissionSchema>;
 export const reviewSchema = z.object({
   decision: z.enum(["APPROVED", "REJECTED"]),
 });
+
+export const bookingSchema = z
+  .object({
+    hotelId: z.string().min(1, "请选择酒店"),
+    checkIn: z.string().min(1, "请选择入住日期"),
+    checkOut: z.string().min(1, "请选择离店日期"),
+    rooms: z.coerce.number().int().min(1, "房间数至少 1").max(10, "房间数过多"),
+  })
+  .refine((d) => d.checkOut > d.checkIn, {
+    message: "离店日期需晚于入住日期",
+    path: ["checkOut"],
+  });
+export type BookingInput = z.infer<typeof bookingSchema>;

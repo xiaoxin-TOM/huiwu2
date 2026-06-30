@@ -117,6 +117,17 @@ async function main() {
     }
   }
 
+  const hotels = [
+    { name: "会议中心大酒店", price: 600, address: "会场旁 200 米", distance: "步行 3 分钟",
+      description: "<p>紧邻主会场,含双早。</p>" },
+    { name: "城市快捷酒店", price: 320, address: "地铁 8 号线奥体中心站", distance: "地铁 2 站",
+      description: "<p>经济实惠,交通便利。</p>" },
+  ];
+  for (const h of hotels) {
+    const found = await prisma.hotel.findFirst({ where: { name: h.name } });
+    if (!found) await prisma.hotel.create({ data: h });
+  }
+
   console.log("seed 完成");
 }
 
