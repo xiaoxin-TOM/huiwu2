@@ -76,3 +76,17 @@ export const speakerSchema = z.object({
   photoUrl: z.string().optional().default(""),
   isModerator: z.boolean(),
 });
+
+export const sessionSchema = z.object({
+  day: z.string().min(1, "请填写日期"),
+  startTime: z.string().min(1, "请填写开始时间"),
+  endTime: z.string().min(1, "请填写结束时间"),
+  room: z.string().optional().default(""),
+  title: z.string().min(1, "请填写标题"),
+  isBrief: z.boolean(),
+});
+
+export const sessionSpeakerSchema = z.object({
+  speakerId: z.string().min(1, "请选择讲者"),
+  role: z.enum(["SPEAKER", "MODERATOR"]),
+});
