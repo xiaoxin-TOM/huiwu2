@@ -56,3 +56,9 @@ export const siteConfigSchema = z.object({
   liveUrl: z.string().optional().default(""),
   welcomeHtml: z.string().optional().default(""),
 });
+
+export const noticeSchema = z.object({
+  title: z.string().min(1, "请填写标题"),
+  contentHtml: z.string().optional().default(""),
+  isPublished: z.boolean(),
+});
