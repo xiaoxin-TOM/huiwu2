@@ -99,3 +99,7 @@ export const hotelSchema = z.object({
   imageUrl: z.string().optional().default(""),
   distance: z.string().optional().default(""),
 });
+
+export const roleSchema = z.object({
+  role: z.enum(["USER", "ADMIN"]),
+});
