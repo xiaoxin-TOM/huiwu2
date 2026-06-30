@@ -1,11 +1,13 @@
 import { afterAll, expect, test } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { getPublishedNotices, getNoticeById } from "@/lib/content";
+import { getPublishedNotices, getNoticeById, getPage } from "@/lib/content";
 
 const ids: string[] = [];
+const pageSlugs: string[] = [];
 
 afterAll(async () => {
   await prisma.notice.deleteMany({ where: { id: { in: ids } } });
+  await prisma.page.deleteMany({ where: { slug: { in: pageSlugs } } });
   await prisma.$disconnect();
 });
 
@@ -32,4 +34,14 @@ test("getNoticeById 对未发布或不存在返回 null", async () => {
   ids.push(hidden.id);
   expect(await getNoticeById(hidden.id)).toBeNull();
   expect(await getNoticeById("不存在的id")).toBeNull();
+});
+
+test("getPage 命中返回页,缺失返回 null", async () => {
+  await prisma.page.create({
+    data: { slug: "venue-test", title: "交通测试", contentHtml: "<p>路线</p>" },
+  });
+  pageSlugs.push("venue-test");
+  const page = await getPage("venue-test");
+  expect(page?.title).toBe("交通测试");
+  expect(await getPage("不存在")).toBeNull();
 });

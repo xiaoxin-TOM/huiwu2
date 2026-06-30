@@ -59,6 +59,23 @@ async function main() {
     const found = await prisma.notice.findFirst({ where: { title: n.title } });
     if (!found) await prisma.notice.create({ data: n });
   }
+  const pages = [
+    {
+      slug: "venue",
+      title: "会场交通",
+      contentHtml:
+        "<p>会场:北京国际会议中心。地铁 8 号线奥体中心站 B 口步行 10 分钟。</p>",
+    },
+    {
+      slug: "contact",
+      title: "联系方式",
+      contentHtml: "<p>会务组邮箱:office@conf.local<br/>电话:010-00000000</p>",
+    },
+  ];
+  for (const p of pages) {
+    await prisma.page.upsert({ where: { slug: p.slug }, update: {}, create: p });
+  }
+
   console.log("seed 完成");
 }
 
