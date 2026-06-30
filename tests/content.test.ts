@@ -26,6 +26,8 @@ test("getPublishedNotices 只返回已发布并按时间降序", async () => {
   const list = await getPublishedNotices();
   const titles = list.map((n) => n.title);
   expect(titles).not.toContain("未发布");
+  expect(titles).toContain("新通知");
+  expect(titles).toContain("旧通知");
   expect(titles.indexOf("新通知")).toBeLessThan(titles.indexOf("旧通知"));
 });
 

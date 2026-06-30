@@ -28,6 +28,15 @@ test("按天分组,天内按会场分组,会场内按开始时间", () => {
   const day1 = grouped[0];
   expect(day1.rooms.map((r) => r.room)).toEqual(["A", "B"]);
   expect(day1.rooms[0].sessions.map((s) => s.id)).toEqual(["d1a-early", "d1a-late"]);
+
+  const day2 = grouped[1];
+  expect(day2.day).toBe("2026-09-19");
+  expect(day2.rooms.map((r) => r.room)).toEqual(["A"]);
+  expect(day2.rooms[0].sessions.map((s) => s.id)).toEqual(["d2"]);
+
+  // day1 room B contains d1b
+  expect(day1.rooms[1].room).toBe("B");
+  expect(day1.rooms[1].sessions.map((s) => s.id)).toEqual(["d1b"]);
 });
 
 test("空输入返回空数组", () => {

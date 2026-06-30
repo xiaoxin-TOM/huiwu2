@@ -35,3 +35,7 @@ test("按单位匹配且大小写不敏感", () => {
 test("按单位中文匹配", () => {
   expect(filterSpeakers(list, "北京大学").map((s) => s.id)).toEqual(["3"]);
 });
+
+test("按姓名匹配大小写不敏感", () => {
+  expect(filterSpeakers(list, "li si").map((s) => s.id)).toEqual(["2"]);
+});
