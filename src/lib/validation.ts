@@ -90,3 +90,12 @@ export const sessionSpeakerSchema = z.object({
   speakerId: z.string().min(1, "请选择讲者"),
   role: z.enum(["SPEAKER", "MODERATOR"]),
 });
+
+export const hotelSchema = z.object({
+  name: z.string().min(1, "请填写酒店名称"),
+  description: z.string().optional().default(""),
+  price: z.coerce.number().int().min(0, "价格不能为负"),
+  address: z.string().optional().default(""),
+  imageUrl: z.string().optional().default(""),
+  distance: z.string().optional().default(""),
+});
