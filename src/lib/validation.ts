@@ -47,3 +47,12 @@ export const albumSchema = z.object({
   title: z.string().min(1, "请填写相册标题"),
   date: z.string().min(1, "请填写日期"),
 });
+
+export const siteConfigSchema = z.object({
+  confName: z.string().min(1, "请填写会议名称"),
+  confDate: z.string().optional().default(""),
+  confLocation: z.string().optional().default(""),
+  logoUrl: z.string().optional().default(""),
+  liveUrl: z.string().optional().default(""),
+  welcomeHtml: z.string().optional().default(""),
+});
