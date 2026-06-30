@@ -76,6 +76,16 @@ async function main() {
     await prisma.page.upsert({ where: { slug: p.slug }, update: {}, create: p });
   }
 
+  const speakers = [
+    { name: "张三", title: "教授", organization: "清华大学", bio: "<p>研究方向:人工智能。</p>" },
+    { name: "李四", title: "研究员", organization: "北京大学", bio: "<p>研究方向:材料科学。</p>" },
+    { name: "王五", title: "主任", organization: "中科院", bio: "<p>大会主持人。</p>", isModerator: true },
+  ];
+  for (const s of speakers) {
+    const found = await prisma.speaker.findFirst({ where: { name: s.name } });
+    if (!found) await prisma.speaker.create({ data: s });
+  }
+
   console.log("seed 完成");
 }
 
