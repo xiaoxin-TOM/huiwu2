@@ -37,6 +37,28 @@ async function main() {
       });
     }
   }
+
+  const notices = [
+    {
+      title: "第一轮会议通知",
+      contentHtml: "<p>欢迎参加示例学术年会,现将有关事项通知如下。</p>",
+      isPublished: true,
+    },
+    {
+      title: "论文征集启事",
+      contentHtml: "<p>即日起开放摘要投稿,截止日期以官网为准。</p>",
+      isPublished: true,
+    },
+    {
+      title: "(草稿)日程调整",
+      contentHtml: "<p>内部草稿,暂不发布。</p>",
+      isPublished: false,
+    },
+  ];
+  for (const n of notices) {
+    const found = await prisma.notice.findFirst({ where: { title: n.title } });
+    if (!found) await prisma.notice.create({ data: n });
+  }
   console.log("seed 完成");
 }
 
