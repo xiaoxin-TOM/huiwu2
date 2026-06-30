@@ -30,7 +30,11 @@ export async function POST(req: Request) {
   const fileError = validatePdf({ type: file.type, size: file.size });
   if (fileError) return NextResponse.json({ ok: false, error: fileError }, { status: 400 });
 
-  const fileUrl = await savePdf(file);
-  const sub = await createSubmission(user.id, { ...parsed.data, fileUrl });
-  return NextResponse.json({ ok: true, id: sub.id });
+  try {
+    const fileUrl = await savePdf(file);
+    const sub = await createSubmission(user.id, { ...parsed.data, fileUrl });
+    return NextResponse.json({ ok: true, id: sub.id });
+  } catch {
+    return NextResponse.json({ ok: false, error: "提交失败" }, { status: 500 });
+  }
 }

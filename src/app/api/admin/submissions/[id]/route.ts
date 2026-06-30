@@ -15,6 +15,10 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/submissio
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: "参数错误" }, { status: 400 });
   }
-  await reviewSubmission(id, parsed.data.decision);
+  try {
+    await reviewSubmission(id, parsed.data.decision);
+  } catch {
+    return NextResponse.json({ ok: false, error: "操作失败" }, { status: 400 });
+  }
   return NextResponse.redirect(new URL("/admin/submissions", req.url), { status: 303 });
 }
