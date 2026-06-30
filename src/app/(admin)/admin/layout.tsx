@@ -9,6 +9,7 @@ const MENU = [
   { href: "/admin/registrations", label: "报名管理" },
   { href: "/admin/submissions", label: "论文管理" },
   { href: "/admin/hotels", label: "酒店管理" },
+  { href: "/admin/bookings", label: "预订管理" },
   { href: "/admin/albums", label: "图片直播" },
   { href: "/admin/users", label: "用户管理" },
 ];
