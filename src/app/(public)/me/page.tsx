@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { getUserRegistration } from "@/lib/registrations";
 import { listUserSubmissions } from "@/lib/submissions";
+import { listUserBookings } from "@/lib/bookings";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: "待审核",
@@ -11,9 +12,10 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default async function MePage() {
   const user = await requireUser();
-  const [registration, submissions] = await Promise.all([
+  const [registration, submissions, bookings] = await Promise.all([
     getUserRegistration(user.id),
     listUserSubmissions(user.id),
+    listUserBookings(user.id),
   ]);
 
   return (
@@ -47,6 +49,25 @@ export default async function MePage() {
               <li key={s.id} className="flex items-center gap-3 px-3 py-2 text-sm">
                 <span className="font-medium">{s.title}</span>
                 <span className="ml-auto text-sky-700">{STATUS_LABEL[s.status] ?? s.status}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <h2 className="text-lg font-semibold">我的酒店预订</h2>
+        {bookings.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            尚无预订。<a href="/hotels" className="text-sky-700 hover:underline">去预订</a>
+          </p>
+        ) : (
+          <ul className="divide-y rounded border">
+            {bookings.map((b) => (
+              <li key={b.id} className="flex items-center gap-3 px-3 py-2 text-sm">
+                <span className="font-medium">{b.hotel.name}</span>
+                <span className="text-gray-400">{b.checkIn} → {b.checkOut} · {b.rooms} 间</span>
+                <span className="ml-auto text-sky-700">{STATUS_LABEL[b.status] ?? b.status}</span>
               </li>
             ))}
           </ul>
