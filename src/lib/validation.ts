@@ -62,3 +62,8 @@ export const noticeSchema = z.object({
   contentHtml: z.string().optional().default(""),
   isPublished: z.boolean(),
 });
+
+export const pageSchema = z.object({
+  title: z.string().min(1, "请填写标题"),
+  contentHtml: z.string().optional().default(""),
+});
