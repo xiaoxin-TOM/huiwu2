@@ -42,3 +42,8 @@ export const bookingSchema = z
     path: ["checkOut"],
   });
 export type BookingInput = z.infer<typeof bookingSchema>;
+
+export const albumSchema = z.object({
+  title: z.string().min(1, "请填写相册标题"),
+  date: z.string().min(1, "请填写日期"),
+});

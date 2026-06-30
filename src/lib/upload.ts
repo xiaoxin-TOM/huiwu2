@@ -19,3 +19,26 @@ export async function savePdf(file: File): Promise<string> {
   await writeFile(path.join(dir, name), buf);
   return `/uploads/${name}`;
 }
+
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const IMAGE_EXT: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
+export function validateImage(file: { type: string; size: number }): string | null {
+  if (!(file.type in IMAGE_EXT)) return "仅支持 JPG/PNG/WebP 图片";
+  if (file.size > MAX_IMAGE_BYTES) return "图片不能超过 5MB";
+  return null;
+}
+
+export async function saveImage(file: File): Promise<string> {
+  const ext = IMAGE_EXT[file.type] ?? "bin";
+  const dir = path.join(process.cwd(), "public", "uploads", "images");
+  await mkdir(dir, { recursive: true });
+  const name = `${randomUUID()}.${ext}`;
+  const buf = Buffer.from(await file.arrayBuffer());
+  await writeFile(path.join(dir, name), buf);
+  return `/uploads/images/${name}`;
+}
