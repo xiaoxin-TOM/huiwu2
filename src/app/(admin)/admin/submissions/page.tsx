@@ -1,10 +1,5 @@
 import { listSubmissions } from "@/lib/submissions";
-
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "待审核",
-  APPROVED: "已通过",
-  REJECTED: "未通过",
-};
+import { STATUS_LABEL } from "@/lib/labels";
 
 function ReviewButtons({ id }: { id: string }) {
   return (

@@ -1,12 +1,7 @@
 import { requireUser } from "@/lib/session";
 import { listUserSubmissions } from "@/lib/submissions";
 import SubmissionForm from "@/components/SubmissionForm";
-
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "待审核",
-  APPROVED: "已通过",
-  REJECTED: "未通过",
-};
+import { STATUS_LABEL } from "@/lib/labels";
 
 export default async function SubmissionsPage() {
   const user = await requireUser();
