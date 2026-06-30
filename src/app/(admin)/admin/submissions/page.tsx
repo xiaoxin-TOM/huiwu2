@@ -20,7 +20,10 @@ export default async function AdminSubmissionsPage() {
   const subs = await listSubmissions();
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">论文管理</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">论文管理</h1>
+        <a href="/api/admin/submissions/export" className="text-sm text-sky-700 hover:underline">导出 CSV</a>
+      </div>
       {subs.length === 0 ? (
         <p className="text-gray-500">暂无投稿。</p>
       ) : (
