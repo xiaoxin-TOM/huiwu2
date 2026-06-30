@@ -86,6 +86,37 @@ async function main() {
     if (!found) await prisma.speaker.create({ data: s });
   }
 
+  const zhang = await prisma.speaker.findFirst({ where: { name: "张三" } });
+  const li = await prisma.speaker.findFirst({ where: { name: "李四" } });
+  const wang = await prisma.speaker.findFirst({ where: { name: "王五" } });
+
+  const sessions = [
+    {
+      day: "2026-09-18", startTime: "09:00", endTime: "09:30",
+      room: "主会场", title: "开幕式", isBrief: true,
+      links: wang ? [{ speakerId: wang.id, role: "MODERATOR" }] : [],
+    },
+    {
+      day: "2026-09-18", startTime: "09:30", endTime: "10:30",
+      room: "主会场", title: "主旨报告:人工智能前沿", isBrief: true,
+      links: zhang ? [{ speakerId: zhang.id, role: "SPEAKER" }] : [],
+    },
+    {
+      day: "2026-09-19", startTime: "14:00", endTime: "15:00",
+      room: "分会场 A", title: "材料科学分论坛", isBrief: false,
+      links: li ? [{ speakerId: li.id, role: "SPEAKER" }] : [],
+    },
+  ];
+  for (const s of sessions) {
+    const found = await prisma.session.findFirst({ where: { title: s.title } });
+    if (!found) {
+      const { links, ...data } = s;
+      await prisma.session.create({
+        data: { ...data, speakers: { create: links } },
+      });
+    }
+  }
+
   console.log("seed 完成");
 }
 
