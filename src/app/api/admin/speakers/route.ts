@@ -1,0 +1,34 @@
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { isAdmin } from "@/lib/access";
+import { speakerSchema } from "@/lib/validation";
+import { createSpeaker } from "@/lib/speakers-admin";
+
+function parse(form: FormData | null) {
+  return speakerSchema.safeParse({
+    name: form?.get("name") ?? "",
+    title: form?.get("title") ?? "",
+    organization: form?.get("organization") ?? "",
+    bio: form?.get("bio") ?? "",
+    photoUrl: form?.get("photoUrl") ?? "",
+    isModerator: form?.get("isModerator") === "on",
+  });
+}
+
+export async function POST(req: Request) {
+  const session = await auth();
+  if (!isAdmin(session?.user?.role)) {
+    return NextResponse.json({ ok: false, error: "无权限" }, { status: 403 });
+  }
+  const form = await req.formData().catch(() => null);
+  const parsed = parse(form);
+  if (!parsed.success) {
+    return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
+  }
+  try {
+    await createSpeaker(parsed.data);
+  } catch {
+    return NextResponse.json({ ok: false, error: "创建失败" }, { status: 500 });
+  }
+  return NextResponse.redirect(new URL("/admin/speakers", req.url), { status: 303 });
+}

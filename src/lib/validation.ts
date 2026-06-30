@@ -67,3 +67,12 @@ export const pageSchema = z.object({
   title: z.string().min(1, "请填写标题"),
   contentHtml: z.string().optional().default(""),
 });
+
+export const speakerSchema = z.object({
+  name: z.string().min(1, "请填写姓名"),
+  title: z.string().optional().default(""),
+  organization: z.string().optional().default(""),
+  bio: z.string().optional().default(""),
+  photoUrl: z.string().optional().default(""),
+  isModerator: z.boolean(),
+});
