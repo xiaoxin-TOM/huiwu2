@@ -12,6 +12,7 @@ async function main() {
       confLocation: "北京国际会议中心",
       welcomeHtml: "<p>欢迎参加本次大会。</p>",
       contactHtml: "<p>会务组电话:010-00000000</p>",
+      liveUrl: "https://www.bilibili.com/",
     },
   });
 
@@ -115,6 +116,31 @@ async function main() {
         data: { ...data, speakers: { create: links } },
       });
     }
+  }
+
+  const hotels = [
+    { name: "会议中心大酒店", price: 600, address: "会场旁 200 米", distance: "步行 3 分钟",
+      description: "<p>紧邻主会场,含双早。</p>" },
+    { name: "城市快捷酒店", price: 320, address: "地铁 8 号线奥体中心站", distance: "地铁 2 站",
+      description: "<p>经济实惠,交通便利。</p>" },
+  ];
+  for (const h of hotels) {
+    const found = await prisma.hotel.findFirst({ where: { name: h.name } });
+    if (!found) await prisma.hotel.create({ data: h });
+  }
+
+  const albumTitle = "开幕式现场";
+  let demoAlbum = await prisma.album.findFirst({ where: { title: albumTitle } });
+  if (!demoAlbum) {
+    demoAlbum = await prisma.album.create({
+      data: { title: albumTitle, date: "2026-09-18", coverUrl: "/uploads/images/demo1.jpg" },
+    });
+    await prisma.photo.createMany({
+      data: [
+        { albumId: demoAlbum.id, url: "/uploads/images/demo1.jpg", caption: "嘉宾合影" },
+        { albumId: demoAlbum.id, url: "/uploads/images/demo2.jpg", caption: "主会场" },
+      ],
+    });
   }
 
   console.log("seed 完成");
