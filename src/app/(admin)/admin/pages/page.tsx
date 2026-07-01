@@ -21,7 +21,7 @@ export default async function AdminPagesPage() {
             <input name="title" required defaultValue={page?.title ?? k.label}
               className="w-full rounded border px-3 py-2" placeholder="标题" />
             <textarea name="contentHtml" rows={6} defaultValue={page?.contentHtml ?? ""}
-              className="w-full rounded border px-3 py-2 font-mono text-sm" placeholder="正文(HTML)" />
+              className="w-full rounded border px-3 py-2 text-sm" placeholder="正文（纯文本，换行自动分段）" />
             <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-sm text-white">保存</button>
           </form>
         );

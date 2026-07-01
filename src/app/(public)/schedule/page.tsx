@@ -1,50 +1,62 @@
 import { getDetailedSessions, groupByDayAndRoom } from "@/lib/schedule";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SectionCard } from "@/components/ui/Card";
+import { ClockIcon, UsersIcon, CalendarIcon } from "@/components/icons";
 
 export default async function SchedulePage() {
   const grouped = groupByDayAndRoom(await getDetailedSessions());
   return (
-    <section className="space-y-8">
-      <h1 className="text-2xl font-bold">详细日程</h1>
+    <div className="space-y-5">
+      <PageHeader title="详细日程" />
       {grouped.length === 0 ? (
-        <p className="text-gray-500">日程待发布。</p>
+        <p className="text-slate-500">日程待发布。</p>
       ) : (
         grouped.map((day) => (
-          <div key={day.day} className="space-y-4">
-            <h2 className="text-lg font-semibold text-sky-700">{day.day}</h2>
-            {day.rooms.map((room) => (
-              <div key={room.room} className="space-y-2">
-                <h3 className="text-sm font-medium text-gray-500">{room.room}</h3>
-                <ul className="divide-y rounded border">
-                  {room.sessions.map((s) => {
-                    const speakers = s.speakers
-                      .filter((x) => x.role === "SPEAKER")
-                      .map((x) => x.speaker.name);
-                    const moderators = s.speakers
-                      .filter((x) => x.role === "MODERATOR")
-                      .map((x) => x.speaker.name);
-                    return (
-                      <li key={s.id} className="space-y-1 px-3 py-2">
-                        <div className="flex gap-3 text-sm">
-                          <span className="w-28 shrink-0 text-gray-500">
+          <SectionCard key={day.day} title={day.day}>
+            <div className="space-y-5">
+              {day.rooms.map((room) => (
+                <div key={room.room}>
+                  <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-sky-700">
+                    <CalendarIcon className="h-4 w-4" />
+                    {room.room}
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {room.sessions.map((s) => {
+                      const speakers = s.speakers
+                        .filter((x) => x.role === "SPEAKER")
+                        .map((x) => x.speaker.name);
+                      const moderators = s.speakers
+                        .filter((x) => x.role === "MODERATOR")
+                        .map((x) => x.speaker.name);
+                      return (
+                        <div
+                          key={s.id}
+                          className="rounded-xl border border-slate-100 bg-slate-50 p-4 transition hover:border-sky-200 hover:bg-sky-50/30"
+                        >
+                          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-sky-700">
+                            <ClockIcon className="h-4 w-4" />
                             {s.startTime}–{s.endTime}
-                          </span>
-                          <span className="font-medium">{s.title}</span>
+                          </div>
+                          <h4 className="mb-2 font-semibold text-slate-800">{s.title}</h4>
+                          {speakers.length > 0 && (
+                            <p className="flex items-center gap-1 text-xs text-slate-500">
+                              <UsersIcon className="h-3.5 w-3.5" />
+                              讲者：{speakers.join("、")}
+                            </p>
+                          )}
+                          {moderators.length > 0 && (
+                            <p className="mt-1 text-xs text-slate-400">主持：{moderators.join("、")}</p>
+                          )}
                         </div>
-                        {speakers.length > 0 && (
-                          <p className="pl-28 text-xs text-gray-500">讲者:{speakers.join("、")}</p>
-                        )}
-                        {moderators.length > 0 && (
-                          <p className="pl-28 text-xs text-gray-500">主持:{moderators.join("、")}</p>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
-          </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionCard>
         ))
       )}
-    </section>
+    </div>
   );
 }

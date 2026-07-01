@@ -1,31 +1,29 @@
-import Link from "next/link";
 import { listAlbums } from "@/lib/albums";
+import { DataCard } from "@/components/ui/Card";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { ImageIcon } from "@/components/icons";
 
 export default async function PhotosPage() {
   const albums = await listAlbums();
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-bold">图片直播</h1>
+    <div className="space-y-4">
+      <PageHeader title="图片直播" />
       {albums.length === 0 ? (
-        <p className="text-gray-500">暂无相册。</p>
+        <p className="text-slate-500">暂无相册。</p>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {albums.map((a) => (
-            <li key={a.id} className="rounded border">
-              <Link href={`/photos/${a.id}`} className="block">
-                {a.coverUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={a.coverUrl} alt={a.title} className="h-40 w-full rounded-t object-cover" />
-                )}
-                <div className="p-3">
-                  <h2 className="font-medium text-sky-700">{a.title}</h2>
-                  <p className="text-sm text-gray-400">{a.date}</p>
-                </div>
-              </Link>
-            </li>
+            <DataCard
+              key={a.id}
+              href={`/photos/${a.id}`}
+              title={a.title}
+              meta={a.date}
+              imageUrl={a.coverUrl}
+              icon={<ImageIcon className="h-6 w-6" />}
+            />
           ))}
-        </ul>
+        </div>
       )}
-    </section>
+    </div>
   );
 }

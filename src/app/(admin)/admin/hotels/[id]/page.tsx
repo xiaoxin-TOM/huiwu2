@@ -14,7 +14,9 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
         <input name="address" defaultValue={h.address} placeholder="地址" className="w-full rounded border px-3 py-2" />
         <input name="distance" defaultValue={h.distance} placeholder="距离" className="w-full rounded border px-3 py-2" />
         <input name="imageUrl" defaultValue={h.imageUrl ?? ""} placeholder="图片地址" className="w-full rounded border px-3 py-2" />
-        <textarea name="description" rows={4} defaultValue={h.description} className="w-full rounded border px-3 py-2 font-mono text-sm" />
+        <label className="block text-sm text-gray-600">酒店介绍（纯文本，换行自动分段）
+          <textarea name="description" rows={4} defaultValue={h.description} className="mt-1 w-full rounded border px-3 py-2 text-sm" />
+        </label>
         <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-white">保存</button>
       </form>
     </div>

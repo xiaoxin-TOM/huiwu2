@@ -29,3 +29,7 @@ export function addPhoto(albumId: string, url: string, caption: string) {
 export function deletePhoto(id: string) {
   return prisma.photo.delete({ where: { id } });
 }
+
+export function deleteAlbum(id: string) {
+  return prisma.album.delete({ where: { id } });
+}

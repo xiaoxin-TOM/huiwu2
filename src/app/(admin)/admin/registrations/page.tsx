@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { listRegistrations } from "@/lib/registrations";
 import { STATUS_LABEL } from "@/lib/labels";
 
@@ -22,7 +23,7 @@ export default async function AdminRegistrationsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">报名管理</h1>
-        <a href="/api/admin/registrations/export" className="text-sm text-sky-700 hover:underline">导出 CSV</a>
+        <Link href="/api/admin/registrations/export" download className="text-sm text-sky-700 hover:underline">导出 CSV</Link>
       </div>
       {regs.length === 0 ? (
         <p className="text-gray-500">暂无报名。</p>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { registerSchema } from "@/lib/validation";
 import { createUser } from "@/lib/users";
+import { verifyCode } from "@/lib/verification-code";
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -11,8 +12,16 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+
+  const { code, name, email, password, phone, organization } = parsed.data;
+
+  const codeValid = await verifyCode(email, code);
+  if (!codeValid) {
+    return NextResponse.json({ ok: false, error: "验证码错误或已过期" }, { status: 400 });
+  }
+
   try {
-    const { id } = await createUser(parsed.data);
+    const { id } = await createUser({ name, email, password, phone, organization });
     return NextResponse.json({ ok: true, id });
   } catch (e) {
     if (e instanceof Error && e.message === "EMAIL_TAKEN") {

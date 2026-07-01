@@ -26,9 +26,9 @@ export default async function AdminSitePage() {
           <input name="liveUrl" defaultValue={cfg?.liveUrl ?? ""}
             className="mt-1 w-full rounded border px-3 py-2" />
         </label>
-        <label className="block text-sm text-gray-600">欢迎致辞(HTML)
+        <label className="block text-sm text-gray-600">欢迎致辞（纯文本，换行自动分段）
           <textarea name="welcomeHtml" rows={6} defaultValue={cfg?.welcomeHtml ?? ""}
-            className="mt-1 w-full rounded border px-3 py-2 font-mono text-sm" />
+            className="mt-1 w-full rounded border px-3 py-2 text-sm" />
         </label>
         <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-white">保存</button>
       </form>

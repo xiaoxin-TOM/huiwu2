@@ -11,8 +11,10 @@ export default async function EditNoticePage({ params }: { params: Promise<{ id:
       <form action={`/api/admin/notices/${notice.id}`} method="post" className="space-y-3">
         <input name="title" required defaultValue={notice.title}
           className="w-full rounded border px-3 py-2" />
-        <textarea name="contentHtml" rows={8} defaultValue={notice.contentHtml}
-          className="w-full rounded border px-3 py-2 font-mono text-sm" />
+        <label className="block text-sm text-gray-600">正文（纯文本，换行自动分段）
+          <textarea name="contentHtml" rows={8} defaultValue={notice.contentHtml}
+            className="mt-1 w-full rounded border px-3 py-2 text-sm" />
+        </label>
         <label className="flex items-center gap-2 text-sm text-gray-600">
           <input type="checkbox" name="isPublished" defaultChecked={notice.isPublished} /> 已发布
         </label>

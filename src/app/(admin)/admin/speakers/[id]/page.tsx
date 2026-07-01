@@ -13,7 +13,9 @@ export default async function EditSpeakerPage({ params }: { params: Promise<{ id
         <input name="title" defaultValue={s.title} placeholder="职称" className="w-full rounded border px-3 py-2" />
         <input name="organization" defaultValue={s.organization} placeholder="单位" className="w-full rounded border px-3 py-2" />
         <input name="photoUrl" defaultValue={s.photoUrl ?? ""} placeholder="照片地址" className="w-full rounded border px-3 py-2" />
-        <textarea name="bio" rows={5} defaultValue={s.bio} className="w-full rounded border px-3 py-2 font-mono text-sm" />
+        <label className="block text-sm text-gray-600">简介（纯文本，换行自动分段）
+          <textarea name="bio" rows={5} defaultValue={s.bio} className="mt-1 w-full rounded border px-3 py-2 text-sm" />
+        </label>
         <label className="flex items-center gap-2 text-sm text-gray-600">
           <input type="checkbox" name="isModerator" defaultChecked={s.isModerator} /> 主持人
         </label>
