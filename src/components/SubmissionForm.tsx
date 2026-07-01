@@ -1,6 +1,8 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { inputClass, buttonClass, labelClass } from "@/components/ui/Card";
 
 export default function SubmissionForm() {
   const router = useRouter();
@@ -25,20 +27,38 @@ export default function SubmissionForm() {
       form.reset();
       router.refresh();
     } catch {
-      setError("网络错误,请重试");
+      setError("网络错误，请重试");
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="max-w-md space-y-3">
-      <input name="title" required placeholder="论文题目" className="w-full rounded border px-3 py-2" />
-      <input name="authors" required placeholder="作者(多位用、分隔)" className="w-full rounded border px-3 py-2" />
-      <textarea name="abstract" required placeholder="摘要" rows={4} className="w-full rounded border px-3 py-2" />
-      <input name="file" type="file" accept="application/pdf" required className="w-full text-sm" />
+    <form onSubmit={onSubmit} className="max-w-md space-y-4">
+      <div>
+        <label className={labelClass}>论文题目</label>
+        <input name="title" required placeholder="请输入论文题目" className={inputClass} />
+      </div>
+      <div>
+        <label className={labelClass}>作者</label>
+        <input name="authors" required placeholder="多位作者请用、分隔" className={inputClass} />
+      </div>
+      <div>
+        <label className={labelClass}>摘要</label>
+        <textarea name="abstract" required placeholder="请输入摘要" rows={4} className={inputClass} />
+      </div>
+      <div>
+        <label className={labelClass}>PDF 文件</label>
+        <input
+          name="file"
+          type="file"
+          accept="application/pdf"
+          required
+          className="block w-full text-sm text-slate-500 file:mr-3 file:rounded-xl file:border-0 file:bg-sky-50 file:px-4 file:py-2 file:font-medium file:text-sky-700 hover:file:bg-sky-100"
+        />
+      </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <button type="submit" disabled={submitting} className="rounded bg-sky-700 px-4 py-2 text-white disabled:opacity-50">
+      <button type="submit" disabled={submitting} className={buttonClass}>
         {submitting ? "提交中…" : "提交论文"}
       </button>
     </form>

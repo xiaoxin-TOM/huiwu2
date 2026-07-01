@@ -1,5 +1,7 @@
-import Link from "next/link";
 import { getAllSpeakers, filterSpeakers } from "@/lib/speakers";
+import { DataCard, FormCard, inputClass, buttonClass } from "@/components/ui/Card";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { UsersIcon, SearchIcon } from "@/components/icons";
 
 export default async function SpeakersPage({
   searchParams,
@@ -8,37 +10,44 @@ export default async function SpeakersPage({
 }) {
   const { q = "" } = await searchParams;
   const speakers = filterSpeakers(await getAllSpeakers(), q);
+
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-bold">讲者查询</h1>
-      <form className="flex gap-2" action="/speakers" method="get">
-        <input
-          name="q"
-          defaultValue={q}
-          placeholder="按姓名或单位搜索"
-          className="rounded border px-3 py-2 text-sm"
-        />
-        <button type="submit" className="rounded bg-sky-700 px-3 py-2 text-sm text-white">
-          搜索
-        </button>
-      </form>
+    <div className="space-y-4">
+      <PageHeader title="讲者查询" />
+
+      <FormCard>
+        <form action="/speakers" method="get" className="flex gap-2">
+          <div className="relative flex-1">
+            <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="按姓名或单位搜索"
+              className={`${inputClass} pl-9`}
+            />
+          </div>
+          <button type="submit" className={`${buttonClass} w-auto px-5`}>
+            搜索
+          </button>
+        </form>
+      </FormCard>
+
       {speakers.length === 0 ? (
-        <p className="text-gray-500">未找到匹配的讲者。</p>
+        <p className="text-slate-500">未找到匹配的讲者。</p>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {speakers.map((s) => (
-            <li key={s.id} className="rounded border p-4">
-              <Link href={`/speakers/${s.id}`} className="font-medium text-sky-700 hover:underline">
-                {s.name}
-              </Link>
-              {s.isModerator && (
-                <span className="ml-2 rounded bg-amber-100 px-1.5 text-xs text-amber-700">主持人</span>
-              )}
-              <p className="text-sm text-gray-500">{s.title} · {s.organization}</p>
-            </li>
+            <DataCard
+              key={s.id}
+              href={`/speakers/${s.id}`}
+              title={s.name}
+              meta={s.isModerator ? "主持人" : `${s.title} · ${s.organization}`}
+              description={s.isModerator ? `${s.title} · ${s.organization}` : undefined}
+              icon={<UsersIcon className="h-6 w-6" />}
+            />
           ))}
-        </ul>
+        </div>
       )}
-    </section>
+    </div>
   );
 }

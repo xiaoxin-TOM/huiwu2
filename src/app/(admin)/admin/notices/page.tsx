@@ -10,8 +10,8 @@ export default async function AdminNoticesPage() {
       <form action="/api/admin/notices" method="post" className="space-y-2 rounded border p-4">
         <h2 className="font-medium">新建通知</h2>
         <input name="title" required placeholder="标题" className="w-full rounded border px-3 py-2" />
-        <textarea name="contentHtml" rows={4} placeholder="正文(HTML)"
-          className="w-full rounded border px-3 py-2 font-mono text-sm" />
+        <textarea name="contentHtml" rows={4} placeholder="正文（纯文本，换行自动分段）"
+          className="w-full rounded border px-3 py-2 text-sm" />
         <label className="flex items-center gap-2 text-sm text-gray-600">
           <input type="checkbox" name="isPublished" defaultChecked /> 立即发布
         </label>

@@ -1,6 +1,8 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { inputClass, selectClass, buttonClass, labelClass } from "@/components/ui/Card";
 
 type HotelOption = { id: string; name: string; price: number };
 
@@ -33,31 +35,49 @@ export default function BookingForm({ hotels }: { hotels: HotelOption[] }) {
       router.push("/me");
       router.refresh();
     } catch {
-      setError("网络错误,请重试");
+      setError("网络错误，请重试");
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="max-w-md space-y-3">
-      <select name="hotelId" required className="w-full rounded border px-3 py-2">
-        <option value="">请选择酒店</option>
-        {hotels.map((h) => (
-          <option key={h.id} value={h.id}>{h.name}(¥{h.price}/晚)</option>
-        ))}
-      </select>
-      <label className="block text-sm text-gray-500">入住日期
-        <input name="checkIn" type="date" required className="mt-1 w-full rounded border px-3 py-2" />
-      </label>
-      <label className="block text-sm text-gray-500">离店日期
-        <input name="checkOut" type="date" required className="mt-1 w-full rounded border px-3 py-2" />
-      </label>
-      <input name="rooms" type="number" min={1} defaultValue={1} required
-        className="w-full rounded border px-3 py-2" placeholder="房间数" />
+    <form onSubmit={onSubmit} className="max-w-md space-y-4">
+      <div>
+        <label className={labelClass}>选择酒店</label>
+        <select name="hotelId" required className={selectClass}>
+          <option value="">请选择酒店</option>
+          {hotels.map((h) => (
+            <option key={h.id} value={h.id}>
+              {h.name}（¥{h.price}/晚）
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className={labelClass}>入住日期</label>
+          <input name="checkIn" type="date" required className={inputClass} />
+        </div>
+        <div>
+          <label className={labelClass}>离店日期</label>
+          <input name="checkOut" type="date" required className={inputClass} />
+        </div>
+      </div>
+      <div>
+        <label className={labelClass}>房间数</label>
+        <input
+          name="rooms"
+          type="number"
+          min={1}
+          defaultValue={1}
+          required
+          className={inputClass}
+          placeholder="房间数"
+        />
+      </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <button type="submit" disabled={submitting}
-        className="rounded bg-sky-700 px-4 py-2 text-white disabled:opacity-50">
+      <button type="submit" disabled={submitting} className={buttonClass}>
         {submitting ? "提交中…" : "提交预订"}
       </button>
     </form>

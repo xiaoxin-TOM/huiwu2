@@ -20,6 +20,16 @@ model User {
   bookings      HotelBooking[]
 }
 
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
 model SiteConfig {
   id           Int      @id @default(1)
   confName     String   @default("")

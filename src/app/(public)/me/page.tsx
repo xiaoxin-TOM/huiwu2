@@ -1,73 +1,81 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { getUserRegistration } from "@/lib/registrations";
-import { listUserSubmissions } from "@/lib/submissions";
 import { listUserBookings } from "@/lib/bookings";
 import { STATUS_LABEL } from "@/lib/labels";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SectionCard, DataCard, IconCard } from "@/components/ui/Card";
+import LogoutButton from "@/components/LogoutButton";
+import { UserIcon, ClipboardListIcon, HotelIcon, FileTextIcon } from "@/components/icons";
 
 export default async function MePage() {
   const user = await requireUser();
-  const [registration, submissions, bookings] = await Promise.all([
+  const [registration, bookings] = await Promise.all([
     getUserRegistration(user.id),
-    listUserSubmissions(user.id),
     listUserBookings(user.id),
   ]);
 
   return (
-    <section className="space-y-6">
-      <h1 className="text-2xl font-bold">个人中心</h1>
-      <p className="text-gray-600">{user.name}（{user.email}）</p>
+    <div className="space-y-4">
+      <PageHeader title="个人中心" action={<LogoutButton variant="dark" />} />
 
-      <div className="space-y-2">
-        <h2 className="text-lg font-semibold">我的报名</h2>
+      <SectionCard>
+        <div className="flex items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
+            <UserIcon className="h-8 w-8" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">{user.name}</h2>
+            <p className="text-sm text-slate-500">{user.email}</p>
+          </div>
+        </div>
+      </SectionCard>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <IconCard href="/register-conf" title="我的报名" icon={<ClipboardListIcon className="h-6 w-6" />} />
+        <IconCard href="/hotels" title="我的预订" icon={<HotelIcon className="h-6 w-6" />} />
+        <IconCard href="/" title="返回首页" icon={<FileTextIcon className="h-6 w-6" />} />
+      </div>
+
+      <SectionCard title="我的报名">
         {registration ? (
-          <p className="text-sm">
-            {registration.type.name} ·
-            <span className="ml-1 text-sky-700">{STATUS_LABEL[registration.status] ?? registration.status}</span>
-          </p>
+          <DataCard
+            title={registration.type.name}
+            meta={STATUS_LABEL[registration.status] ?? registration.status}
+            icon={<ClipboardListIcon className="h-6 w-6" />}
+          />
         ) : (
-          <p className="text-sm text-gray-500">
-            尚未报名。<Link href="/register-conf" className="text-sky-700 hover:underline">去报名</Link>
+          <p className="text-sm text-slate-500">
+            尚未报名。
+            <Link href="/register-conf" className="text-sky-600 hover:underline">
+              去报名
+            </Link>
           </p>
         )}
-      </div>
+      </SectionCard>
 
-      <div className="space-y-2">
-        <h2 className="text-lg font-semibold">我的投稿</h2>
-        {submissions.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            尚无投稿。<Link href="/submissions" className="text-sky-700 hover:underline">去投稿</Link>
-          </p>
-        ) : (
-          <ul className="divide-y rounded border">
-            {submissions.map((s) => (
-              <li key={s.id} className="flex items-center gap-3 px-3 py-2 text-sm">
-                <span className="font-medium">{s.title}</span>
-                <span className="ml-auto text-sky-700">{STATUS_LABEL[s.status] ?? s.status}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <h2 className="text-lg font-semibold">我的酒店预订</h2>
+      <SectionCard title="我的酒店预订">
         {bookings.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            尚无预订。<Link href="/hotels" className="text-sky-700 hover:underline">去预订</Link>
+          <p className="text-sm text-slate-500">
+            尚无预订。
+            <Link href="/hotels" className="text-sky-600 hover:underline">
+              去预订
+            </Link>
           </p>
         ) : (
-          <ul className="divide-y rounded border">
+          <div className="grid gap-3">
             {bookings.map((b) => (
-              <li key={b.id} className="flex items-center gap-3 px-3 py-2 text-sm">
-                <span className="font-medium">{b.hotel.name}</span>
-                <span className="text-gray-400">{b.checkIn} → {b.checkOut} · {b.rooms} 间</span>
-                <span className="ml-auto text-sky-700">{STATUS_LABEL[b.status] ?? b.status}</span>
-              </li>
+              <DataCard
+                key={b.id}
+                title={b.hotel.name}
+                meta={STATUS_LABEL[b.status] ?? b.status}
+                description={`${b.checkIn} → ${b.checkOut} · ${b.rooms} 间`}
+                icon={<HotelIcon className="h-6 w-6" />}
+              />
             ))}
-          </ul>
+          </div>
         )}
-      </div>
-    </section>
+      </SectionCard>
+    </div>
   );
 }

@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import { getSpeakerById } from "@/lib/speakers";
 import RichText from "@/components/RichText";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SectionCard } from "@/components/ui/Card";
+import { UsersIcon } from "@/components/icons";
 
 export default async function SpeakerDetailPage({
   params,
@@ -10,14 +13,27 @@ export default async function SpeakerDetailPage({
   const { id } = await params;
   const s = await getSpeakerById(id);
   if (!s) notFound();
+
   return (
-    <article className="space-y-3">
-      <h1 className="text-2xl font-bold">{s.name}</h1>
-      <p className="text-gray-500">
-        {s.title} · {s.organization}
-        {s.isModerator && " · 主持人"}
-      </p>
-      <RichText html={s.bio} />
-    </article>
+    <div className="space-y-4">
+      <PageHeader title="讲者详情" backHref="/speakers" />
+      <SectionCard>
+        <div className="mb-4 flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
+            <UsersIcon className="h-7 w-7" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">{s.name}</h2>
+            <p className="text-sm text-slate-500">
+              {s.title} · {s.organization}
+              {s.isModerator && <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700">主持人</span>}
+            </p>
+          </div>
+        </div>
+        <div className="prose max-w-none text-slate-600">
+          <RichText html={s.bio} />
+        </div>
+      </SectionCard>
+    </div>
   );
 }

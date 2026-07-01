@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { config } from "@/middleware";
+import { config } from "@/proxy";
 
-test("middleware 仅匹配 /admin", () => {
+test("proxy 仅匹配 /admin", () => {
   expect(config.matcher).toContain("/admin/:path*");
 });

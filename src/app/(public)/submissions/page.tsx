@@ -2,35 +2,46 @@ import { requireUser } from "@/lib/session";
 import { listUserSubmissions } from "@/lib/submissions";
 import SubmissionForm from "@/components/SubmissionForm";
 import { STATUS_LABEL } from "@/lib/labels";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SectionCard, DataCard, IconCard } from "@/components/ui/Card";
+import { FileEditIcon, CalendarIcon, UsersIcon, FileTextIcon } from "@/components/icons";
 
 export default async function SubmissionsPage() {
   const user = await requireUser();
   const subs = await listUserSubmissions(user.id);
+
   return (
-    <section className="space-y-6">
-      <h1 className="text-2xl font-bold">论文提交</h1>
+    <div className="space-y-4">
+      <PageHeader title="论文提交" />
 
-      <div className="space-y-2">
-        <h2 className="text-lg font-semibold">我的投稿</h2>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <IconCard href="/schedule" title="会议日程" icon={<CalendarIcon className="h-6 w-6" />} />
+        <IconCard href="/speakers" title="讲者查询" icon={<UsersIcon className="h-6 w-6" />} />
+        <IconCard href="/register-conf" title="会议报名" icon={<FileTextIcon className="h-6 w-6" />} />
+        <IconCard href="/" title="返回首页" icon={<FileEditIcon className="h-6 w-6" />} />
+      </div>
+
+      <SectionCard title="我的投稿">
         {subs.length === 0 ? (
-          <p className="text-gray-500">暂无投稿。</p>
+          <p className="text-sm text-slate-500">暂无投稿。</p>
         ) : (
-          <ul className="divide-y rounded border">
+          <div className="grid gap-3">
             {subs.map((s) => (
-              <li key={s.id} className="flex items-center gap-3 px-3 py-2 text-sm">
-                <span className="font-medium">{s.title}</span>
-                <span className="text-gray-400">{s.authors}</span>
-                <span className="ml-auto text-sky-700">{STATUS_LABEL[s.status] ?? s.status}</span>
-              </li>
+              <DataCard
+                key={s.id}
+                title={s.title}
+                meta={STATUS_LABEL[s.status] ?? s.status}
+                description={s.authors}
+                icon={<FileEditIcon className="h-6 w-6" />}
+              />
             ))}
-          </ul>
+          </div>
         )}
-      </div>
+      </SectionCard>
 
-      <div className="space-y-2">
-        <h2 className="text-lg font-semibold">提交新论文</h2>
+      <SectionCard title="提交新论文">
         <SubmissionForm />
-      </div>
-    </section>
+      </SectionCard>
+    </div>
   );
 }

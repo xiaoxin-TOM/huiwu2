@@ -1,8 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/password";
-import type { RegisterInput } from "@/lib/validation";
 
-export async function createUser(input: RegisterInput): Promise<{ id: string }> {
+export interface CreateUserInput {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  organization?: string;
+}
+
+export async function createUser(input: CreateUserInput): Promise<{ id: string }> {
   const existing = await prisma.user.findUnique({ where: { email: input.email } });
   if (existing) throw new Error("EMAIL_TAKEN");
   const user = await prisma.user.create({

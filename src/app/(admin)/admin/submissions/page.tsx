@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { listSubmissions } from "@/lib/submissions";
 import { STATUS_LABEL } from "@/lib/labels";
 
@@ -22,7 +23,7 @@ export default async function AdminSubmissionsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">论文管理</h1>
-        <a href="/api/admin/submissions/export" className="text-sm text-sky-700 hover:underline">导出 CSV</a>
+        <Link href="/api/admin/submissions/export" download className="text-sm text-sky-700 hover:underline">导出 CSV</Link>
       </div>
       {subs.length === 0 ? (
         <p className="text-gray-500">暂无投稿。</p>
