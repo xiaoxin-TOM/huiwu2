@@ -24,26 +24,28 @@ export default async function AdminBookingsPage() {
       {bookings.length === 0 ? (
         <p className="text-gray-500">暂无预订。</p>
       ) : (
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b text-left text-gray-500">
-              <th className="py-2">预订人</th><th>酒店</th><th>入住</th><th>离店</th><th>房间</th><th>状态</th><th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bookings.map((b) => (
-              <tr key={b.id} className="border-b">
-                <td className="py-2">{b.user.email}</td>
-                <td>{b.hotel.name}</td>
-                <td>{b.checkIn}</td>
-                <td>{b.checkOut}</td>
-                <td>{b.rooms}</td>
-                <td className="text-sky-700">{STATUS_LABEL[b.status] ?? b.status}</td>
-                <td><ReviewButtons id={b.id} /></td>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b text-left text-gray-500">
+                <th className="py-2">预订人</th><th>酒店</th><th>入住</th><th>离店</th><th>房间</th><th>状态</th><th>操作</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {bookings.map((b) => (
+                <tr key={b.id} className="border-b">
+                  <td className="py-2">{b.user.email}</td>
+                  <td>{b.hotel.name}</td>
+                  <td>{b.checkIn}</td>
+                  <td>{b.checkOut}</td>
+                  <td>{b.rooms}</td>
+                  <td className="text-sky-700">{STATUS_LABEL[b.status] ?? b.status}</td>
+                  <td><ReviewButtons id={b.id} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

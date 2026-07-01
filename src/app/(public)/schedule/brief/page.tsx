@@ -11,7 +11,7 @@ export default async function BriefSchedulePage() {
         <ul className="divide-y">
           {sessions.map((s) => (
             <li key={s.id} className="flex gap-4 py-2 text-sm">
-              <span className="w-44 shrink-0 text-gray-500">
+              <span className="w-32 shrink-0 text-gray-500 sm:w-44">
                 {s.day} {s.startTime}–{s.endTime}
               </span>
               <span className="font-medium">{s.title}</span>
