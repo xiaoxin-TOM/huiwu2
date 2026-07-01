@@ -16,9 +16,9 @@ export default async function SpeakersPage({
           name="q"
           defaultValue={q}
           placeholder="按姓名或单位搜索"
-          className="rounded border px-3 py-1.5 text-sm"
+          className="rounded border px-3 py-2 text-sm"
         />
-        <button type="submit" className="rounded bg-sky-700 px-3 py-1.5 text-sm text-white">
+        <button type="submit" className="rounded bg-sky-700 px-3 py-2 text-sm text-white">
           搜索
         </button>
       </form>
