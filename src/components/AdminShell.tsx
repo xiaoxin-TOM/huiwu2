@@ -22,7 +22,7 @@ export default function AdminShell({
           type="button"
           aria-label="打开菜单"
           onClick={() => setOpen(true)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded hover:bg-gray-800"
+          className="inline-flex h-11 w-11 items-center justify-center rounded hover:bg-gray-800"
         >
           <span className="text-2xl leading-none">☰</span>
         </button>
