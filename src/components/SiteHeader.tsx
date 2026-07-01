@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import MobileNav from "@/components/MobileNav";
 
 const NAV = [
   { href: "/", label: "首页" },
@@ -18,23 +19,29 @@ const NAV = [
 
 export default async function SiteHeader() {
   const session = await auth();
+  const accountHref = session?.user ? "/me" : "/login";
+  const accountLabel = session?.user ? "个人中心" : "登录 / 注册";
+
   return (
-    <header className="border-b bg-white">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
-        <Link href="/" className="font-bold text-lg text-sky-700">会务系统</Link>
-        <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+    <header className="relative border-b bg-white">
+      <div className="mx-auto flex max-w-6xl items-center gap-x-4 px-4 py-3">
+        <Link href="/" className="text-lg font-bold text-sky-700">会务系统</Link>
+
+        {/* 桌面导航 */}
+        <nav className="hidden flex-wrap gap-x-4 gap-y-1 text-sm md:flex">
           {NAV.map((n) => (
             <Link key={n.href} href={n.href} className="text-gray-700 hover:text-sky-700">
               {n.label}
             </Link>
           ))}
         </nav>
-        <div className="ml-auto text-sm">
-          {session?.user ? (
-            <Link href="/me" className="text-sky-700">个人中心</Link>
-          ) : (
-            <Link href="/login" className="text-sky-700">登录 / 注册</Link>
-          )}
+        <div className="ml-auto hidden text-sm md:block">
+          <Link href={accountHref} className="text-sky-700">{accountLabel}</Link>
+        </div>
+
+        {/* 移动端汉堡 */}
+        <div className="ml-auto md:hidden">
+          <MobileNav items={NAV} accountHref={accountHref} accountLabel={accountLabel} />
         </div>
       </div>
     </header>
