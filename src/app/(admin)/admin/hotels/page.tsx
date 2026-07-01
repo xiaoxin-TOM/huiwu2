@@ -20,31 +20,33 @@ export default async function AdminHotelsPage() {
       {hotels.length === 0 ? (
         <p className="text-gray-500">暂无酒店。</p>
       ) : (
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b text-left text-gray-500">
-              <th className="py-2">名称</th><th>价格</th><th>地址</th><th>距离</th><th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {hotels.map((h) => (
-              <tr key={h.id} className="border-b">
-                <td className="py-2">{h.name}</td>
-                <td>¥{h.price}</td>
-                <td>{h.address}</td>
-                <td>{h.distance}</td>
-                <td className="py-2">
-                  <div className="flex gap-2">
-                    <Link href={`/admin/hotels/${h.id}`} className="text-sky-700 hover:underline">编辑</Link>
-                    <form action={`/api/admin/hotels/${h.id}/delete`} method="post">
-                      <button type="submit" className="text-red-600 hover:underline">删除</button>
-                    </form>
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b text-left text-gray-500">
+                <th className="py-2">名称</th><th>价格</th><th>地址</th><th>距离</th><th>操作</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {hotels.map((h) => (
+                <tr key={h.id} className="border-b">
+                  <td className="py-2">{h.name}</td>
+                  <td>¥{h.price}</td>
+                  <td>{h.address}</td>
+                  <td>{h.distance}</td>
+                  <td className="py-2">
+                    <div className="flex gap-2">
+                      <Link href={`/admin/hotels/${h.id}`} className="text-sky-700 hover:underline">编辑</Link>
+                      <form action={`/api/admin/hotels/${h.id}/delete`} method="post">
+                        <button type="submit" className="text-red-600 hover:underline">删除</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
