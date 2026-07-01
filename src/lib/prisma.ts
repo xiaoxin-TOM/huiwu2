@@ -1,9 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 function createPrismaClient(): PrismaClient {
-  const url = process.env.DATABASE_URL ?? "file:./dev.db";
-  const adapter = new PrismaLibSql({ url });
+  const connectionString =
+    process.env.DATABASE_URL ??
+    "postgresql://postgres:postgres@localhost:5432/huiwu_dev";
+  const adapter = new PrismaPg({ connectionString });
   return new PrismaClient({ adapter });
 }
 
