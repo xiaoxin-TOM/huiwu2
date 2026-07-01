@@ -34,7 +34,7 @@ export function validateImage(file: { type: string; size: number }): string | nu
 }
 
 export async function saveImage(file: File): Promise<string> {
-  const ext = IMAGE_EXT[file.type] ?? "bin";
+  const ext = IMAGE_EXT[file.type];
   const dir = path.join(process.cwd(), "public", "uploads", "images");
   await mkdir(dir, { recursive: true });
   const name = `${randomUUID()}.${ext}`;

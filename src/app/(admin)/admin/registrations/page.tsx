@@ -1,10 +1,5 @@
 import { listRegistrations } from "@/lib/registrations";
-
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "待审核",
-  APPROVED: "已通过",
-  REJECTED: "未通过",
-};
+import { STATUS_LABEL } from "@/lib/labels";
 
 function ReviewButtons({ id }: { id: string }) {
   return (
@@ -25,7 +20,10 @@ export default async function AdminRegistrationsPage() {
   const regs = await listRegistrations();
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">报名管理</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">报名管理</h1>
+        <a href="/api/admin/registrations/export" className="text-sm text-sky-700 hover:underline">导出 CSV</a>
+      </div>
       {regs.length === 0 ? (
         <p className="text-gray-500">暂无报名。</p>
       ) : (

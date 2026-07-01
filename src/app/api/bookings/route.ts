@@ -8,6 +8,7 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ ok: false, error: "请先登录" }, { status: 401 });
 
   const body = await req.json().catch(() => null);
+  if (!body) return NextResponse.json({ ok: false, error: "参数错误" }, { status: 400 });
   const parsed = bookingSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

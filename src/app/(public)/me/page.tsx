@@ -3,12 +3,7 @@ import { requireUser } from "@/lib/session";
 import { getUserRegistration } from "@/lib/registrations";
 import { listUserSubmissions } from "@/lib/submissions";
 import { listUserBookings } from "@/lib/bookings";
-
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "待审核",
-  APPROVED: "已通过",
-  REJECTED: "未通过",
-};
+import { STATUS_LABEL } from "@/lib/labels";
 
 export default async function MePage() {
   const user = await requireUser();
@@ -59,7 +54,7 @@ export default async function MePage() {
         <h2 className="text-lg font-semibold">我的酒店预订</h2>
         {bookings.length === 0 ? (
           <p className="text-sm text-gray-500">
-            尚无预订。<a href="/hotels" className="text-sky-700 hover:underline">去预订</a>
+            尚无预订。<Link href="/hotels" className="text-sky-700 hover:underline">去预订</Link>
           </p>
         ) : (
           <ul className="divide-y rounded border">

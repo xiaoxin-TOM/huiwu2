@@ -47,3 +47,59 @@ export const albumSchema = z.object({
   title: z.string().min(1, "请填写相册标题"),
   date: z.string().min(1, "请填写日期"),
 });
+
+export const siteConfigSchema = z.object({
+  confName: z.string().min(1, "请填写会议名称"),
+  confDate: z.string().optional().default(""),
+  confLocation: z.string().optional().default(""),
+  logoUrl: z.string().optional().default(""),
+  liveUrl: z.string().optional().default(""),
+  welcomeHtml: z.string().optional().default(""),
+});
+
+export const noticeSchema = z.object({
+  title: z.string().min(1, "请填写标题"),
+  contentHtml: z.string().optional().default(""),
+  isPublished: z.boolean(),
+});
+
+export const pageSchema = z.object({
+  title: z.string().min(1, "请填写标题"),
+  contentHtml: z.string().optional().default(""),
+});
+
+export const speakerSchema = z.object({
+  name: z.string().min(1, "请填写姓名"),
+  title: z.string().optional().default(""),
+  organization: z.string().optional().default(""),
+  bio: z.string().optional().default(""),
+  photoUrl: z.string().optional().default(""),
+  isModerator: z.boolean(),
+});
+
+export const sessionSchema = z.object({
+  day: z.string().min(1, "请填写日期"),
+  startTime: z.string().min(1, "请填写开始时间"),
+  endTime: z.string().min(1, "请填写结束时间"),
+  room: z.string().optional().default(""),
+  title: z.string().min(1, "请填写标题"),
+  isBrief: z.boolean(),
+});
+
+export const sessionSpeakerSchema = z.object({
+  speakerId: z.string().min(1, "请选择讲者"),
+  role: z.enum(["SPEAKER", "MODERATOR"]),
+});
+
+export const hotelSchema = z.object({
+  name: z.string().min(1, "请填写酒店名称"),
+  description: z.string().optional().default(""),
+  price: z.coerce.number().int().min(0, "价格不能为负"),
+  address: z.string().optional().default(""),
+  imageUrl: z.string().optional().default(""),
+  distance: z.string().optional().default(""),
+});
+
+export const roleSchema = z.object({
+  role: z.enum(["USER", "ADMIN"]),
+});

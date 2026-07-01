@@ -3,12 +3,7 @@ import { requireUser } from "@/lib/session";
 import { getUserRegistration } from "@/lib/registrations";
 import { prisma } from "@/lib/prisma";
 import RegistrationForm from "@/components/RegistrationForm";
-
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "待审核",
-  APPROVED: "已通过",
-  REJECTED: "未通过",
-};
+import { STATUS_LABEL } from "@/lib/labels";
 
 export default async function RegisterConfPage() {
   const user = await requireUser();

@@ -14,3 +14,7 @@ test("拒绝非图片类型", () => {
 test("拒绝超过 5MB", () => {
   expect(validateImage({ type: "image/jpeg", size: 6 * 1024 * 1024 })).toBe("图片不能超过 5MB");
 });
+
+test("正好 5MB 通过", () => {
+  expect(validateImage({ type: "image/jpeg", size: 5 * 1024 * 1024 })).toBeNull();
+});
