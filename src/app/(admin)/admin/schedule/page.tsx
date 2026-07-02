@@ -13,9 +13,6 @@ export default async function AdminSchedulePage() {
         <input name="endTime" placeholder="结束 10:00" required className="rounded border px-2 py-1.5 text-sm" />
         <input name="room" placeholder="会场" className="rounded border px-2 py-1.5 text-sm" />
         <input name="title" placeholder="场次标题" required className="rounded border px-2 py-1.5 text-sm sm:col-span-2" />
-        <label className="flex items-center gap-2 text-sm text-gray-600">
-          <input type="checkbox" name="isBrief" /> 进简明日程
-        </label>
         <button type="submit" className="rounded bg-sky-700 px-3 py-1.5 text-sm text-white">新建场次</button>
       </form>
 

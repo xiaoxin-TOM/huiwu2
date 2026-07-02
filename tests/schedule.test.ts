@@ -9,7 +9,6 @@ function sess(p: Partial<SessionWithSpeakers>): SessionWithSpeakers {
     endTime: p.endTime ?? "10:00",
     room: p.room ?? "主会场",
     title: p.title ?? "场次",
-    isBrief: p.isBrief ?? false,
     speakers: p.speakers ?? [],
   };
 }

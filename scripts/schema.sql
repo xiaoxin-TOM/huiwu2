@@ -111,7 +111,6 @@ CREATE TABLE "Session" (
     "endTime" TEXT NOT NULL,
     "room" TEXT NOT NULL DEFAULT '',
     "title" TEXT NOT NULL,
-    "isBrief" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
 );

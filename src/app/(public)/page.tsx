@@ -12,7 +12,6 @@ import {
   PhoneIcon,
   FileTextIcon,
   HotelIcon,
-  BookmarkIcon,
 } from "@/components/icons";
 
 const FEATURES = [
@@ -25,7 +24,6 @@ const FEATURES = [
   { href: "/live", label: "现场直播", icon: VideoIcon },
   { href: "/hotels", label: "酒店预订", icon: HotelIcon },
   { href: "/contact", label: "联系我们", icon: PhoneIcon },
-  { href: "/schedule/brief", label: "简明日程", icon: BookmarkIcon },
 ];
 
 export default async function HomePage() {

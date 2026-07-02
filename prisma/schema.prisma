@@ -114,7 +114,6 @@ model Session {
   endTime   String
   room      String           @default("")
   title     String
-  isBrief   Boolean          @default(false)
   speakers  SessionSpeaker[]
 }
 

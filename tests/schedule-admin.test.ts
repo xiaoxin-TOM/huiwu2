@@ -27,17 +27,16 @@ afterAll(async () => {
 test("建场次→改→指派讲者→读→撤销→删", async () => {
   const sess = await createSession({
     day: "2026-09-18", startTime: "09:00", endTime: "10:00",
-    room: "主会场", title: "测试场次", isBrief: true,
+    room: "主会场", title: "测试场次",
   });
   sessionIds.push(sess.id);
   expect(sess.title).toBe("测试场次");
 
   const up = await updateSession(sess.id, {
     day: "2026-09-18", startTime: "09:00", endTime: "10:30",
-    room: "主会场", title: "测试场次改", isBrief: false,
+    room: "主会场", title: "测试场次改",
   });
   expect(up.endTime).toBe("10:30");
-  expect(up.isBrief).toBe(false);
 
   await addSessionSpeaker(sess.id, speakerId, "SPEAKER");
   const full = await getSessionAdmin(sess.id);

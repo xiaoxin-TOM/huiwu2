@@ -20,9 +20,6 @@ export default async function EditSessionPage({ params }: { params: Promise<{ id
         </div>
         <input name="room" defaultValue={sess.room} placeholder="会场" className="w-full rounded border px-3 py-2" />
         <input name="title" required defaultValue={sess.title} placeholder="标题" className="w-full rounded border px-3 py-2" />
-        <label className="flex items-center gap-2 text-sm text-gray-600">
-          <input type="checkbox" name="isBrief" defaultChecked={sess.isBrief} /> 进简明日程
-        </label>
         <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-white">保存场次</button>
       </form>
 

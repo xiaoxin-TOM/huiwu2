@@ -16,7 +16,6 @@ export async function POST(req: Request) {
     endTime: form?.get("endTime") ?? "",
     room: form?.get("room") ?? "",
     title: form?.get("title") ?? "",
-    isBrief: form?.get("isBrief") === "on",
   });
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });

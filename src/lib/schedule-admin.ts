@@ -8,7 +8,6 @@ type SessionData = {
   endTime: string;
   room: string;
   title: string;
-  isBrief: boolean;
 };
 
 const include = { speakers: { include: { speaker: true } } } as const;

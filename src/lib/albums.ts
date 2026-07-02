@@ -1,17 +1,18 @@
 import { prisma } from "@/lib/prisma";
+import type { Album, Photo } from "@prisma/client";
 
-export function listAlbums() {
+export function listAlbums(): Promise<Album[]> {
   return prisma.album.findMany({ orderBy: { date: "desc" } });
 }
 
-export function listAlbumsAdmin() {
+export function listAlbumsAdmin(): Promise<(Album & { photos: Photo[] })[]> {
   return prisma.album.findMany({
     orderBy: { date: "desc" },
     include: { photos: { orderBy: { createdAt: "asc" } } },
   });
 }
 
-export function getAlbum(id: string) {
+export function getAlbum(id: string): Promise<(Album & { photos: Photo[] }) | null> {
   return prisma.album.findUnique({
     where: { id },
     include: { photos: { orderBy: { createdAt: "asc" } } },

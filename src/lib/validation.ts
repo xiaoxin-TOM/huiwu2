@@ -85,7 +85,6 @@ export const sessionSchema = z.object({
   endTime: z.string().min(1, "请填写结束时间"),
   room: z.string().optional().default(""),
   title: z.string().min(1, "请填写标题"),
-  isBrief: z.boolean(),
 });
 
 export const sessionSpeakerSchema = z.object({

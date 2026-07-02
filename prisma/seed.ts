@@ -95,17 +95,17 @@ async function main() {
   const sessions = [
     {
       day: "2026-09-18", startTime: "09:00", endTime: "09:30",
-      room: "主会场", title: "开幕式", isBrief: true,
+      room: "主会场", title: "开幕式",
       links: wang ? [{ speakerId: wang.id, role: "MODERATOR" }] : [],
     },
     {
       day: "2026-09-18", startTime: "09:30", endTime: "10:30",
-      room: "主会场", title: "主旨报告:人工智能前沿", isBrief: true,
+      room: "主会场", title: "主旨报告:人工智能前沿",
       links: zhang ? [{ speakerId: zhang.id, role: "SPEAKER" }] : [],
     },
     {
       day: "2026-09-19", startTime: "14:00", endTime: "15:00",
-      room: "分会场 A", title: "材料科学分论坛", isBrief: false,
+      room: "分会场 A", title: "材料科学分论坛",
       links: li ? [{ speakerId: li.id, role: "SPEAKER" }] : [],
     },
   ];

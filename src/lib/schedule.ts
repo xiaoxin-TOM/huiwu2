@@ -42,11 +42,3 @@ export function getDetailedSessions(): Promise<SessionWithSpeakers[]> {
     orderBy: [{ day: "asc" }, { startTime: "asc" }],
   });
 }
-
-export function getBriefSessions(): Promise<SessionWithSpeakers[]> {
-  return prisma.session.findMany({
-    where: { isBrief: true },
-    include,
-    orderBy: [{ day: "asc" }, { startTime: "asc" }],
-  });
-}
