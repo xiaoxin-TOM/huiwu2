@@ -49,6 +49,13 @@ export const albumSchema = z.object({
   date: z.string().min(1, "请填写日期"),
 });
 
+const coordField = (min: number, max: number, msg: string) =>
+  z.string().optional().default("").refine((v) => {
+    if (v === "") return true;
+    const n = Number(v);
+    return Number.isFinite(n) && n >= min && n <= max;
+  }, msg);
+
 export const siteConfigSchema = z.object({
   confName: z.string().min(1, "请填写会议名称"),
   confDate: z.string().optional().default(""),
@@ -57,6 +64,10 @@ export const siteConfigSchema = z.object({
   liveUrl: z.string().optional().default(""),
   welcomeHtml: z.string().optional().default(""),
   footerHtml: z.string().optional().default(""),
+  venueName: z.string().optional().default(""),
+  venueAddress: z.string().optional().default(""),
+  venueLng: coordField(-180, 180, "经度无效(-180~180)"),
+  venueLat: coordField(-90, 90, "纬度无效(-90~90)"),
 });
 
 export const noticeSchema = z.object({
