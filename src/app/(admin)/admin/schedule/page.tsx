@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { listSessionsAdmin } from "@/lib/schedule-admin";
+import { getAllSpeakers } from "@/lib/speakers";
+import { SessionSpeakerFields } from "@/components/SessionSpeakerFields";
 
 export default async function AdminSchedulePage() {
-  const sessions = await listSessionsAdmin();
+  const [sessions, speakers] = await Promise.all([listSessionsAdmin(), getAllSpeakers()]);
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">日程管理</h1>
@@ -12,7 +14,8 @@ export default async function AdminSchedulePage() {
         <input name="startTime" placeholder="开始 09:00" required className="rounded border px-2 py-1.5 text-sm" />
         <input name="endTime" placeholder="结束 10:00" required className="rounded border px-2 py-1.5 text-sm" />
         <input name="room" placeholder="会场" className="rounded border px-2 py-1.5 text-sm" />
-        <input name="title" placeholder="场次标题" required className="rounded border px-2 py-1.5 text-sm sm:col-span-2" />
+        <input name="title" placeholder="场次标题" required className="rounded border px-2 py-1.5 text-sm sm:col-span-3" />
+        <SessionSpeakerFields speakers={speakers} />
         <button type="submit" className="rounded bg-sky-700 px-3 py-1.5 text-sm text-white">新建场次</button>
       </form>
 

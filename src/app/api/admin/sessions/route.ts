@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { sessionSchema } from "@/lib/validation";
-import { createSession } from "@/lib/schedule-admin";
+import { createSessionWithSpeakers } from "@/lib/schedule-admin";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -20,8 +20,20 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
   }
+
+  const speakerIds = form?.getAll("speakerId") ?? [];
+  const roles = form?.getAll("role") ?? [];
+  const links: { speakerId: string; role: string }[] = [];
+  for (let i = 0; i < speakerIds.length; i++) {
+    const speakerId = String(speakerIds[i] ?? "");
+    const role = String(roles[i] ?? "");
+    if (speakerId && (role === "SPEAKER" || role === "MODERATOR")) {
+      links.push({ speakerId, role });
+    }
+  }
+
   try {
-    await createSession(parsed.data);
+    await createSessionWithSpeakers(parsed.data, links);
   } catch {
     return NextResponse.json({ ok: false, error: "创建失败" }, { status: 500 });
   }

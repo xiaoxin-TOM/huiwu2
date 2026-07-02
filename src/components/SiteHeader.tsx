@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
@@ -10,11 +11,15 @@ export default async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link
-          href="/"
-          className="rounded-md bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-lg font-bold text-transparent"
-        >
-          会务系统
+        <Link href="/" className="rounded-md">
+          <Image
+            src="/imgs/hwttupian.png"
+            alt="会务系统"
+            width={600}
+            height={602}
+            className="h-10 w-auto object-contain"
+            priority
+          />
         </Link>
 
         <div className="flex items-center gap-2 text-sm">

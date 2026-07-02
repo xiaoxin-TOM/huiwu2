@@ -27,6 +27,32 @@ export function createSession(data: SessionData) {
   return prisma.session.create({ data });
 }
 
+export async function createSessionWithSpeakers(
+  data: SessionData,
+  links: { speakerId: string; role: string }[],
+) {
+  return prisma.$transaction(async (tx) => {
+    const session = await tx.session.create({ data });
+    if (links.length > 0) {
+      const seen = new Set<string>();
+      const uniqueLinks = links.filter((l) => {
+        const key = `${l.speakerId}-${l.role}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      await tx.sessionSpeaker.createMany({
+        data: uniqueLinks.map((l) => ({
+          sessionId: session.id,
+          speakerId: l.speakerId,
+          role: l.role,
+        })),
+      });
+    }
+    return session;
+  });
+}
+
 export function updateSession(id: string, data: SessionData) {
   return prisma.session.update({ where: { id }, data });
 }
