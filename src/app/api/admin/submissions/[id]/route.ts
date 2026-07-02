@@ -20,5 +20,5 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/submissio
   } catch {
     return NextResponse.json({ ok: false, error: "操作失败" }, { status: 400 });
   }
-  return NextResponse.redirect(new URL("/admin/submissions", req.url), { status: 303 });
+  return NextResponse.redirect("/admin/submissions", { status: 303 });
 }

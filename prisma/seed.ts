@@ -12,6 +12,7 @@ async function main() {
       confLocation: "北京国际会议中心",
       welcomeHtml: "<p>欢迎参加本次大会。</p>",
       contactHtml: "<p>会务组电话:010-00000000</p>",
+      footerHtml: "© 2026 会务管理系统 · All rights reserved.\n中国医院协会 版权所有\n技术支持由位值科技有限公司提供",
       liveUrl: "https://www.bilibili.com/",
     },
   });

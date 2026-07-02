@@ -30,6 +30,10 @@ export default async function AdminSitePage() {
           <textarea name="welcomeHtml" rows={6} defaultValue={cfg?.welcomeHtml ?? ""}
             className="mt-1 w-full rounded border px-3 py-2 text-sm" />
         </label>
+        <label className="block text-sm text-gray-600">页脚内容（纯文本，每行一段）
+          <textarea name="footerHtml" rows={4} defaultValue={cfg?.footerHtml ?? ""}
+            className="mt-1 w-full rounded border px-3 py-2 text-sm" />
+        </label>
         <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-white">保存</button>
       </form>
     </div>

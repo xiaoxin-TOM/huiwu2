@@ -11,6 +11,7 @@ export function updateSiteConfig(data: {
   logoUrl: string;
   liveUrl: string;
   welcomeHtml: string;
+  footerHtml: string;
 }) {
   return prisma.siteConfig.upsert({
     where: { id: 1 },

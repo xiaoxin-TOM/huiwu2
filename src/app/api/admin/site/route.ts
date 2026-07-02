@@ -21,6 +21,7 @@ export async function POST(req: Request) {
     logoUrl: g("logoUrl"),
     liveUrl: g("liveUrl"),
     welcomeHtml: g("welcomeHtml"),
+    footerHtml: g("footerHtml"),
   });
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
@@ -30,5 +31,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });
   }
-  return NextResponse.redirect(new URL("/admin/site", req.url), { status: 303 });
+  let redirectTo = form?.get("redirectTo")?.toString() ?? "/admin/site";
+  if (!redirectTo.startsWith("/")) redirectTo = "/admin/site";
+  return NextResponse.redirect(redirectTo, { status: 303 });
 }

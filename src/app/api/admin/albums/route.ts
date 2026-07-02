@@ -19,5 +19,5 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: "创建失败" }, { status: 500 });
   }
-  return NextResponse.redirect(new URL("/admin/albums", req.url), { status: 303 });
+  return NextResponse.redirect("/admin/albums", { status: 303 });
 }

@@ -56,6 +56,7 @@ export const siteConfigSchema = z.object({
   logoUrl: z.string().optional().default(""),
   liveUrl: z.string().optional().default(""),
   welcomeHtml: z.string().optional().default(""),
+  footerHtml: z.string().optional().default(""),
 });
 
 export const noticeSchema = z.object({

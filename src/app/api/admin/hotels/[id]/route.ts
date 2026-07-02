@@ -27,5 +27,5 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/hotels/[i
   } catch {
     return NextResponse.json({ ok: false, error: "更新失败" }, { status: 400 });
   }
-  return NextResponse.redirect(new URL("/admin/hotels", req.url), { status: 303 });
+  return NextResponse.redirect("/admin/hotels", { status: 303 });
 }

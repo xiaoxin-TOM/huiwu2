@@ -39,6 +39,7 @@ model SiteConfig {
   welcomeHtml  String   @default("")
   liveUrl      String?
   contactHtml  String   @default("")
+  footerHtml   String   @default("")
   updatedAt    DateTime @updatedAt
 }
 
