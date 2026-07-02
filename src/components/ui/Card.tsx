@@ -12,6 +12,7 @@ export interface IconCardProps {
   subtitle?: string;
   className?: string;
   variant?: "default" | "compact" | "large";
+  bgImage?: string;
 }
 
 export function IconCard({
@@ -22,9 +23,12 @@ export function IconCard({
   subtitle,
   className = "",
   variant = "default",
+  bgImage,
 }: IconCardProps) {
-  const base =
-    "group flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-white p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]";
+  const hasImage = Boolean(bgImage);
+  const base = hasImage
+    ? "group relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-100/50 p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
+    : "group flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-white p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]";
 
   const sizes = {
     compact: "gap-2 p-4",
@@ -46,14 +50,32 @@ export function IconCard({
 
   const content = (
     <>
+      {hasImage && (
+        <>
+          <span
+            className="pointer-events-none absolute inset-0 bg-no-repeat"
+            style={{ backgroundImage: `url('${bgImage}')`, backgroundSize: "100% 100%", backgroundPosition: "center" }}
+            aria-hidden="true"
+          />
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/30 to-sky-50/20" aria-hidden="true" />
+        </>
+      )}
       <div
-        className={`flex items-center justify-center rounded-xl bg-sky-100 text-sky-600 transition group-hover:bg-sky-600 group-hover:text-white ${iconSizes[variant]}`}
+        className={`relative z-10 flex items-center justify-center rounded-xl transition ${
+          hasImage
+            ? "bg-sky-600/90 text-white shadow-sm group-hover:scale-105"
+            : "bg-sky-100 text-sky-600 group-hover:bg-sky-600 group-hover:text-white"
+        } ${iconSizes[variant]}`}
       >
         {icon}
       </div>
-      <div className="min-w-0">
-        <div className={`font-semibold text-slate-700 ${titleSizes[variant]}`}>{title}</div>
-        {subtitle && <div className="mt-1 text-xs text-slate-400">{subtitle}</div>}
+      <div className="relative z-10 min-w-0">
+        <div className={`font-bold leading-snug ${hasImage ? "text-sky-700" : "text-slate-700"} ${titleSizes[variant]}`}>
+          {title}
+        </div>
+        {subtitle && (
+          <div className={`mt-1 text-xs ${hasImage ? "text-sky-600/80 drop-shadow-sm" : "text-slate-400"}`}>{subtitle}</div>
+        )}
       </div>
     </>
   );

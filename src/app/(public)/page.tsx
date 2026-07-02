@@ -48,7 +48,7 @@ export default async function HomePage() {
         <h2 className="mb-4 text-lg font-bold text-slate-800">会议服务</h2>
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
           {FEATURES.map(({ href, label, icon: Icon }) => (
-            <IconCard key={href + label} href={href} title={label} icon={<Icon className="h-6 w-6" />} variant="default" />
+            <IconCard key={href + label} href={href} title={label} icon={<Icon className="h-6 w-6" />} variant="default" bgImage="/imgs/anbg.png" />
           ))}
         </div>
       </section>
