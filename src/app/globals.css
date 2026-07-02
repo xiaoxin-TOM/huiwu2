@@ -36,17 +36,17 @@
   --color-brand-navy: var(--brand-navy);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+/* 微信等环境可能强制深色模式，确保输入框文字始终为黑色 */
+input,
+textarea,
+select {
+  color: #000000 !important;
 }
 
 /* Smooth scrolling for anchor links */
