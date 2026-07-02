@@ -23,31 +23,33 @@ export default async function AdminSpeakersPage() {
       {speakers.length === 0 ? (
         <p className="text-gray-500">暂无讲者。</p>
       ) : (
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b text-left text-gray-500">
-              <th className="py-2">姓名</th><th>职称</th><th>单位</th><th>角色</th><th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {speakers.map((s) => (
-              <tr key={s.id} className="border-b">
-                <td className="py-2">{s.name}</td>
-                <td>{s.title}</td>
-                <td>{s.organization}</td>
-                <td>{s.isModerator ? "主持人" : "讲者"}</td>
-                <td className="py-2">
-                  <div className="flex gap-2">
-                    <Link href={`/admin/speakers/${s.id}`} className="text-sky-700 hover:underline">编辑</Link>
-                    <form action={`/api/admin/speakers/${s.id}/delete`} method="post">
-                      <button type="submit" className="text-red-600 hover:underline">删除</button>
-                    </form>
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b text-left text-gray-500">
+                <th className="py-2">姓名</th><th>职称</th><th>单位</th><th>角色</th><th>操作</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {speakers.map((s) => (
+                <tr key={s.id} className="border-b">
+                  <td className="py-2">{s.name}</td>
+                  <td>{s.title}</td>
+                  <td>{s.organization}</td>
+                  <td>{s.isModerator ? "主持人" : "讲者"}</td>
+                  <td className="py-2">
+                    <div className="flex gap-2">
+                      <Link href={`/admin/speakers/${s.id}`} className="text-sky-700 hover:underline">编辑</Link>
+                      <form action={`/api/admin/speakers/${s.id}/delete`} method="post">
+                        <button type="submit" className="text-red-600 hover:underline">删除</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

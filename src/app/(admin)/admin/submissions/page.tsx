@@ -28,31 +28,33 @@ export default async function AdminSubmissionsPage() {
       {subs.length === 0 ? (
         <p className="text-gray-500">暂无投稿。</p>
       ) : (
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b text-left text-gray-500">
-              <th className="py-2">题目</th><th>作者</th><th>提交人</th><th>PDF</th><th>状态</th><th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {subs.map((s) => (
-              <tr key={s.id} className="border-b align-top">
-                <td className="py-2">{s.title}</td>
-                <td>{s.authors}</td>
-                <td>{s.user.email}</td>
-                <td>
-                  {s.fileUrl ? (
-                    <a href={s.fileUrl} target="_blank" rel="noreferrer" className="text-sky-700 hover:underline">下载</a>
-                  ) : (
-                    <span className="text-gray-400">无</span>
-                  )}
-                </td>
-                <td className="text-sky-700">{STATUS_LABEL[s.status] ?? s.status}</td>
-                <td><ReviewButtons id={s.id} /></td>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b text-left text-gray-500">
+                <th className="py-2">题目</th><th>作者</th><th>提交人</th><th>PDF</th><th>状态</th><th>操作</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {subs.map((s) => (
+                <tr key={s.id} className="border-b align-top">
+                  <td className="py-2">{s.title}</td>
+                  <td>{s.authors}</td>
+                  <td>{s.user.email}</td>
+                  <td>
+                    {s.fileUrl ? (
+                      <a href={s.fileUrl} target="_blank" rel="noreferrer" className="text-sky-700 hover:underline">下载</a>
+                    ) : (
+                      <span className="text-gray-400">无</span>
+                    )}
+                  </td>
+                  <td className="text-sky-700">{STATUS_LABEL[s.status] ?? s.status}</td>
+                  <td><ReviewButtons id={s.id} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
