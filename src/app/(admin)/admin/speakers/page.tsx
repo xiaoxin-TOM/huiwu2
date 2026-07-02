@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllSpeakers } from "@/lib/speakers";
+import AdminForm from "@/components/AdminForm";
 
 export default async function AdminSpeakersPage() {
   const speakers = await getAllSpeakers();
@@ -7,7 +8,7 @@ export default async function AdminSpeakersPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">讲者管理</h1>
 
-      <form action="/api/admin/speakers" method="post" className="space-y-2 rounded border p-4">
+      <AdminForm action="/api/admin/speakers" redirectTo="/admin/speakers" className="space-y-2 rounded border p-4">
         <h2 className="font-medium">新建讲者</h2>
         <input name="name" required placeholder="姓名" className="w-full rounded border px-3 py-2" />
         <input name="title" placeholder="职称" className="w-full rounded border px-3 py-2" />
@@ -18,7 +19,7 @@ export default async function AdminSpeakersPage() {
           <input type="checkbox" name="isModerator" /> 主持人
         </label>
         <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-sm text-white">新建</button>
-      </form>
+      </AdminForm>
 
       {speakers.length === 0 ? (
         <p className="text-gray-500">暂无讲者。</p>
@@ -40,9 +41,9 @@ export default async function AdminSpeakersPage() {
                   <td className="py-2">
                     <div className="flex gap-2">
                       <Link href={`/admin/speakers/${s.id}`} className="text-sky-700 hover:underline">编辑</Link>
-                      <form action={`/api/admin/speakers/${s.id}/delete`} method="post">
+                      <AdminForm action={`/api/admin/speakers/${s.id}/delete`} redirectTo="/admin/speakers">
                         <button type="submit" className="text-red-600 hover:underline">删除</button>
-                      </form>
+                      </AdminForm>
                     </div>
                   </td>
                 </tr>

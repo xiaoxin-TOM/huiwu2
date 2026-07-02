@@ -1,6 +1,7 @@
 import { listAlbumsAdmin } from "@/lib/albums";
 import AlbumPhotoUpload from "@/components/AlbumPhotoUpload";
 import DeleteAlbumButton from "@/components/DeleteAlbumButton";
+import AdminForm from "@/components/AdminForm";
 import { PlusIcon, TrashIcon } from "@/components/icons";
 
 export default async function AdminAlbumsPage() {
@@ -11,7 +12,7 @@ export default async function AdminAlbumsPage() {
         <h1 className="text-xl font-bold text-admin-text">图片直播管理</h1>
       </div>
 
-      <form action="/api/admin/albums" method="post" className="rounded-xl bg-white p-5 shadow-sm">
+      <AdminForm action="/api/admin/albums" redirectTo="/admin/albums" className="rounded-xl bg-white p-5 shadow-sm">
         <h2 className="mb-4 text-lg font-semibold text-slate-800">新建相册</h2>
         <div className="flex flex-wrap items-end gap-3">
           <label className="block text-sm text-slate-600">
@@ -39,7 +40,7 @@ export default async function AdminAlbumsPage() {
             新建相册
           </button>
         </div>
-      </form>
+      </AdminForm>
 
       {albums.length === 0 ? (
         <p className="text-slate-500">暂无相册。</p>
@@ -65,7 +66,7 @@ export default async function AdminAlbumsPage() {
                     alt={p.caption}
                     className="h-24 w-full rounded-lg object-cover"
                   />
-                  <form action={`/api/admin/photos/${p.id}/delete`} method="post">
+                  <AdminForm action={`/api/admin/photos/${p.id}/delete`} redirectTo="/admin/albums">
                     <button
                       type="submit"
                       className="flex w-full items-center justify-center gap-1 rounded-lg bg-red-50 px-1 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
@@ -73,7 +74,7 @@ export default async function AdminAlbumsPage() {
                       <TrashIcon className="h-3 w-3" />
                       删除
                     </button>
-                  </form>
+                  </AdminForm>
                 </div>
               ))}
             </div>

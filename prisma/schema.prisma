@@ -80,7 +80,24 @@ model Registration {
   title        String           @default("")
   phone        String           @default("")
   status       String           @default("PENDING") // PENDING | APPROVED | REJECTED
+  // 签到凭证与状态
+  token        String           @unique @default(uuid())
+  checkedIn    Boolean          @default(false)
+  checkedInAt  DateTime?
+  checkinLogs  CheckinLog[]
   createdAt    DateTime         @default(now())
+}
+
+model CheckinLog {
+  id             String       @id @default(cuid())
+  registrationId String
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  checkedAt      DateTime     @default(now())
+  byUserId       String?      // 管理员操作时记录其 userId，自助签到为空
+  method         String       @default("SCAN") // SCAN | MANUAL | SELF
+
+  @@index([registrationId])
+  @@index([checkedAt])
 }
 
 model Submission {

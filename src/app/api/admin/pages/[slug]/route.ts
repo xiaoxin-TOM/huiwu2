@@ -33,7 +33,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/pages/[sl
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });
   }
-  return NextResponse.redirect("/admin/pages", { status: 303 });
+  return NextResponse.json({ ok: true });
 }
 
 export async function PUT(req: Request, ctx: RouteContext<"/api/admin/pages/[slug]">) {
