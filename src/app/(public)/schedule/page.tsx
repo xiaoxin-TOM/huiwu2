@@ -22,12 +22,13 @@ export default async function SchedulePage() {
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {room.sessions.map((s) => {
-                      const speakers = s.speakers
+                      const sessionSpeakers = s.speakers ?? [];
+                      const speakers = sessionSpeakers
                         .filter((x) => x.role === "SPEAKER")
-                        .map((x) => x.speaker.name);
-                      const moderators = s.speakers
+                        .map((x) => x.speaker?.name ?? "未知讲者");
+                      const moderators = sessionSpeakers
                         .filter((x) => x.role === "MODERATOR")
-                        .map((x) => x.speaker.name);
+                        .map((x) => x.speaker?.name ?? "未知主持");
                       return (
                         <div
                           key={s.id}

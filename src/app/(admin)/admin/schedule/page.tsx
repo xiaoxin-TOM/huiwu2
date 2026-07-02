@@ -33,7 +33,7 @@ export default async function AdminSchedulePage() {
                   <td>{s.startTime}–{s.endTime}</td>
                   <td>{s.room}</td>
                   <td>{s.title}</td>
-                  <td>{s.speakers.map((x) => x.speaker.name).join("、")}</td>
+                  <td>{(s.speakers ?? []).map((x) => x.speaker?.name ?? "未知讲者").join("、")}</td>
                   <td className="py-2">
                     <div className="flex gap-2">
                       <Link href={`/admin/schedule/${s.id}`} className="text-sky-700 hover:underline">编辑</Link>

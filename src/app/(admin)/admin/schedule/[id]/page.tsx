@@ -25,13 +25,13 @@ export default async function EditSessionPage({ params }: { params: Promise<{ id
 
       <div className="space-y-3 rounded border p-4">
         <h2 className="font-medium">讲者 / 主持人</h2>
-        {sess.speakers.length === 0 ? (
+        {(sess.speakers ?? []).length === 0 ? (
           <p className="text-sm text-gray-500">尚未指派。</p>
         ) : (
           <ul className="divide-y">
-            {sess.speakers.map((x) => (
+            {(sess.speakers ?? []).map((x) => (
               <li key={`${x.speakerId}-${x.role}`} className="flex items-center gap-3 py-2 text-sm">
-                <span>{x.speaker.name}</span>
+                <span>{x.speaker?.name ?? "未知讲者（已删除）"}</span>
                 <span className="text-gray-400">{ROLE_LABEL[x.role] ?? x.role}</span>
                 <form action={`/api/admin/sessions/${sess.id}/speakers/delete`} method="post" className="ml-auto">
                   <input type="hidden" name="speakerId" value={x.speakerId} />

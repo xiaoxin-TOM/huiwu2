@@ -13,9 +13,9 @@ export type DayGroup = {
 export function groupByDayAndRoom(sessions: SessionWithSpeakers[]): DayGroup[] {
   const sorted = [...sessions].sort(
     (a, b) =>
-      a.day.localeCompare(b.day) ||
-      a.room.localeCompare(b.room) ||
-      a.startTime.localeCompare(b.startTime),
+      String(a.day ?? "").localeCompare(String(b.day ?? "")) ||
+      String(a.room ?? "").localeCompare(String(b.room ?? "")) ||
+      String(a.startTime ?? "").localeCompare(String(b.startTime ?? "")),
   );
   const days: DayGroup[] = [];
   for (const s of sorted) {
