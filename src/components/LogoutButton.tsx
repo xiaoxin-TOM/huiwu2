@@ -19,10 +19,7 @@ export default function LogoutButton({ variant = "dark" }: LogoutButtonProps) {
     <button
       type="button"
       onClick={() => {
-        const callbackUrl = typeof window !== "undefined"
-          ? `${window.location.origin}/login`
-          : "/login";
-        signOut({ callbackUrl, redirect: true });
+        signOut({ callbackUrl: "/login", redirect: true });
       }}
       className={`${base} ${styles}`}
     >

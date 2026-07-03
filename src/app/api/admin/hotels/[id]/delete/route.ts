@@ -15,5 +15,5 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/hotels/[i
     // HotelBooking.hotel 为 Restrict:有预订时删除失败
     return NextResponse.json({ ok: false, error: "该酒店存在预订,无法删除" }, { status: 400 });
   }
-  return NextResponse.redirect("/admin/hotels", { status: 303 });
+  return NextResponse.json({ ok: true });
 }

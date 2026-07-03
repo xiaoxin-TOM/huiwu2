@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listSessionsAdmin } from "@/lib/schedule-admin";
 import { getAllSpeakers } from "@/lib/speakers";
 import { SessionSpeakerFields } from "@/components/SessionSpeakerFields";
+import AdminForm from "@/components/AdminForm";
 
 export default async function AdminSchedulePage() {
   const [sessions, speakers] = await Promise.all([listSessionsAdmin(), getAllSpeakers()]);
@@ -9,7 +10,7 @@ export default async function AdminSchedulePage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">日程管理</h1>
 
-      <form action="/api/admin/sessions" method="post" className="grid grid-cols-2 gap-2 rounded border p-4 sm:grid-cols-3">
+      <AdminForm action="/api/admin/sessions" redirectTo="/admin/schedule" className="grid grid-cols-2 gap-2 rounded border p-4 sm:grid-cols-3">
         <input name="day" type="date" required className="rounded border px-2 py-1.5 text-sm" />
         <input name="startTime" placeholder="开始 09:00" required className="rounded border px-2 py-1.5 text-sm" />
         <input name="endTime" placeholder="结束 10:00" required className="rounded border px-2 py-1.5 text-sm" />
@@ -17,7 +18,7 @@ export default async function AdminSchedulePage() {
         <input name="title" placeholder="场次标题" required className="rounded border px-2 py-1.5 text-sm sm:col-span-3" />
         <SessionSpeakerFields speakers={speakers} />
         <button type="submit" className="rounded bg-sky-700 px-3 py-1.5 text-sm text-white">新建场次</button>
-      </form>
+      </AdminForm>
 
       {sessions.length === 0 ? (
         <p className="text-gray-500">暂无场次。</p>
@@ -40,9 +41,9 @@ export default async function AdminSchedulePage() {
                   <td className="py-2">
                     <div className="flex gap-2">
                       <Link href={`/admin/schedule/${s.id}`} className="text-sky-700 hover:underline">编辑</Link>
-                      <form action={`/api/admin/sessions/${s.id}/delete`} method="post">
+                      <AdminForm action={`/api/admin/sessions/${s.id}/delete`} redirectTo="/admin/schedule">
                         <button type="submit" className="text-red-600 hover:underline">删除</button>
-                      </form>
+                      </AdminForm>
                     </div>
                   </td>
                 </tr>

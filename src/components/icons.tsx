@@ -375,3 +375,35 @@ export const BuildingIcon = (props?: IconProps) =>
     </>,
     props,
   );
+
+export const ScanIcon = (props?: IconProps) =>
+  baseIcon(
+    <>
+      <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+      <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+      <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+      <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+      <line x1="7" y1="12" x2="17" y2="12" />
+    </>,
+    props,
+  );
+
+export const UserCheckIcon = (props?: IconProps) =>
+  baseIcon(
+    <>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="8.5" cy="7" r="4" />
+      <polyline points="17 11 19 13 23 9" />
+    </>,
+    props,
+  );
+
+export const AlertCircleIcon = (props?: IconProps) =>
+  baseIcon(
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </>,
+    props,
+  );

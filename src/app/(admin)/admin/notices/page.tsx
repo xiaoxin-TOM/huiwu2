@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listAllNotices } from "@/lib/notices-admin";
+import AdminForm from "@/components/AdminForm";
 
 export default async function AdminNoticesPage() {
   const notices = await listAllNotices();
@@ -7,7 +8,7 @@ export default async function AdminNoticesPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">通知管理</h1>
 
-      <form action="/api/admin/notices" method="post" className="space-y-2 rounded border p-4">
+      <AdminForm action="/api/admin/notices" redirectTo="/admin/notices" className="space-y-2 rounded border p-4">
         <h2 className="font-medium">新建通知</h2>
         <input name="title" required placeholder="标题" className="w-full rounded border px-3 py-2" />
         <textarea name="contentHtml" rows={4} placeholder="正文（纯文本，换行自动分段）"
@@ -16,7 +17,7 @@ export default async function AdminNoticesPage() {
           <input type="checkbox" name="isPublished" defaultChecked /> 立即发布
         </label>
         <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-sm text-white">新建</button>
-      </form>
+      </AdminForm>
 
       {notices.length === 0 ? (
         <p className="text-gray-500">暂无通知。</p>
@@ -36,9 +37,9 @@ export default async function AdminNoticesPage() {
                   <td>{n.publishedAt.toISOString().slice(0, 10)}</td>
                   <td className="flex gap-2 py-2">
                     <Link href={`/admin/notices/${n.id}`} className="text-sky-700 hover:underline">编辑</Link>
-                    <form action={`/api/admin/notices/${n.id}/delete`} method="post">
+                    <AdminForm action={`/api/admin/notices/${n.id}/delete`} redirectTo="/admin/notices">
                       <button type="submit" className="text-red-600 hover:underline">删除</button>
-                    </form>
+                    </AdminForm>
                   </td>
                 </tr>
               ))}

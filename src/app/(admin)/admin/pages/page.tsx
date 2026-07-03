@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listPages } from "@/lib/pages-admin";
 import { getSiteConfig } from "@/lib/siteconfig";
+import AdminForm from "@/components/AdminForm";
 
 const KNOWN: { slug: string; label: string }[] = [
   { slug: "venue", label: "会场交通" },
@@ -44,7 +45,7 @@ export default async function AdminPagesPage() {
           <h2 className="text-lg font-bold">脚页内容</h2>
           <p className="text-sm text-gray-500">管理首页底部版权、技术支持等文字。纯文本，每行一段。</p>
         </div>
-        <form action="/api/admin/site" method="post" className="space-y-3">
+        <AdminForm action="/api/admin/site" redirectTo="/admin/pages" className="space-y-3">
           <textarea
             name="footerHtml"
             rows={5}
@@ -60,7 +61,7 @@ export default async function AdminPagesPage() {
           <input type="hidden" name="welcomeHtml" value={cfg?.welcomeHtml ?? ""} />
           <input type="hidden" name="redirectTo" value="/admin/pages" />
           <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-sm text-white hover:bg-sky-800">保存脚页内容</button>
-        </form>
+        </AdminForm>
       </div>
     </div>
   );

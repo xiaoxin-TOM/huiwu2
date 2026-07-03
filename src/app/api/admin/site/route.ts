@@ -35,7 +35,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });
   }
-  let redirectTo = form?.get("redirectTo")?.toString() ?? "/admin/site";
-  if (!redirectTo.startsWith("/")) redirectTo = "/admin/site";
-  return NextResponse.redirect(redirectTo, { status: 303 });
+  let redirectTo = form?.get("redirectTo")?.toString() ?? "/admin";
+  if (!redirectTo.startsWith("/")) redirectTo = "/admin";
+  return NextResponse.json({ ok: true, redirectTo });
 }

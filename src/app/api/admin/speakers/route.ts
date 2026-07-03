@@ -30,5 +30,5 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: "创建失败" }, { status: 500 });
   }
-  return NextResponse.redirect("/admin/speakers", { status: 303 });
+  return NextResponse.json({ ok: true });
 }

@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { listUsers } from "@/lib/users-admin";
+import AdminForm from "@/components/AdminForm";
 
 export default async function AdminUsersPage() {
   const [session, users] = await Promise.all([auth(), listUsers()]);
@@ -24,13 +25,13 @@ export default async function AdminUsersPage() {
                   {u.id === selfId ? (
                     <span className="text-gray-400">当前账号</span>
                   ) : (
-                    <form action={`/api/admin/users/${u.id}/role`} method="post" className="flex items-center gap-2">
+                    <AdminForm action={`/api/admin/users/${u.id}/role`} redirectTo="/admin/users" className="flex items-center gap-2">
                       <select name="role" defaultValue={u.role} className="rounded border px-2 py-1 text-sm">
                         <option value="USER">用户</option>
                         <option value="ADMIN">管理员</option>
                       </select>
                       <button type="submit" className="rounded bg-sky-700 px-2 py-1 text-xs text-white">设为</button>
-                    </form>
+                    </AdminForm>
                   )}
                 </td>
               </tr>

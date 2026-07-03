@@ -4,36 +4,34 @@ import { redirect } from "next/navigation";
 import { isAdmin } from "@/lib/access";
 import {
   HomeIcon,
-  SettingsIcon,
   BellIcon,
   FileTextIcon,
   CalendarIcon,
   UsersIcon,
   ClipboardListIcon,
-  FileEditIcon,
   HotelIcon,
   BookmarkIcon,
   ImageIcon,
   UserCogIcon,
   LayersIcon,
   ArrowLeftIcon,
+  ScanIcon,
 } from "@/components/icons";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import AdminShell from "@/components/AdminShell";
 
 const MENU = [
-  { href: "/admin", label: "仪表盘", icon: HomeIcon },
-  { href: "/admin/site", label: "站点设置", icon: SettingsIcon },
+  { href: "/admin", label: "基础信息", icon: HomeIcon },
   { href: "/admin/notices", label: "通知管理", icon: BellIcon },
   { href: "/admin/pages", label: "内容页", icon: FileTextIcon },
   { href: "/admin/schedule", label: "日程管理", icon: CalendarIcon },
   { href: "/admin/speakers", label: "讲者管理", icon: UsersIcon },
   { href: "/admin/registrations", label: "报名管理", icon: ClipboardListIcon },
-  { href: "/admin/submissions", label: "论文管理", icon: FileEditIcon },
   { href: "/admin/hotels", label: "酒店管理", icon: HotelIcon },
   { href: "/admin/bookings", label: "预订管理", icon: BookmarkIcon },
   { href: "/admin/albums", label: "图片直播", icon: ImageIcon },
   { href: "/admin/users", label: "用户管理", icon: UserCogIcon },
+  { href: "/admin/checkin", label: "签到管理", icon: ScanIcon },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

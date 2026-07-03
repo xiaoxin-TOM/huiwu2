@@ -1,17 +1,18 @@
 import { listBookings } from "@/lib/bookings";
 import { STATUS_LABEL } from "@/lib/labels";
+import AdminForm from "@/components/AdminForm";
 
 function ReviewButtons({ id }: { id: string }) {
   return (
     <div className="flex gap-2">
-      <form action={`/api/admin/bookings/${id}`} method="post">
+      <AdminForm action={`/api/admin/bookings/${id}`} redirectTo="/admin/bookings">
         <input type="hidden" name="decision" value="APPROVED" />
         <button type="submit" className="rounded bg-green-600 px-2 py-1 text-xs text-white">通过</button>
-      </form>
-      <form action={`/api/admin/bookings/${id}`} method="post">
+      </AdminForm>
+      <AdminForm action={`/api/admin/bookings/${id}`} redirectTo="/admin/bookings">
         <input type="hidden" name="decision" value="REJECTED" />
         <button type="submit" className="rounded bg-red-600 px-2 py-1 text-xs text-white">拒绝</button>
-      </form>
+      </AdminForm>
     </div>
   );
 }

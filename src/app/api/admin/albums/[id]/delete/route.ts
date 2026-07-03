@@ -14,5 +14,5 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/albums/[i
   } catch {
     return NextResponse.json({ ok: false, error: "删除失败" }, { status: 400 });
   }
-  return NextResponse.redirect("/admin/albums", { status: 303 });
+  return NextResponse.json({ ok: true });
 }

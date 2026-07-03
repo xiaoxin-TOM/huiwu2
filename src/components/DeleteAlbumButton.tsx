@@ -1,10 +1,11 @@
 "use client";
 
+import AdminForm from "@/components/AdminForm";
 import { TrashIcon } from "@/components/icons";
 
 export default function DeleteAlbumButton({ albumId, albumTitle }: { albumId: string; albumTitle: string }) {
   return (
-    <form action={`/api/admin/albums/${albumId}/delete`} method="post">
+    <AdminForm action={`/api/admin/albums/${albumId}/delete`} redirectTo="/admin/albums">
       <button
         type="submit"
         onClick={(e) => {
@@ -17,6 +18,6 @@ export default function DeleteAlbumButton({ albumId, albumTitle }: { albumId: st
         <TrashIcon className="h-3.5 w-3.5" />
         删除相册
       </button>
-    </form>
+    </AdminForm>
   );
 }

@@ -6,6 +6,7 @@ import { STATUS_LABEL } from "@/lib/labels";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard, DataCard, IconCard } from "@/components/ui/Card";
 import LogoutButton from "@/components/LogoutButton";
+import CheckinQrCode from "@/components/CheckinQrCode";
 import { UserIcon, ClipboardListIcon, HotelIcon, FileTextIcon } from "@/components/icons";
 
 export default async function MePage() {
@@ -39,11 +40,20 @@ export default async function MePage() {
 
       <SectionCard title="我的报名">
         {registration ? (
-          <DataCard
-            title={registration.type.name}
-            meta={STATUS_LABEL[registration.status] ?? registration.status}
-            icon={<ClipboardListIcon className="h-6 w-6" />}
-          />
+          <div className="space-y-4">
+            <DataCard
+              title={registration.type.name}
+              meta={STATUS_LABEL[registration.status] ?? registration.status}
+              icon={<ClipboardListIcon className="h-6 w-6" />}
+            />
+            {registration.status === "APPROVED" || registration.checkedIn ? (
+              <CheckinQrCode token={registration.token} />
+            ) : (
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 text-center text-sm text-slate-500">
+                报名审核通过后将显示签到二维码
+              </div>
+            )}
+          </div>
         ) : (
           <p className="text-sm text-slate-500">
             尚未报名。
