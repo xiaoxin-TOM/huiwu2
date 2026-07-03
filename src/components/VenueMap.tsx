@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import AMapLoader from "@amap/amap-jsapi-loader";
 
 type Props = { lng: number; lat: number; name: string; address: string };
 
@@ -22,7 +21,11 @@ export default function VenueMap({ lng, lat, name, address }: Props) {
     }
     let map: AMapInstance | undefined;
     let cancelled = false;
-    AMapLoader.load({ key, version: "2.0" })
+    // 动态 import:@amap/amap-jsapi-loader 在模块顶层直接访问 window,
+    // 静态 import 会在 SSR 阶段(Node 环境无 window)于模块求值时抛错,
+    // 故仅在客户端 effect 内按需加载
+    import("@amap/amap-jsapi-loader")
+      .then(({ default: AMapLoader }) => AMapLoader.load({ key, version: "2.0" }))
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 高德 JS API 无类型定义
       .then((AMap: any) => {
         if (cancelled || !containerRef.current) return;
