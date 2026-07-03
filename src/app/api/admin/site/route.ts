@@ -22,6 +22,10 @@ export async function POST(req: Request) {
     liveUrl: g("liveUrl"),
     welcomeHtml: g("welcomeHtml"),
     footerHtml: g("footerHtml"),
+    venueName: g("venueName"),
+    venueAddress: g("venueAddress"),
+    venueLng: g("venueLng"),
+    venueLat: g("venueLat"),
   });
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });

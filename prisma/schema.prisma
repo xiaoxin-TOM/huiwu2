@@ -39,6 +39,10 @@ model SiteConfig {
   welcomeHtml  String   @default("")
   liveUrl      String?
   contactHtml  String   @default("")
+  venueName    String   @default("")
+  venueAddress String   @default("")
+  venueLng     String   @default("")
+  venueLat     String   @default("")
   footerHtml   String   @default("")
   updatedAt    DateTime @updatedAt
 }

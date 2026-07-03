@@ -12,6 +12,10 @@ export function updateSiteConfig(data: {
   liveUrl: string;
   welcomeHtml: string;
   footerHtml: string;
+  venueName: string;
+  venueAddress: string;
+  venueLng: string;
+  venueLat: string;
 }) {
   return prisma.siteConfig.upsert({
     where: { id: 1 },
