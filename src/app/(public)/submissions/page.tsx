@@ -1,24 +1,31 @@
 import { requireUser } from "@/lib/session";
 import { listUserSubmissions } from "@/lib/submissions";
+import { resolveMeeting } from "@/lib/meetings";
+import { meetingHref } from "@/lib/public";
 import SubmissionForm from "@/components/SubmissionForm";
 import { STATUS_LABEL } from "@/lib/labels";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard, DataCard, IconCard } from "@/components/ui/Card";
 import { FileEditIcon, CalendarIcon, UsersIcon, FileTextIcon } from "@/components/icons";
 
-export default async function SubmissionsPage() {
+export default async function SubmissionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ m?: string }>;
+}) {
   const user = await requireUser();
-  const subs = await listUserSubmissions(user.id);
+  const meeting = await resolveMeeting((await searchParams).m);
+  const subs = await listUserSubmissions(user.id, meeting.id);
 
   return (
     <div className="space-y-4">
-      <PageHeader title="论文提交" />
+      <PageHeader title={`${meeting.title} · 论文提交`} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <IconCard href="/schedule" title="会议日程" icon={<CalendarIcon className="h-6 w-6" />} />
-        <IconCard href="/speakers" title="讲者查询" icon={<UsersIcon className="h-6 w-6" />} />
-        <IconCard href="/register-conf" title="会议报名" icon={<FileTextIcon className="h-6 w-6" />} />
-        <IconCard href="/" title="返回首页" icon={<FileEditIcon className="h-6 w-6" />} />
+        <IconCard href={meetingHref(meeting.id, "/schedule")} title="会议日程" icon={<CalendarIcon className="h-6 w-6" />} />
+        <IconCard href={meetingHref(meeting.id, "/speakers")} title="讲者查询" icon={<UsersIcon className="h-6 w-6" />} />
+        <IconCard href={meetingHref(meeting.id, "/register-conf")} title="会议报名" icon={<FileTextIcon className="h-6 w-6" />} />
+        <IconCard href={meetingHref(meeting.id, "/")} title="返回首页" icon={<FileEditIcon className="h-6 w-6" />} />
       </div>
 
       <SectionCard title="我的投稿">
@@ -40,7 +47,7 @@ export default async function SubmissionsPage() {
       </SectionCard>
 
       <SectionCard title="提交新论文">
-        <SubmissionForm />
+        <SubmissionForm meetingId={meeting.id} />
       </SectionCard>
     </div>
   );

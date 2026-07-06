@@ -12,6 +12,7 @@ export async function authorizeCredentials(
   if (!email || !password) return null;
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return null;
+  if (!user.isActive) return null;
   if (!(await verifyPassword(password, user.passwordHash))) return null;
   return { id: user.id, name: user.name, email: user.email, role: user.role };
 }

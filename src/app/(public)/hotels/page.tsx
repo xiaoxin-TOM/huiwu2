@@ -1,11 +1,17 @@
 import { listHotels } from "@/lib/hotels";
+import { resolveMeeting } from "@/lib/meetings";
 import BookingForm from "@/components/BookingForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard, DataCard } from "@/components/ui/Card";
 import { HotelIcon } from "@/components/icons";
 
-export default async function HotelsPage() {
-  const hotels = await listHotels();
+export default async function HotelsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ m?: string }>;
+}) {
+  const meeting = await resolveMeeting((await searchParams).m);
+  const hotels = await listHotels(meeting.id);
   return (
     <div className="space-y-5">
       <PageHeader title="酒店预订" />
@@ -30,7 +36,7 @@ export default async function HotelsPage() {
 
           <SectionCard title="提交预订申请">
             <p className="mb-4 text-sm text-slate-500">提交后可在个人中心查看审核状态（需登录）。</p>
-            <BookingForm hotels={hotels.map((h) => ({ id: h.id, name: h.name, price: h.price }))} />
+            <BookingForm meetingId={meeting.id} hotels={hotels.map((h) => ({ id: h.id, name: h.name, price: h.price }))} />
           </SectionCard>
         </>
       )}

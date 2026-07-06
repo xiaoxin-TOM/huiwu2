@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { siteConfigSchema } from "@/lib/validation";
-import { updateSiteConfig } from "@/lib/siteconfig";
+import { getCurrentMeetingId, updateMeetingConfig } from "@/lib/meetings";
 
 export async function POST(req: Request) {
   const session = await auth();
   if (!isAdmin(session?.user?.role)) {
     return NextResponse.json({ ok: false, error: "无权限" }, { status: 403 });
+  }
+  const meetingId = await getCurrentMeetingId();
+  if (!meetingId) {
+    return NextResponse.json({ ok: false, error: "未选择会议" }, { status: 400 });
   }
   const form = await req.formData().catch(() => null);
   const g = (k: string) => {
@@ -27,7 +31,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
   }
   try {
-    await updateSiteConfig(parsed.data);
+    await updateMeetingConfig(meetingId, {
+      title: parsed.data.confName,
+      confDate: parsed.data.confDate,
+      location: parsed.data.confLocation,
+      logoUrl: parsed.data.logoUrl || null,
+      liveUrl: parsed.data.liveUrl || null,
+      welcomeHtml: parsed.data.welcomeHtml,
+      footerHtml: parsed.data.footerHtml,
+    });
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });
   }

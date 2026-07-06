@@ -19,6 +19,7 @@ export default function AdminShell({
 
   // 切换后台页面后自动收起抽屉
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpen(false);
   }, [pathname]);
 

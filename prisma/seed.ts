@@ -18,17 +18,38 @@ async function main() {
   });
 
   const adminEmail = "admin@conf.local";
-  const exists = await prisma.user.findUnique({ where: { email: adminEmail } });
-  if (!exists) {
+  const adminExists = await prisma.user.findUnique({ where: { email: adminEmail } });
+  if (!adminExists) {
     await prisma.user.create({
       data: {
         name: "系统管理员",
         email: adminEmail,
         passwordHash: await hashPassword("admin123"),
         role: "ADMIN",
+        isActive: true,
       },
     });
   }
+
+  const defaultMeeting = await prisma.meeting.upsert({
+    where: { id: "default-meeting" },
+    update: {},
+    create: {
+      id: "default-meeting",
+      title: "示例学术年会",
+      confDate: "2026-09-18 至 2026-09-20",
+      description: "默认会议,用于演示多会议功能。",
+      location: "北京国际会议中心",
+      startDate: "2026-09-18",
+      endDate: "2026-09-20",
+      welcomeHtml: "<p>欢迎参加本次大会。</p>",
+      contactHtml: "<p>会务组电话:010-00000000</p>",
+      footerHtml: "© 2026 会务管理系统 · All rights reserved.\n中国医院协会 版权所有\n技术支持由位值科技有限公司提供",
+      liveUrl: "https://www.bilibili.com/",
+      isDefault: true,
+    },
+  });
+  console.log("默认会议:", defaultMeeting.title);
 
   const types = ["普通代表", "学生代表", "现场注册"];
   for (const name of types) {
@@ -39,6 +60,8 @@ async function main() {
       });
     }
   }
+
+  const meetingId = defaultMeeting.id;
 
   const notices = [
     {
@@ -58,8 +81,8 @@ async function main() {
     },
   ];
   for (const n of notices) {
-    const found = await prisma.notice.findFirst({ where: { title: n.title } });
-    if (!found) await prisma.notice.create({ data: n });
+    const found = await prisma.notice.findFirst({ where: { meetingId, title: n.title } });
+    if (!found) await prisma.notice.create({ data: { ...n, meetingId } });
   }
   const pages = [
     {
@@ -75,7 +98,11 @@ async function main() {
     },
   ];
   for (const p of pages) {
-    await prisma.page.upsert({ where: { slug: p.slug }, update: {}, create: p });
+    await prisma.page.upsert({
+      where: { meetingId_slug: { meetingId, slug: p.slug } },
+      update: {},
+      create: { ...p, meetingId },
+    });
   }
 
   const speakers = [
@@ -84,13 +111,13 @@ async function main() {
     { name: "王五", title: "主任", organization: "中科院", bio: "<p>大会主持人。</p>", isModerator: true },
   ];
   for (const s of speakers) {
-    const found = await prisma.speaker.findFirst({ where: { name: s.name } });
-    if (!found) await prisma.speaker.create({ data: s });
+    const found = await prisma.speaker.findFirst({ where: { meetingId, name: s.name } });
+    if (!found) await prisma.speaker.create({ data: { ...s, meetingId } });
   }
 
-  const zhang = await prisma.speaker.findFirst({ where: { name: "张三" } });
-  const li = await prisma.speaker.findFirst({ where: { name: "李四" } });
-  const wang = await prisma.speaker.findFirst({ where: { name: "王五" } });
+  const zhang = await prisma.speaker.findFirst({ where: { meetingId, name: "张三" } });
+  const li = await prisma.speaker.findFirst({ where: { meetingId, name: "李四" } });
+  const wang = await prisma.speaker.findFirst({ where: { meetingId, name: "王五" } });
 
   const sessions = [
     {
@@ -110,11 +137,11 @@ async function main() {
     },
   ];
   for (const s of sessions) {
-    const found = await prisma.session.findFirst({ where: { title: s.title } });
+    const found = await prisma.session.findFirst({ where: { meetingId, title: s.title } });
     if (!found) {
       const { links, ...data } = s;
       await prisma.session.create({
-        data: { ...data, speakers: { create: links } },
+        data: { ...data, meetingId, speakers: { create: links } },
       });
     }
   }
@@ -126,15 +153,15 @@ async function main() {
       description: "<p>经济实惠,交通便利。</p>" },
   ];
   for (const h of hotels) {
-    const found = await prisma.hotel.findFirst({ where: { name: h.name } });
-    if (!found) await prisma.hotel.create({ data: h });
+    const found = await prisma.hotel.findFirst({ where: { meetingId, name: h.name } });
+    if (!found) await prisma.hotel.create({ data: { ...h, meetingId } });
   }
 
   const albumTitle = "开幕式现场";
-  let demoAlbum = await prisma.album.findFirst({ where: { title: albumTitle } });
+  let demoAlbum = await prisma.album.findFirst({ where: { meetingId, title: albumTitle } });
   if (!demoAlbum) {
     demoAlbum = await prisma.album.create({
-      data: { title: albumTitle, date: "2026-09-18", coverUrl: "/uploads/images/demo1.jpg" },
+      data: { meetingId, title: albumTitle, date: "2026-09-18", coverUrl: "/uploads/images/demo1.jpg" },
     });
     await prisma.photo.createMany({
       data: [

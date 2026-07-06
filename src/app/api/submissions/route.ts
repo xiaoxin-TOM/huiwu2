@@ -3,6 +3,7 @@ import { submissionSchema } from "@/lib/validation";
 import { currentUser } from "@/lib/session";
 import { validatePdf, savePdf } from "@/lib/upload";
 import { createSubmission } from "@/lib/submissions";
+import { resolveMeetingId } from "@/lib/meetings";
 
 export async function POST(req: Request) {
   const user = await currentUser();
@@ -31,10 +32,14 @@ export async function POST(req: Request) {
   if (fileError) return NextResponse.json({ ok: false, error: fileError }, { status: 400 });
 
   try {
+    const meetingId = await resolveMeetingId(String(form.get("meetingId") ?? ""));
     const fileUrl = await savePdf(file);
-    const sub = await createSubmission(user.id, { ...parsed.data, fileUrl });
+    const sub = await createSubmission(user.id, meetingId, { ...parsed.data, fileUrl });
     return NextResponse.json({ ok: true, id: sub.id });
-  } catch {
+  } catch (e) {
+    if (e instanceof Error && e.message === "NO_DEFAULT_MEETING") {
+      return NextResponse.json({ ok: false, error: "当前无默认会议，请联系管理员" }, { status: 400 });
+    }
     return NextResponse.json({ ok: false, error: "提交失败" }, { status: 500 });
   }
 }

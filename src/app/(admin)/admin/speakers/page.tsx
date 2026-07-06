@@ -1,9 +1,19 @@
 import Link from "next/link";
 import { getAllSpeakers } from "@/lib/speakers";
+import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 
 export default async function AdminSpeakersPage() {
-  const speakers = await getAllSpeakers();
+  const meeting = await getCurrentMeeting();
+  if (!meeting) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">讲者管理</h1>
+        <p className="text-red-600">未选择当前会议，请先到“会议管理”选择或创建一个会议。</p>
+      </div>
+    );
+  }
+  const speakers = await getAllSpeakers(meeting.id);
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">讲者管理</h1>

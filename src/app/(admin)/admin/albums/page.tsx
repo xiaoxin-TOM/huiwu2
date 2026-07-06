@@ -1,11 +1,21 @@
 import { listAlbumsAdmin } from "@/lib/albums";
+import { getCurrentMeeting } from "@/lib/meetings";
 import AlbumPhotoUpload from "@/components/AlbumPhotoUpload";
 import DeleteAlbumButton from "@/components/DeleteAlbumButton";
 import AdminForm from "@/components/AdminForm";
 import { PlusIcon, TrashIcon } from "@/components/icons";
 
 export default async function AdminAlbumsPage() {
-  const albums = await listAlbumsAdmin();
+  const meeting = await getCurrentMeeting();
+  if (!meeting) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-xl font-bold text-admin-text">图片直播管理</h1>
+        <p className="text-red-600">未选择当前会议，请先到“会议管理”选择或创建一个会议。</p>
+      </div>
+    );
+  }
+  const albums = await listAlbumsAdmin(meeting.id);
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

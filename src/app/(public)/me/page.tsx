@@ -2,6 +2,8 @@ import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { getUserRegistration } from "@/lib/registrations";
 import { listUserBookings } from "@/lib/bookings";
+import { resolveMeeting } from "@/lib/meetings";
+import { meetingHref } from "@/lib/public";
 import { STATUS_LABEL } from "@/lib/labels";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard, DataCard, IconCard } from "@/components/ui/Card";
@@ -9,11 +11,16 @@ import LogoutButton from "@/components/LogoutButton";
 import CheckinQrCode from "@/components/CheckinQrCode";
 import { UserIcon, ClipboardListIcon, HotelIcon, FileTextIcon } from "@/components/icons";
 
-export default async function MePage() {
+export default async function MePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ m?: string }>;
+}) {
   const user = await requireUser();
+  const meeting = await resolveMeeting((await searchParams).m);
   const [registration, bookings] = await Promise.all([
-    getUserRegistration(user.id),
-    listUserBookings(user.id),
+    getUserRegistration(user.id, meeting.id),
+    listUserBookings(user.id, meeting.id),
   ]);
 
   return (
@@ -33,9 +40,9 @@ export default async function MePage() {
       </SectionCard>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <IconCard href="/register-conf" title="我的报名" icon={<ClipboardListIcon className="h-6 w-6" />} />
-        <IconCard href="/hotels" title="我的预订" icon={<HotelIcon className="h-6 w-6" />} />
-        <IconCard href="/" title="返回首页" icon={<FileTextIcon className="h-6 w-6" />} />
+        <IconCard href={meetingHref(meeting.id, "/register-conf")} title="我的报名" icon={<ClipboardListIcon className="h-6 w-6" />} />
+        <IconCard href={meetingHref(meeting.id, "/hotels")} title="我的预订" icon={<HotelIcon className="h-6 w-6" />} />
+        <IconCard href={meetingHref(meeting.id, "/")} title="返回首页" icon={<FileTextIcon className="h-6 w-6" />} />
       </div>
 
       <SectionCard title="我的报名">
@@ -57,7 +64,7 @@ export default async function MePage() {
         ) : (
           <p className="text-sm text-slate-500">
             尚未报名。
-            <Link href="/register-conf" className="text-sky-600 hover:underline">
+            <Link href={meetingHref(meeting.id, "/register-conf")} className="text-sky-600 hover:underline">
               去报名
             </Link>
           </p>
@@ -68,7 +75,7 @@ export default async function MePage() {
         {bookings.length === 0 ? (
           <p className="text-sm text-slate-500">
             尚无预订。
-            <Link href="/hotels" className="text-sky-600 hover:underline">
+            <Link href={meetingHref(meeting.id, "/hotels")} className="text-sky-600 hover:underline">
               去预订
             </Link>
           </p>

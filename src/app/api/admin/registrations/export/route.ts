@@ -1,9 +1,10 @@
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { listRegistrations } from "@/lib/registrations";
+import { requireCurrentMeetingForRequest } from "@/lib/meetings";
 import { toCsv } from "@/lib/csv";
 
-export async function GET() {
+export async function GET(req: Request) {
   const session = await auth();
   if (!isAdmin(session?.user?.role)) {
     return new Response(JSON.stringify({ ok: false, error: "无权限" }), {
@@ -11,7 +12,8 @@ export async function GET() {
       headers: { "Content-Type": "application/json" },
     });
   }
-  const regs = await listRegistrations();
+  const meeting = await requireCurrentMeetingForRequest(req);
+  const regs = await listRegistrations(meeting.id);
   const csv = toCsv(
     ["姓名", "邮箱", "参会类型", "单位", "职称", "电话", "状态", "提交时间"],
     regs.map((r) => [
@@ -22,7 +24,7 @@ export async function GET() {
   return new Response("﻿" + csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="registrations.csv"',
+      "Content-Disposition": `attachment; filename="registrations-${meeting.id}.csv"`,
     },
   });
 }

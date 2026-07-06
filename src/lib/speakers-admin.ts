@@ -9,8 +9,8 @@ type SpeakerData = {
   isModerator: boolean;
 };
 
-export function createSpeaker(data: SpeakerData) {
-  return prisma.speaker.create({ data });
+export function createSpeaker(meetingId: string, data: SpeakerData) {
+  return prisma.speaker.create({ data: { ...data, meetingId } });
 }
 
 export function updateSpeaker(id: string, data: SpeakerData) {

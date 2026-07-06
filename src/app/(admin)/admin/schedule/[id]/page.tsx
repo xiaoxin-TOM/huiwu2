@@ -1,13 +1,26 @@
 import { notFound } from "next/navigation";
 import { getSessionAdmin } from "@/lib/schedule-admin";
 import { getAllSpeakers } from "@/lib/speakers";
+import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 
 const ROLE_LABEL: Record<string, string> = { SPEAKER: "讲者", MODERATOR: "主持人" };
 
 export default async function EditSessionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [sess, speakers] = await Promise.all([getSessionAdmin(id), getAllSpeakers()]);
+  const meeting = await getCurrentMeeting();
+  if (!meeting) {
+    return (
+      <div className="max-w-2xl space-y-6">
+        <h1 className="text-2xl font-bold">编辑场次</h1>
+        <p className="text-red-600">未选择当前会议，请先到“会议管理”选择或创建一个会议。</p>
+      </div>
+    );
+  }
+  const [sess, speakers] = await Promise.all([
+    getSessionAdmin(id, meeting.id),
+    getAllSpeakers(meeting.id),
+  ]);
   if (!sess) notFound();
   return (
     <div className="max-w-2xl space-y-6">

@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { getCheckinStats, listRecentCheckins } from "@/lib/registrations";
+import { requireCurrentMeeting } from "@/lib/meetings";
 import { ScanIcon, UserCheckIcon } from "@/components/icons";
 
 export default async function AdminCheckinPage() {
-  const [stats, recent] = await Promise.all([getCheckinStats(), listRecentCheckins(10)]);
+  const meeting = await requireCurrentMeeting();
+  const [stats, recent] = await Promise.all([getCheckinStats(meeting.id), listRecentCheckins(meeting.id, 10)]);
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">签到管理</h1>
+      <div>
+        <h1 className="text-2xl font-bold">签到管理</h1>
+        <p className="text-sm text-gray-500">当前会议：{meeting.title}</p>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-xl bg-white p-5 shadow-sm">

@@ -1,10 +1,20 @@
 import { notFound } from "next/navigation";
 import { getSpeakerById } from "@/lib/speakers";
+import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 
 export default async function EditSpeakerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const s = await getSpeakerById(id);
+  const meeting = await getCurrentMeeting();
+  if (!meeting) {
+    return (
+      <div className="max-w-2xl space-y-4">
+        <h1 className="text-2xl font-bold">编辑讲者</h1>
+        <p className="text-red-600">未选择当前会议，请先到“会议管理”选择或创建一个会议。</p>
+      </div>
+    );
+  }
+  const s = await getSpeakerById(id, meeting.id);
   if (!s) notFound();
   return (
     <div className="max-w-2xl space-y-4">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listRegistrations } from "@/lib/registrations";
+import { requireCurrentMeeting } from "@/lib/meetings";
 import { STATUS_LABEL } from "@/lib/labels";
 import AdminForm from "@/components/AdminForm";
 
@@ -19,11 +20,15 @@ function ReviewButtons({ id }: { id: string }) {
 }
 
 export default async function AdminRegistrationsPage() {
-  const regs = await listRegistrations();
+  const meeting = await requireCurrentMeeting();
+  const regs = await listRegistrations(meeting.id);
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">报名管理</h1>
+        <div>
+          <h1 className="text-2xl font-bold">报名管理</h1>
+          <p className="text-sm text-gray-500">当前会议：{meeting.title}</p>
+        </div>
         <Link href="/api/admin/registrations/export" download className="text-sm text-sky-700 hover:underline">导出 CSV</Link>
       </div>
       {regs.length === 0 ? (

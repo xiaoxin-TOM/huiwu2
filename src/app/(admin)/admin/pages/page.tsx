@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { listPages } from "@/lib/pages-admin";
-import { getSiteConfig } from "@/lib/siteconfig";
+import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 
 const KNOWN: { slug: string; label: string }[] = [
@@ -9,9 +9,17 @@ const KNOWN: { slug: string; label: string }[] = [
 ];
 
 export default async function AdminPagesPage() {
-  const existing = await listPages();
+  const meeting = await getCurrentMeeting();
+  if (!meeting) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">内容页管理</h1>
+        <p className="text-red-600">未选择当前会议，请先到“会议管理”选择或创建一个会议。</p>
+      </div>
+    );
+  }
+  const existing = await listPages(meeting.id);
   const bySlug = new Map(existing.map((p) => [p.slug, p]));
-  const cfg = await getSiteConfig();
   return (
     <div className="space-y-8">
       <div className="space-y-6">
@@ -43,22 +51,22 @@ export default async function AdminPagesPage() {
       <div className="space-y-4 rounded border p-4">
         <div>
           <h2 className="text-lg font-bold">脚页内容</h2>
-          <p className="text-sm text-gray-500">管理首页底部版权、技术支持等文字。纯文本，每行一段。</p>
+          <p className="text-sm text-gray-500">管理当前会议底部版权、技术支持等文字。纯文本，每行一段。</p>
         </div>
         <AdminForm action="/api/admin/site" redirectTo="/admin/pages" className="space-y-3">
           <textarea
             name="footerHtml"
             rows={5}
-            defaultValue={cfg?.footerHtml ?? ""}
+            defaultValue={meeting.footerHtml ?? ""}
             placeholder="例如：\n© 2026 会务管理系统 · All rights reserved.\n中国医院协会 版权所有\n技术支持由位值科技有限公司提供"
             className="w-full rounded border px-3 py-2 text-sm"
           />
-          <input type="hidden" name="confName" value={cfg?.confName ?? "会务管理系统"} />
-          <input type="hidden" name="confDate" value={cfg?.confDate ?? ""} />
-          <input type="hidden" name="confLocation" value={cfg?.confLocation ?? ""} />
-          <input type="hidden" name="logoUrl" value={cfg?.logoUrl ?? ""} />
-          <input type="hidden" name="liveUrl" value={cfg?.liveUrl ?? ""} />
-          <input type="hidden" name="welcomeHtml" value={cfg?.welcomeHtml ?? ""} />
+          <input type="hidden" name="confName" value={meeting.title} />
+          <input type="hidden" name="confDate" value={meeting.confDate ?? ""} />
+          <input type="hidden" name="confLocation" value={meeting.location ?? ""} />
+          <input type="hidden" name="logoUrl" value={meeting.logoUrl ?? ""} />
+          <input type="hidden" name="liveUrl" value={meeting.liveUrl ?? ""} />
+          <input type="hidden" name="welcomeHtml" value={meeting.welcomeHtml ?? ""} />
           <input type="hidden" name="redirectTo" value="/admin/pages" />
           <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-sm text-white hover:bg-sky-800">保存脚页内容</button>
         </AdminForm>

@@ -16,12 +16,16 @@ import {
   LayersIcon,
   ArrowLeftIcon,
   ScanIcon,
+  StarIcon,
+  LinkIcon,
+  FileEditIcon,
 } from "@/components/icons";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import AdminShell from "@/components/AdminShell";
 
 const MENU = [
   { href: "/admin", label: "基础信息", icon: HomeIcon },
+  { href: "/admin/meetings", label: "会议管理", icon: LayersIcon },
   { href: "/admin/notices", label: "通知管理", icon: BellIcon },
   { href: "/admin/pages", label: "内容页", icon: FileTextIcon },
   { href: "/admin/schedule", label: "日程管理", icon: CalendarIcon },
@@ -29,7 +33,12 @@ const MENU = [
   { href: "/admin/registrations", label: "报名管理", icon: ClipboardListIcon },
   { href: "/admin/hotels", label: "酒店管理", icon: HotelIcon },
   { href: "/admin/bookings", label: "预订管理", icon: BookmarkIcon },
+  { href: "/admin/submissions", label: "投稿审核", icon: FileEditIcon },
   { href: "/admin/albums", label: "图片直播", icon: ImageIcon },
+  { href: "/admin/guests", label: "嘉宾管理", icon: StarIcon },
+  { href: "/admin/receptions", label: "接待管理", icon: UsersIcon },
+  { href: "/admin/channels", label: "渠道推广", icon: LinkIcon },
+  { href: "/admin/badge-template", label: "胸卡模板", icon: FileTextIcon },
   { href: "/admin/users", label: "用户管理", icon: UserCogIcon },
   { href: "/admin/checkin", label: "签到管理", icon: ScanIcon },
 ];

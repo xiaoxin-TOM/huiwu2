@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getPage } from "@/lib/pages-admin";
+import { getPageBySlug } from "@/lib/pages-admin";
+import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 
 const KNOWN: Record<string, string> = {
@@ -9,7 +10,16 @@ const KNOWN: Record<string, string> = {
 
 export default async function EditPagePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const page = await getPage(slug);
+  const meeting = await getCurrentMeeting();
+  if (!meeting) {
+    return (
+      <div className="max-w-3xl space-y-4">
+        <h1 className="text-2xl font-bold">内容页管理</h1>
+        <p className="text-red-600">未选择当前会议，请先到“会议管理”选择或创建一个会议。</p>
+      </div>
+    );
+  }
+  const page = await getPageBySlug(slug, meeting.id);
   const isNew = !page;
   return (
     <div className="max-w-3xl space-y-4">

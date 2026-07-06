@@ -1,17 +1,26 @@
 import { notFound } from "next/navigation";
 import { getNoticeById } from "@/lib/content";
+import { resolveMeeting } from "@/lib/meetings";
+import { meetingHref } from "@/lib/public";
 import RichText from "@/components/RichText";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
 
-export default async function NoticeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function NoticeDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ m?: string }>;
+}) {
   const { id } = await params;
-  const notice = await getNoticeById(id);
+  const meeting = await resolveMeeting((await searchParams).m);
+  const notice = await getNoticeById(id, meeting.id);
   if (!notice) notFound();
 
   return (
     <div className="space-y-4">
-      <PageHeader title="通知详情" backHref="/notices" />
+      <PageHeader title="通知详情" backHref={meetingHref(meeting.id, "/notices")} />
       <SectionCard>
         <h2 className="mb-2 text-xl font-bold text-slate-800">{notice.title}</h2>
         <p className="mb-4 text-sm text-slate-400">{notice.publishedAt.toISOString().slice(0, 10)}</p>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { searchRegistrations } from "@/lib/registrations";
+import { requireCurrentMeetingForRequest } from "@/lib/meetings";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -10,7 +11,8 @@ export async function GET(req: Request) {
   }
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q") ?? "";
-  const list = await searchRegistrations(q);
+  const meeting = await requireCurrentMeetingForRequest(req);
+  const list = await searchRegistrations(q, meeting.id);
   return NextResponse.json({
     ok: true,
     list: list.map((r) => ({

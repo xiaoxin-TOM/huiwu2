@@ -9,8 +9,8 @@ type HotelData = {
   distance: string;
 };
 
-export function createHotel(data: HotelData) {
-  return prisma.hotel.create({ data });
+export function createHotel(meetingId: string, data: HotelData) {
+  return prisma.hotel.create({ data: { ...data, meetingId } });
 }
 
 export function updateHotel(id: string, data: HotelData) {

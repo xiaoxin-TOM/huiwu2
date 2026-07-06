@@ -6,7 +6,13 @@ import { inputClass, selectClass, buttonClass, labelClass } from "@/components/u
 
 type HotelOption = { id: string; name: string; price: number };
 
-export default function BookingForm({ hotels }: { hotels: HotelOption[] }) {
+export default function BookingForm({
+  meetingId,
+  hotels,
+}: {
+  meetingId: string;
+  hotels: HotelOption[];
+}) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -21,6 +27,7 @@ export default function BookingForm({ hotels }: { hotels: HotelOption[] }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          meetingId,
           hotelId: fd.get("hotelId"),
           checkIn: fd.get("checkIn"),
           checkOut: fd.get("checkOut"),
@@ -32,7 +39,7 @@ export default function BookingForm({ hotels }: { hotels: HotelOption[] }) {
         setError(data.error ?? "预订失败");
         return;
       }
-      router.push("/me");
+      router.push(`/m/${meetingId}/me`);
       router.refresh();
     } catch {
       setError("网络错误，请重试");

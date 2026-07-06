@@ -1,11 +1,24 @@
 import Link from "next/link";
 import { listSessionsAdmin } from "@/lib/schedule-admin";
 import { getAllSpeakers } from "@/lib/speakers";
+import { getCurrentMeeting } from "@/lib/meetings";
 import { SessionSpeakerFields } from "@/components/SessionSpeakerFields";
 import AdminForm from "@/components/AdminForm";
 
 export default async function AdminSchedulePage() {
-  const [sessions, speakers] = await Promise.all([listSessionsAdmin(), getAllSpeakers()]);
+  const meeting = await getCurrentMeeting();
+  if (!meeting) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">日程管理</h1>
+        <p className="text-red-600">未选择当前会议，请先到“会议管理”选择或创建一个会议。</p>
+      </div>
+    );
+  }
+  const [sessions, speakers] = await Promise.all([
+    listSessionsAdmin(meeting.id),
+    getAllSpeakers(meeting.id),
+  ]);
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">日程管理</h1>
