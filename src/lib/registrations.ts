@@ -44,6 +44,35 @@ export function getUserRegistration(userId: string, meetingId: string) {
   });
 }
 
+export function listUserRegistrationsAcrossMeetings(userId: string) {
+  return prisma.registration.findMany({
+    where: { userId },
+    include: { meeting: true, type: true },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export function searchRegistrationsAcrossMeetings(query: string) {
+  const q = query.trim();
+  if (!q) return [];
+  const where: Prisma.RegistrationWhereInput = {
+    OR: [
+      { fullName: { contains: q, mode: "insensitive" } },
+      { phone: { contains: q } },
+      { organization: { contains: q, mode: "insensitive" } },
+      { user: { email: { contains: q, mode: "insensitive" } } },
+      { user: { name: { contains: q, mode: "insensitive" } } },
+      { meeting: { title: { contains: q, mode: "insensitive" } } },
+    ],
+  };
+  return prisma.registration.findMany({
+    where,
+    include: { user: true, meeting: true, type: true },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+}
+
 export function listRegistrations(meetingId: string) {
   return prisma.registration.findMany({
     where: { meetingId },

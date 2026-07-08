@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { requireCurrentMeeting } from "@/lib/meetings";
+import { requireSelectedMeeting } from "@/lib/meetings";
+import { redirect } from "next/navigation";
 import AdminSiteForm from "@/components/AdminSiteForm";
+import { ButtonLink } from "@/components/ui/Button";
 import {
   UsersIcon,
   ClipboardListIcon,
   BookmarkIcon,
-
   FileEditIcon,
   StarIcon,
   LinkIcon,
@@ -23,7 +23,8 @@ const STATS = [
 ] as const;
 
 export default async function AdminDashboard() {
-  const meeting = await requireCurrentMeeting();
+  const meeting = await requireSelectedMeeting().catch(() => null);
+  if (!meeting) redirect("/admin/meetings");
   const [regs, checkedIn, bookings, submissions, guests, channels] = await Promise.all([
     prisma.registration.count({ where: { meetingId: meeting.id } }),
     prisma.registration.count({ where: { meetingId: meeting.id, checkedIn: true } }),
@@ -49,12 +50,9 @@ export default async function AdminDashboard() {
           <h1 className="text-xl font-bold text-admin-text">基础信息</h1>
           <p className="text-sm text-admin-muted">当前会议：{meeting.title}</p>
         </div>
-        <Link
-          href="/admin/meetings"
-          className="rounded-lg bg-sky-700 px-3 py-1.5 text-sm text-white hover:bg-sky-800"
-        >
+        <ButtonLink href="/admin/meetings" variant="primary" size="sm">
           切换会议
-        </Link>
+        </ButtonLink>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
@@ -91,18 +89,18 @@ export default async function AdminDashboard() {
         <div className="space-y-4 rounded-xl bg-white p-5 shadow-sm">
           <h2 className="text-lg font-semibold">数据导出</h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Link href="/api/admin/registrations/export" download className="flex items-center gap-2 rounded-lg border border-slate-200 p-3 text-sm hover:bg-slate-50">
+            <ButtonLink href="/api/admin/registrations/export" download variant="secondary" size="sm" className="flex items-center justify-start gap-2 p-3">
               <DownloadIcon className="h-4 w-4" /> 报名名单 CSV
-            </Link>
-            <Link href="/api/admin/bookings/export" download className="flex items-center gap-2 rounded-lg border border-slate-200 p-3 text-sm hover:bg-slate-50">
+            </ButtonLink>
+            <ButtonLink href="/api/admin/bookings/export" download variant="secondary" size="sm" className="flex items-center justify-start gap-2 p-3">
               <DownloadIcon className="h-4 w-4" /> 酒店预订 CSV
-            </Link>
-            <Link href="/api/admin/checkins/export" download className="flex items-center gap-2 rounded-lg border border-slate-200 p-3 text-sm hover:bg-slate-50">
+            </ButtonLink>
+            <ButtonLink href="/api/admin/checkins/export" download variant="secondary" size="sm" className="flex items-center justify-start gap-2 p-3">
               <DownloadIcon className="h-4 w-4" /> 签到记录 CSV
-            </Link>
-            <Link href="/api/admin/channels/export" download className="flex items-center gap-2 rounded-lg border border-slate-200 p-3 text-sm hover:bg-slate-50">
+            </ButtonLink>
+            <ButtonLink href="/api/admin/channels/export" download variant="secondary" size="sm" className="flex items-center justify-start gap-2 p-3">
               <DownloadIcon className="h-4 w-4" /> 渠道统计 CSV
-            </Link>
+            </ButtonLink>
           </div>
         </div>
       </div>

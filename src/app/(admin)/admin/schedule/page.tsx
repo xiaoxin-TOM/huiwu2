@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { listSessionsAdmin } from "@/lib/schedule-admin";
 import { getAllSpeakers } from "@/lib/speakers";
 import { getCurrentMeeting } from "@/lib/meetings";
 import { SessionSpeakerFields } from "@/components/SessionSpeakerFields";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminSchedulePage() {
   const meeting = await getCurrentMeeting();
@@ -30,7 +30,9 @@ export default async function AdminSchedulePage() {
         <input name="room" placeholder="会场" className="rounded border px-2 py-1.5 text-sm" />
         <input name="title" placeholder="场次标题" required className="rounded border px-2 py-1.5 text-sm sm:col-span-3" />
         <SessionSpeakerFields speakers={speakers} />
-        <button type="submit" className="rounded bg-sky-700 px-3 py-1.5 text-sm text-white">新建场次</button>
+        <button type="submit" className="rounded-lg bg-sky-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-sky-800">
+          新建场次
+        </button>
       </AdminForm>
 
       {sessions.length === 0 ? (
@@ -52,10 +54,14 @@ export default async function AdminSchedulePage() {
                   <td>{s.title}</td>
                   <td>{(s.speakers ?? []).map((x) => x.speaker?.name ?? "未知讲者").join("、")}</td>
                   <td className="py-2">
-                    <div className="flex gap-2">
-                      <Link href={`/admin/schedule/${s.id}`} className="text-sky-700 hover:underline">编辑</Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <ButtonLink href={`/admin/schedule/${s.id}`} variant="secondary" size="xs">
+                        编辑
+                      </ButtonLink>
                       <AdminForm action={`/api/admin/sessions/${s.id}/delete`} redirectTo="/admin/schedule">
-                        <button type="submit" className="text-red-600 hover:underline">删除</button>
+                        <button type="submit" className="rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100">
+                          删除
+                        </button>
                       </AdminForm>
                     </div>
                   </td>

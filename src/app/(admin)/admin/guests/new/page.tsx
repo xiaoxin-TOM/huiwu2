@@ -1,11 +1,13 @@
-import Link from "next/link";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default function NewGuestPage() {
   return (
     <div className="max-w-xl space-y-4">
-      <div className="flex items-center gap-2">
-        <Link href="/admin/guests" className="text-sm text-sky-700 hover:underline">← 返回</Link>
+      <div className="flex items-center gap-3">
+        <ButtonLink href="/admin/guests" variant="secondary" size="sm">
+          ← 返回
+        </ButtonLink>
         <h1 className="text-2xl font-bold">新建嘉宾</h1>
       </div>
       <AdminForm action="/api/admin/guests" redirectTo="/admin/guests" className="space-y-4 rounded-xl bg-white p-5 shadow-sm">
@@ -53,7 +55,9 @@ export default function NewGuestPage() {
           <label className="block text-sm text-gray-600">座位信息</label>
           <input name="seatInfo" className="mt-1 w-full rounded-lg border px-3 py-2" />
         </div>
-        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-white hover:bg-sky-800">保存</button>
+        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
+          保存
+        </button>
       </AdminForm>
     </div>
   );

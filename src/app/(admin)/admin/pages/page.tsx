@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { listPages } from "@/lib/pages-admin";
 import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 const KNOWN: { slug: string; label: string }[] = [
   { slug: "venue", label: "会场交通" },
@@ -36,12 +36,9 @@ export default async function AdminPagesPage() {
                     {page ? `标题：${page.title}` : "尚未创建，点击编辑可初始化内容"}
                   </p>
                 </div>
-                <Link
-                  href={`/admin/pages/${k.slug}`}
-                  className="rounded bg-sky-700 px-4 py-2 text-sm text-white hover:bg-sky-800"
-                >
+                <ButtonLink href={`/admin/pages/${k.slug}`} variant="primary" size="sm">
                   {page ? "编辑" : "创建"}
-                </Link>
+                </ButtonLink>
               </div>
             );
           })}
@@ -68,7 +65,9 @@ export default async function AdminPagesPage() {
           <input type="hidden" name="liveUrl" value={meeting.liveUrl ?? ""} />
           <input type="hidden" name="welcomeHtml" value={meeting.welcomeHtml ?? ""} />
           <input type="hidden" name="redirectTo" value="/admin/pages" />
-          <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-sm text-white hover:bg-sky-800">保存脚页内容</button>
+          <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
+            保存脚页内容
+          </button>
         </AdminForm>
       </div>
     </div>

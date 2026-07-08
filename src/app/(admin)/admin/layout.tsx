@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { isAdmin } from "@/lib/access";
+import { getSelectedMeeting } from "@/lib/meetings";
 import {
   HomeIcon,
   BellIcon,
@@ -22,10 +24,11 @@ import {
 } from "@/components/icons";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import AdminShell from "@/components/AdminShell";
+import { ButtonLink } from "@/components/ui/Button";
 
 const MENU = [
-  { href: "/admin", label: "基础信息", icon: HomeIcon },
   { href: "/admin/meetings", label: "会议管理", icon: LayersIcon },
+  { href: "/admin", label: "基础信息", icon: HomeIcon },
   { href: "/admin/notices", label: "通知管理", icon: BellIcon },
   { href: "/admin/pages", label: "内容页", icon: FileTextIcon },
   { href: "/admin/schedule", label: "日程管理", icon: CalendarIcon },
@@ -43,10 +46,30 @@ const MENU = [
   { href: "/admin/checkin", label: "签到管理", icon: ScanIcon },
 ];
 
+function menuItemClass(active: boolean, disabled: boolean) {
+  const base =
+    "group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-left transition";
+  if (disabled) {
+    return `${base} cursor-not-allowed text-white/40`;
+  }
+  if (active) {
+    return `${base} bg-white/20 font-medium text-white`;
+  }
+  return `${base} text-white/90 hover:bg-white/15 hover:text-white`;
+}
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user?.role || !isAdmin(session.user.role)) {
-    redirect("/login");
+    redirect("/login?callbackUrl=/admin/meetings");
+  }
+
+  const [selected, headerStore] = await Promise.all([getSelectedMeeting(), headers()]);
+  const pathname = headerStore.get("x-pathname") ?? "/admin";
+
+  // 未选择会议时，只允许停留在会议管理页
+  if (!selected && pathname !== "/admin/meetings") {
+    redirect("/admin/meetings");
   }
 
   const sidebar = (
@@ -62,15 +85,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <ul className="space-y-1">
           {MENU.map((m) => {
             const Icon = m.icon;
+            const active = pathname === m.href || pathname.startsWith(`${m.href}/`);
+            const disabled = !selected && m.href !== "/admin/meetings";
             return (
               <li key={m.href}>
-                <Link
-                  href={m.href}
-                  className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/90 transition hover:bg-white/15 hover:text-white"
-                >
-                  <Icon className="h-5 w-5 opacity-80 group-hover:opacity-100" />
-                  <span>{m.label}</span>
-                </Link>
+                {disabled ? (
+                  <button type="button" disabled className={menuItemClass(active, true)}>
+                    <Icon className="h-5 w-5 opacity-60" />
+                    <span>{m.label}</span>
+                  </button>
+                ) : (
+                  <Link href={m.href} className={menuItemClass(active, false)}>
+                    <Icon className="h-5 w-5 opacity-80 group-hover:opacity-100" />
+                    <span>{m.label}</span>
+                  </Link>
+                )}
               </li>
             );
           })}
@@ -86,13 +115,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <AdminShell sidebar={sidebar}>
       <div className="mb-6 flex justify-end">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-admin-text shadow-sm transition hover:bg-admin-bg"
-        >
+        <ButtonLink href="/" variant="secondary" size="sm">
           <ArrowLeftIcon className="h-4 w-4" />
           返回首页
-        </Link>
+        </ButtonLink>
       </div>
       {children}
     </AdminShell>

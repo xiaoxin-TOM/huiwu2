@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { getCheckinStats, listRecentCheckins } from "@/lib/registrations";
 import { requireCurrentMeeting } from "@/lib/meetings";
+import { ButtonLink } from "@/components/ui/Button";
 import { ScanIcon, UserCheckIcon } from "@/components/icons";
 
 export default async function AdminCheckinPage() {
@@ -30,30 +30,34 @@ export default async function AdminCheckinPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Link
+        <ButtonLink
           href="/admin/checkin/scan"
-          className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-sm transition hover:shadow-md"
+          variant="secondary"
+          size="md"
+          className="flex items-center justify-start gap-4 rounded-xl bg-white p-5 shadow-sm transition hover:shadow-md"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-sky-100 text-sky-600">
             <ScanIcon className="h-6 w-6" />
           </div>
-          <div>
-            <div className="font-semibold">扫码签到</div>
+          <div className="text-left">
+            <div className="font-semibold text-slate-800">扫码签到</div>
             <div className="text-sm text-gray-500">使用摄像头扫描二维码完成签到</div>
           </div>
-        </Link>
-        <Link
+        </ButtonLink>
+        <ButtonLink
           href="/admin/checkin/manual"
-          className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-sm transition hover:shadow-md"
+          variant="secondary"
+          size="md"
+          className="flex items-center justify-start gap-4 rounded-xl bg-white p-5 shadow-sm transition hover:shadow-md"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
             <UserCheckIcon className="h-6 w-6" />
           </div>
-          <div>
-            <div className="font-semibold">手动签到</div>
+          <div className="text-left">
+            <div className="font-semibold text-slate-800">手动签到</div>
             <div className="text-sm text-gray-500">搜索姓名、手机或单位后手动签到</div>
           </div>
-        </Link>
+        </ButtonLink>
       </div>
 
       <div className="rounded-xl bg-white p-5 shadow-sm">

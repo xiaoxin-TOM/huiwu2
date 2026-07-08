@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getChannelById } from "@/lib/channels-admin";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default async function EditChannelPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -10,10 +10,10 @@ export default async function EditChannelPage({ params }: { params: Promise<{ id
 
   return (
     <div className="max-w-xl space-y-4">
-      <div className="flex items-center gap-2">
-        <Link href="/admin/channels" className="text-sm text-sky-700 hover:underline">
+      <div className="flex items-center gap-3">
+        <ButtonLink href="/admin/channels" variant="secondary" size="sm">
           ← 返回
-        </Link>
+        </ButtonLink>
         <h1 className="text-2xl font-bold">编辑渠道</h1>
       </div>
       <AdminForm
@@ -55,7 +55,7 @@ export default async function EditChannelPage({ params }: { params: Promise<{ id
             className="mt-1 w-full rounded-lg border px-3 py-2"
           />
         </div>
-        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-white hover:bg-sky-800">
+        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
           保存
         </button>
       </AdminForm>

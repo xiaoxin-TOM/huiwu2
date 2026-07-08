@@ -1,9 +1,10 @@
-import Link from "next/link";
-import { listMeetings, getCurrentMeeting } from "@/lib/meetings";
+import { listMeetings, getSelectedMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
+import { CopyRegistrationLink } from "@/components/CopyRegistrationLink";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminMeetingsPage() {
-  const [meetings, current] = await Promise.all([listMeetings(), getCurrentMeeting()]);
+  const [meetings, current] = await Promise.all([listMeetings(), getSelectedMeeting()]);
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -13,9 +14,9 @@ export default async function AdminMeetingsPage() {
             当前管理会议：{current ? current.title : "无（请先选择或新建会议）"}
           </p>
         </div>
-        <Link href="/admin/meetings/new" className="rounded-lg bg-sky-700 px-3 py-1.5 text-sm text-white hover:bg-sky-800">
+        <ButtonLink href="/admin/meetings/new" variant="primary">
           + 新建会议
-        </Link>
+        </ButtonLink>
       </div>
       {meetings.length === 0 ? (
         <p className="text-gray-500">暂无会议。</p>
@@ -28,6 +29,7 @@ export default async function AdminMeetingsPage() {
                 <th className="px-4 py-3">地点</th>
                 <th className="px-4 py-3">时间</th>
                 <th className="px-4 py-3">默认</th>
+                <th className="px-4 py-3">报名链接</th>
                 <th className="px-4 py-3">操作</th>
               </tr>
             </thead>
@@ -44,19 +46,30 @@ export default async function AdminMeetingsPage() {
                       <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">默认</span>
                     ) : (
                       <AdminForm action={`/api/admin/meetings/${m.id}/default`} redirectTo="/admin/meetings" className="inline">
-                        <button type="submit" className="text-xs text-sky-700 hover:underline">设为默认</button>
+                        <button type="submit" className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 transition hover:bg-slate-50">
+                          设为默认
+                        </button>
                       </AdminForm>
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-3 text-xs">
+                    <CopyRegistrationLink meetingId={m.id} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap items-center gap-2">
                       <AdminForm action="/api/admin/meetings/select" redirectTo="/admin" className="inline">
                         <input type="hidden" name="id" value={m.id} />
-                        <button type="submit" className="text-emerald-700 hover:underline">进入管理</button>
+                        <button type="submit" className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700">
+                          进入管理
+                        </button>
                       </AdminForm>
-                      <Link href={`/admin/meetings/${m.id}/edit`} className="text-sky-700 hover:underline">编辑</Link>
+                      <ButtonLink href={`/admin/meetings/${m.id}/edit`} variant="secondary" size="xs">
+                        编辑
+                      </ButtonLink>
                       <AdminForm action={`/api/admin/meetings/${m.id}/delete`} redirectTo="/admin/meetings" className="inline">
-                        <button type="submit" className="text-red-600 hover:underline">删除</button>
+                        <button type="submit" className="rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100">
+                          删除
+                        </button>
                       </AdminForm>
                     </div>
                   </td>

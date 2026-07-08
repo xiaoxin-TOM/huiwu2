@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getUserById } from "@/lib/users-admin";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default async function EditUserPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -10,8 +10,10 @@ export default async function EditUserPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="max-w-md space-y-4">
-      <div className="flex items-center gap-2">
-        <Link href="/admin/users" className="text-sm text-sky-700 hover:underline">← 返回</Link>
+      <div className="flex items-center gap-3">
+        <ButtonLink href="/admin/users" variant="secondary" size="sm">
+          ← 返回
+        </ButtonLink>
         <h1 className="text-2xl font-bold">编辑用户</h1>
       </div>
       <AdminForm action={`/api/admin/users/${user.id}`} redirectTo="/admin/users" className="space-y-4 rounded-xl bg-white p-5 shadow-sm">
@@ -38,7 +40,9 @@ export default async function EditUserPage({ params }: { params: Promise<{ id: s
           <input type="checkbox" name="isActive" value="on" id="isActive" defaultChecked={user.isActive} />
           <label htmlFor="isActive" className="text-sm text-gray-600">启用</label>
         </div>
-        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-white hover:bg-sky-800">保存</button>
+        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
+          保存
+        </button>
       </AdminForm>
     </div>
   );

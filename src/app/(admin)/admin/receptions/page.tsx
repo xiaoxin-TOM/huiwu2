@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { requireCurrentMeeting } from "@/lib/meetings";
 import { listGuests } from "@/lib/guests-admin";
 import ReceptionExportButton from "@/components/ReceptionExportButton";
 import QuickRoomEdit from "@/components/QuickRoomEdit";
+import { ButtonLink } from "@/components/ui/Button";
 
 const LEVEL_LABEL: Record<string, string> = {
   VIP: "VIP",
@@ -21,7 +21,13 @@ export default async function AdminReceptionsPage() {
         <ReceptionExportButton guests={guests.map((g) => ({ ...g, reception: g.reception }))} />
       </div>
       {guests.length === 0 ? (
-        <p className="text-gray-500">暂无嘉宾接待信息。请先在 <Link href="/admin/guests" className="text-sky-700 hover:underline">嘉宾管理</Link> 中添加嘉宾。</p>
+        <p className="text-gray-500">
+          暂无嘉宾接待信息。请先在{" "}
+          <ButtonLink href="/admin/guests" variant="ghost" size="xs">
+            嘉宾管理
+          </ButtonLink>{" "}
+          中添加嘉宾。
+        </p>
       ) : (
         <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
           <table className="w-full border-collapse text-sm">
@@ -62,7 +68,9 @@ export default async function AdminReceptionsPage() {
                     {[g.reception?.carDriver, g.reception?.carPlate].filter(Boolean).join(" / ") || "-"}
                   </td>
                   <td className="px-4 py-3">
-                    <Link href={`/admin/guests/${g.id}/edit`} className="text-xs text-sky-700 hover:underline">编辑</Link>
+                    <ButtonLink href={`/admin/guests/${g.id}/edit`} variant="secondary" size="xs">
+                      编辑
+                    </ButtonLink>
                   </td>
                 </tr>
               ))}

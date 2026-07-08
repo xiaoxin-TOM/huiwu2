@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGuestById } from "@/lib/guests-admin";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default async function EditGuestPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -11,8 +11,10 @@ export default async function EditGuestPage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div className="flex items-center gap-2">
-        <Link href="/admin/guests" className="text-sm text-sky-700 hover:underline">← 返回</Link>
+      <div className="flex items-center gap-3">
+        <ButtonLink href="/admin/guests" variant="secondary" size="sm">
+          ← 返回
+        </ButtonLink>
         <h1 className="text-2xl font-bold">编辑嘉宾</h1>
       </div>
       <AdminForm action={`/api/admin/guests/${guest.id}`} redirectTo="/admin/guests" className="space-y-4 rounded-xl bg-white p-5 shadow-sm">
@@ -137,7 +139,9 @@ export default async function EditGuestPage({ params }: { params: Promise<{ id: 
           <textarea name="remark" rows={2} defaultValue={r?.remark ?? ""} className="mt-1 w-full rounded-lg border px-3 py-2" />
         </div>
 
-        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-white hover:bg-sky-800">保存</button>
+        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
+          保存
+        </button>
       </AdminForm>
     </div>
   );

@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { listAllNotices } from "@/lib/notices-admin";
 import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminNoticesPage() {
   const meeting = await getCurrentMeeting();
@@ -26,7 +26,9 @@ export default async function AdminNoticesPage() {
         <label className="flex items-center gap-2 text-sm text-gray-600">
           <input type="checkbox" name="isPublished" defaultChecked /> 立即发布
         </label>
-        <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-sm text-white">新建</button>
+        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
+          新建
+        </button>
       </AdminForm>
 
       {notices.length === 0 ? (
@@ -45,11 +47,17 @@ export default async function AdminNoticesPage() {
                   <td className="py-2">{n.title}</td>
                   <td>{n.isPublished ? "已发布" : "未发布"}</td>
                   <td>{n.publishedAt.toISOString().slice(0, 10)}</td>
-                  <td className="flex gap-2 py-2">
-                    <Link href={`/admin/notices/${n.id}`} className="text-sky-700 hover:underline">编辑</Link>
-                    <AdminForm action={`/api/admin/notices/${n.id}/delete`} redirectTo="/admin/notices">
-                      <button type="submit" className="text-red-600 hover:underline">删除</button>
-                    </AdminForm>
+                  <td className="py-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <ButtonLink href={`/admin/notices/${n.id}`} variant="secondary" size="xs">
+                        编辑
+                      </ButtonLink>
+                      <AdminForm action={`/api/admin/notices/${n.id}/delete`} redirectTo="/admin/notices">
+                        <button type="submit" className="rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100">
+                          删除
+                        </button>
+                      </AdminForm>
+                    </div>
                   </td>
                 </tr>
               ))}

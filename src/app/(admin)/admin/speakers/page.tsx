@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { getAllSpeakers } from "@/lib/speakers";
 import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminSpeakersPage() {
   const meeting = await getCurrentMeeting();
@@ -28,7 +28,9 @@ export default async function AdminSpeakersPage() {
         <label className="flex items-center gap-2 text-sm text-gray-600">
           <input type="checkbox" name="isModerator" /> 主持人
         </label>
-        <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-sm text-white">新建</button>
+        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
+          新建
+        </button>
       </AdminForm>
 
       {speakers.length === 0 ? (
@@ -49,10 +51,14 @@ export default async function AdminSpeakersPage() {
                   <td>{s.organization}</td>
                   <td>{s.isModerator ? "主持人" : "讲者"}</td>
                   <td className="py-2">
-                    <div className="flex gap-2">
-                      <Link href={`/admin/speakers/${s.id}`} className="text-sky-700 hover:underline">编辑</Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <ButtonLink href={`/admin/speakers/${s.id}`} variant="secondary" size="xs">
+                        编辑
+                      </ButtonLink>
                       <AdminForm action={`/api/admin/speakers/${s.id}/delete`} redirectTo="/admin/speakers">
-                        <button type="submit" className="text-red-600 hover:underline">删除</button>
+                        <button type="submit" className="rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100">
+                          删除
+                        </button>
                       </AdminForm>
                     </div>
                   </td>

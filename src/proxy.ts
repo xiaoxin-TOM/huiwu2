@@ -7,6 +7,13 @@ const { auth } = NextAuth(authConfig);
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 
+type AuthRequest = Parameters<Parameters<typeof auth>[0]>[0];
+
+function withPathnameHeader(req: AuthRequest, headers: Headers) {
+  headers.set("x-pathname", req.nextUrl.pathname);
+  return headers;
+}
+
 function rewriteWithMeeting(
   req: Parameters<Parameters<typeof auth>[0]>[0],
   meetingId: string,
@@ -15,7 +22,8 @@ function rewriteWithMeeting(
   const url = req.nextUrl.clone();
   url.pathname = targetPathname;
   url.searchParams.set("m", meetingId);
-  const response = NextResponse.rewrite(url);
+  const requestHeaders = withPathnameHeader(req, new Headers(req.headers));
+  const response = NextResponse.rewrite(url, { request: { headers: requestHeaders } });
   response.cookies.set("public_meeting_id", meetingId, {
     path: "/",
     maxAge: COOKIE_MAX_AGE,
@@ -24,11 +32,21 @@ function rewriteWithMeeting(
   return response;
 }
 
+function redirectToLogin(req: AuthRequest) {
+  const login = new URL("/login", req.nextUrl.origin);
+  login.searchParams.set("callbackUrl", `${req.nextUrl.pathname}${req.nextUrl.search}`);
+  return NextResponse.redirect(login);
+}
+
 export const proxy = auth((req) => {
   const { pathname } = req.nextUrl;
+  const role = req.auth?.user?.role as string | undefined;
 
   const rMatch = pathname.match(/^\/r\/([^/]+)$/);
   if (rMatch) {
+    if (!role) {
+      return redirectToLogin(req);
+    }
     return rewriteWithMeeting(req, rMatch[1], "/register-conf");
   }
 
@@ -42,12 +60,11 @@ export const proxy = auth((req) => {
     return rewriteWithMeeting(req, mMatch[1], mMatch[2]);
   }
 
-  const role = req.auth?.user?.role as string | undefined;
   if (!isAdmin(role)) {
-    const url = new URL("/login", req.nextUrl.origin);
-    return NextResponse.redirect(url);
+    return redirectToLogin(req);
   }
-  return NextResponse.next();
+  const requestHeaders = withPathnameHeader(req, new Headers(req.headers));
+  return NextResponse.next({ request: { headers: requestHeaders } });
 });
 
 export const config = {

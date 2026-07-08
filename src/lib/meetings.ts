@@ -155,3 +155,23 @@ export async function requireMeetingFromSearchParams(searchParams: { m?: string 
   const params = await searchParams;
   return resolveMeeting(params.m);
 }
+
+export async function getSelectedMeetingId(): Promise<string | null> {
+  const c = await cookies();
+  const id = c.get("admin_meeting_id")?.value;
+  if (!id) return null;
+  const exists = await prisma.meeting.findUnique({ where: { id } });
+  return exists ? id : null;
+}
+
+export async function getSelectedMeeting() {
+  const id = await getSelectedMeetingId();
+  if (!id) return null;
+  return prisma.meeting.findUnique({ where: { id } });
+}
+
+export async function requireSelectedMeeting(): Promise<NonNullable<Awaited<ReturnType<typeof getSelectedMeeting>>>> {
+  const meeting = await getSelectedMeeting();
+  if (!meeting) throw new Error("NO_SELECTED_MEETING");
+  return meeting;
+}

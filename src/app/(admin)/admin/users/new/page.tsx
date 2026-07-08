@@ -1,11 +1,13 @@
-import Link from "next/link";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default function NewUserPage() {
   return (
     <div className="max-w-md space-y-4">
-      <div className="flex items-center gap-2">
-        <Link href="/admin/users" className="text-sm text-sky-700 hover:underline">← 返回</Link>
+      <div className="flex items-center gap-3">
+        <ButtonLink href="/admin/users" variant="secondary" size="sm">
+          ← 返回
+        </ButtonLink>
         <h1 className="text-2xl font-bold">新建用户</h1>
       </div>
       <AdminForm action="/api/admin/users" redirectTo="/admin/users" className="space-y-4 rounded-xl bg-white p-5 shadow-sm">
@@ -32,7 +34,9 @@ export default function NewUserPage() {
           <input type="checkbox" name="isActive" value="on" id="isActive" defaultChecked />
           <label htmlFor="isActive" className="text-sm text-gray-600">启用</label>
         </div>
-        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-white hover:bg-sky-800">保存</button>
+        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
+          保存
+        </button>
       </AdminForm>
     </div>
   );

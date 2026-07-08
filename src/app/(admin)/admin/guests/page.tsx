@@ -3,6 +3,7 @@ import { requireCurrentMeeting } from "@/lib/meetings";
 import { listGuests } from "@/lib/guests-admin";
 import AdminForm from "@/components/AdminForm";
 import CopyInviteLinkButton from "@/components/CopyInviteLinkButton";
+import { ButtonLink } from "@/components/ui/Button";
 
 const LEVEL_OPTIONS = [
   { value: "ALL", label: "全部" },
@@ -31,11 +32,12 @@ export default async function AdminGuestsPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">嘉宾管理</h1>
         <div className="flex items-center gap-2">
-          <Link href="/admin/guests/import" className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm hover:bg-slate-50">
-          </Link>
-          <Link href="/admin/guests/new" className="rounded-lg bg-sky-700 px-3 py-1.5 text-sm text-white hover:bg-sky-800">
+          <ButtonLink href="/admin/guests/import" variant="secondary" size="sm">
+            导入嘉宾
+          </ButtonLink>
+          <ButtonLink href="/admin/guests/new" variant="primary" size="sm">
             + 新建嘉宾
-          </Link>
+          </ButtonLink>
         </div>
       </div>
 
@@ -56,7 +58,9 @@ export default async function AdminGuestsPage({
           className="ml-auto rounded-lg border px-3 py-1.5 text-sm"
         />
         <input type="hidden" name="level" value={level} />
-        <button type="submit" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-slate-50">搜索</button>
+        <button type="submit" className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+          搜索
+        </button>
       </form>
 
       {guests.length === 0 ? (
@@ -87,11 +91,15 @@ export default async function AdminGuestsPage({
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-3 text-xs">
-                      <Link href={`/admin/guests/${g.id}/edit`} className="text-sky-700 hover:underline">编辑</Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <ButtonLink href={`/admin/guests/${g.id}/edit`} variant="secondary" size="xs">
+                        编辑
+                      </ButtonLink>
                       <CopyInviteLinkButton token={g.token} />
                       <AdminForm action={`/api/admin/guests/${g.id}/delete`} redirectTo="/admin/guests" className="inline">
-                        <button type="submit" className="text-red-600 hover:underline">删除</button>
+                        <button type="submit" className="rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100">
+                          删除
+                        </button>
                       </AdminForm>
                     </div>
                   </td>
