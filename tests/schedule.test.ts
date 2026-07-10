@@ -4,6 +4,7 @@ import { groupByDayAndRoom, type SessionWithSpeakers } from "@/lib/schedule";
 function sess(p: Partial<SessionWithSpeakers>): SessionWithSpeakers {
   return {
     id: p.id ?? "x",
+    meetingId: p.meetingId ?? "default-meeting",
     day: p.day ?? "2026-09-18",
     startTime: p.startTime ?? "09:00",
     endTime: p.endTime ?? "10:00",

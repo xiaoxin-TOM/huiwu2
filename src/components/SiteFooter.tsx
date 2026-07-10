@@ -1,15 +1,9 @@
-import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { getPublicMeetingForRequest } from "@/lib/meetings";
 import { getPublicConfig } from "@/lib/public";
 
 async function getFooterMeeting() {
-  const c = await cookies();
-  const meetingId = c.get("public_meeting_id")?.value;
-  if (meetingId) {
-    const meeting = await prisma.meeting.findUnique({ where: { id: meetingId } });
-    if (meeting) return meeting;
-  }
-  return prisma.meeting.findFirst({ where: { isDefault: true } });
+  return getPublicMeetingForRequest();
 }
 
 export default async function SiteFooter() {

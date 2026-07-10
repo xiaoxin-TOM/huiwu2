@@ -1,5 +1,5 @@
 import { getAllSpeakers, filterSpeakers } from "@/lib/speakers";
-import { resolveMeeting } from "@/lib/meetings";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { meetingHref } from "@/lib/public";
 import { DataCard, FormCard, inputClass, buttonClass } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -11,7 +11,8 @@ export default async function SpeakersPage({
   searchParams: Promise<{ m?: string; q?: string }>;
 }) {
   const params = await searchParams;
-  const meeting = await resolveMeeting(params.m);
+  const meeting = await requirePublicMeeting(params.m);
+  await guardPublicAccess(meeting.id);
   const { q = "" } = params;
   const speakers = filterSpeakers(await getAllSpeakers(meeting.id), q);
 

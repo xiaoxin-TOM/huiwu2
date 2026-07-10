@@ -2,6 +2,7 @@ import { getAllSpeakers } from "@/lib/speakers";
 import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 import { ButtonLink } from "@/components/ui/Button";
+import SpeakerInviteButton from "@/components/SpeakerInviteButton";
 
 export default async function AdminSpeakersPage() {
   const meeting = await getCurrentMeeting();
@@ -40,7 +41,12 @@ export default async function AdminSpeakersPage() {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500">
-                <th className="py-2">姓名</th><th>职称</th><th>单位</th><th>角色</th><th>操作</th>
+                <th className="py-2">姓名</th>
+                <th>职称</th>
+                <th>单位</th>
+                <th>角色</th>
+                <th>认证状态</th>
+                <th>操作</th>
               </tr>
             </thead>
             <tbody>
@@ -50,11 +56,27 @@ export default async function AdminSpeakersPage() {
                   <td>{s.title}</td>
                   <td>{s.organization}</td>
                   <td>{s.isModerator ? "主持人" : "讲者"}</td>
+                  <td>
+                    {s.confirmed ? (
+                      <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
+                        已认证
+                      </span>
+                    ) : s.invitedAt ? (
+                      <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700">
+                        待确认
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                        未邀约
+                      </span>
+                    )}
+                  </td>
                   <td className="py-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <ButtonLink href={`/admin/speakers/${s.id}`} variant="secondary" size="xs">
                         编辑
                       </ButtonLink>
+                      <SpeakerInviteButton speakerId={s.id} />
                       <AdminForm action={`/api/admin/speakers/${s.id}/delete`} redirectTo="/admin/speakers">
                         <button type="submit" className="rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100">
                           删除

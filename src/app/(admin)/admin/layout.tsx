@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -24,6 +23,7 @@ import {
 } from "@/components/icons";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import AdminShell from "@/components/AdminShell";
+import AdminNavItem from "@/components/AdminNavItem";
 import { ButtonLink } from "@/components/ui/Button";
 
 const MENU = [
@@ -45,18 +45,6 @@ const MENU = [
   { href: "/admin/users", label: "用户管理", icon: UserCogIcon },
   { href: "/admin/checkin", label: "签到管理", icon: ScanIcon },
 ];
-
-function menuItemClass(active: boolean, disabled: boolean) {
-  const base =
-    "group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-left transition";
-  if (disabled) {
-    return `${base} cursor-not-allowed text-white/40`;
-  }
-  if (active) {
-    return `${base} bg-white/20 font-medium text-white`;
-  }
-  return `${base} text-white/90 hover:bg-white/15 hover:text-white`;
-}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -84,22 +72,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <ul className="space-y-1">
           {MENU.map((m) => {
-            const Icon = m.icon;
-            const active = pathname === m.href || pathname.startsWith(`${m.href}/`);
             const disabled = !selected && m.href !== "/admin/meetings";
             return (
               <li key={m.href}>
-                {disabled ? (
-                  <button type="button" disabled className={menuItemClass(active, true)}>
-                    <Icon className="h-5 w-5 opacity-60" />
-                    <span>{m.label}</span>
-                  </button>
-                ) : (
-                  <Link href={m.href} className={menuItemClass(active, false)}>
-                    <Icon className="h-5 w-5 opacity-80 group-hover:opacity-100" />
-                    <span>{m.label}</span>
-                  </Link>
-                )}
+                <AdminNavItem href={m.href} label={m.label} icon={m.icon} disabled={disabled} />
               </li>
             );
           })}

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { resolveMeeting } from "@/lib/meetings";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { getPublicConfig } from "@/lib/public";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
@@ -10,7 +10,8 @@ export default async function LivePage({
 }: {
   searchParams: Promise<{ m?: string }>;
 }) {
-  const meeting = await resolveMeeting((await searchParams).m);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
   const siteConfig = await prisma.siteConfig.findUnique({ where: { id: 1 } });
   const cfg = getPublicConfig(meeting, siteConfig);
   const liveUrl = cfg.liveUrl;

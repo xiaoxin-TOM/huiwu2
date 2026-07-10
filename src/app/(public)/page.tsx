@@ -2,7 +2,7 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import RichText from "@/components/RichText";
 import { IconCard } from "@/components/ui/Card";
-import { resolveMeeting } from "@/lib/meetings";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { getPublicConfig, meetingHref } from "@/lib/public";
 import {
   MailIcon,
@@ -33,7 +33,8 @@ export default async function HomePage({
 }: {
   searchParams: Promise<{ m?: string }>;
 }) {
-  const meeting = await resolveMeeting((await searchParams).m);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
   const siteConfig = await prisma.siteConfig.findUnique({ where: { id: 1 } });
   const cfg = getPublicConfig(meeting, siteConfig);
 

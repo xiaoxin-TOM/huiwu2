@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/session";
 import { listUserSubmissions } from "@/lib/submissions";
-import { resolveMeeting } from "@/lib/meetings";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { meetingHref } from "@/lib/public";
 import SubmissionForm from "@/components/SubmissionForm";
 import { STATUS_LABEL } from "@/lib/labels";
@@ -14,7 +14,8 @@ export default async function SubmissionsPage({
   searchParams: Promise<{ m?: string }>;
 }) {
   const user = await requireUser();
-  const meeting = await resolveMeeting((await searchParams).m);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
   const subs = await listUserSubmissions(user.id, meeting.id);
 
   return (

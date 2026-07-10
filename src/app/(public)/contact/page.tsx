@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getPage } from "@/lib/content";
-import { resolveMeeting } from "@/lib/meetings";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { getPublicConfig } from "@/lib/public";
 import RichText from "@/components/RichText";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -11,7 +11,8 @@ export default async function ContactPage({
 }: {
   searchParams: Promise<{ m?: string }>;
 }) {
-  const meeting = await resolveMeeting((await searchParams).m);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
   const siteConfig = await prisma.siteConfig.findUnique({ where: { id: 1 } });
   const cfg = getPublicConfig(meeting, siteConfig);
   const page = await getPage("contact", meeting.id);

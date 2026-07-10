@@ -1,5 +1,5 @@
 import { getDetailedSessions, groupByDayAndRoom } from "@/lib/schedule";
-import { resolveMeeting } from "@/lib/meetings";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
 import { ClockIcon, UsersIcon, CalendarIcon } from "@/components/icons";
@@ -9,7 +9,8 @@ export default async function SchedulePage({
 }: {
   searchParams: Promise<{ m?: string }>;
 }) {
-  const meeting = await resolveMeeting((await searchParams).m);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
   const grouped = groupByDayAndRoom(await getDetailedSessions(meeting.id));
   return (
     <div className="space-y-5">

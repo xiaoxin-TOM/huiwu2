@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 export function listMeetings() {
@@ -133,11 +133,32 @@ export async function requireCurrentMeetingForRequest(req: Request) {
   return meeting;
 }
 
+export async function getPublicMeetingFromCookie() {
+  const c = await cookies();
+  const id = c.get("public_meeting_id")?.value;
+  if (!id) return null;
+  return prisma.meeting.findUnique({ where: { id } });
+}
+
+export async function getPublicMeetingForRequest() {
+  const h = await headers();
+  const headerId = h.get("x-meeting-id");
+  if (headerId) {
+    const meeting = await prisma.meeting.findUnique({ where: { id: headerId } });
+    if (meeting) return meeting;
+  }
+  const cookieMeeting = await getPublicMeetingFromCookie();
+  if (cookieMeeting) return cookieMeeting;
+  return getDefaultMeeting();
+}
+
 export async function resolveMeetingId(meetingId?: string | null): Promise<string> {
   if (meetingId) {
     const exists = await prisma.meeting.findUnique({ where: { id: meetingId } });
     if (exists) return exists.id;
   }
+  const cookieMeeting = await getPublicMeetingFromCookie();
+  if (cookieMeeting) return cookieMeeting.id;
   const def = await getDefaultMeeting();
   if (!def) throw new Error("NO_DEFAULT_MEETING");
   return def.id;
@@ -148,6 +169,8 @@ export async function resolveMeeting(meetingId?: string | null) {
     const meeting = await prisma.meeting.findUnique({ where: { id: meetingId } });
     if (meeting) return meeting;
   }
+  const cookieMeeting = await getPublicMeetingFromCookie();
+  if (cookieMeeting) return cookieMeeting;
   return requireDefaultMeeting();
 }
 

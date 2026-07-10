@@ -23,6 +23,7 @@ function rewriteWithMeeting(
   url.pathname = targetPathname;
   url.searchParams.set("m", meetingId);
   const requestHeaders = withPathnameHeader(req, new Headers(req.headers));
+  requestHeaders.set("x-meeting-id", meetingId);
   const response = NextResponse.rewrite(url, { request: { headers: requestHeaders } });
   response.cookies.set("public_meeting_id", meetingId, {
     path: "/",

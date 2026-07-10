@@ -1,5 +1,5 @@
 import { listHotels } from "@/lib/hotels";
-import { resolveMeeting } from "@/lib/meetings";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import BookingForm from "@/components/BookingForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard, DataCard } from "@/components/ui/Card";
@@ -10,7 +10,8 @@ export default async function HotelsPage({
 }: {
   searchParams: Promise<{ m?: string }>;
 }) {
-  const meeting = await resolveMeeting((await searchParams).m);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
   const hotels = await listHotels(meeting.id);
   return (
     <div className="space-y-5">

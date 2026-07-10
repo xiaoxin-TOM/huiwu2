@@ -1,5 +1,5 @@
 import { getPublishedNotices } from "@/lib/content";
-import { resolveMeeting } from "@/lib/meetings";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { meetingHref } from "@/lib/public";
 import { DataCard } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -10,7 +10,8 @@ export default async function NoticesPage({
 }: {
   searchParams: Promise<{ m?: string }>;
 }) {
-  const meeting = await resolveMeeting((await searchParams).m);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
   const notices = await getPublishedNotices(meeting.id);
   return (
     <div className="space-y-4">

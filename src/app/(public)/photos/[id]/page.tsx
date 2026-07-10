@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getAlbum } from "@/lib/albums";
-import { resolveMeeting } from "@/lib/meetings";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { meetingHref } from "@/lib/public";
 import { PageHeader } from "@/components/ui/PageHeader";
 
@@ -12,7 +12,8 @@ export default async function AlbumPage({
   searchParams: Promise<{ m?: string }>;
 }) {
   const { id } = await params;
-  const meeting = await resolveMeeting((await searchParams).m);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
   const album = await getAlbum(id, meeting.id);
   if (!album) notFound();
 

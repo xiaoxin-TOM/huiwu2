@@ -22,6 +22,7 @@ model User {
   bookings      HotelBooking[]
   ownedMeetings Meeting[]      @relation("MeetingOwner")
   staffMeetings MeetingStaff[]
+  speakers      Speaker[]
 }
 
 model VerificationCode {
@@ -185,22 +186,31 @@ model Speaker {
   bio          String           @default("")
   photoUrl     String?
   isModerator  Boolean          @default(false)
+  token        String?          @unique @default(uuid())
+  invitedAt    DateTime?
+  confirmed    Boolean          @default(false)
+  confirmedAt  DateTime?
+  userId       String?
+  user         User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
   sessions     SessionSpeaker[]
+  materials    SpeakerMaterial[]
   meeting      Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 
   @@index([meetingId])
+  @@index([userId])
 }
 
 model Session {
-  id        String           @id @default(cuid())
-  meetingId String           @default("default-meeting")
+  id        String            @id @default(cuid())
+  meetingId String            @default("default-meeting")
   day       String // 日期 YYYY-MM-DD
   startTime String
   endTime   String
-  room      String           @default("")
+  room      String            @default("")
   title     String
   speakers  SessionSpeaker[]
-  meeting   Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  materials SpeakerMaterial[]
+  meeting   Meeting           @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 
   @@index([meetingId])
 }
@@ -212,6 +222,21 @@ model SessionSpeaker {
   session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   speaker   Speaker @relation(fields: [speakerId], references: [id], onDelete: Cascade)
   @@id([sessionId, speakerId, role])
+}
+
+model SpeakerMaterial {
+  id         String   @id @default(cuid())
+  speakerId  String
+  sessionId  String
+  fileUrl    String
+  fileName   String
+  fileSize   Int
+  uploadedAt DateTime @default(now())
+  speaker    Speaker  @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([speakerId])
+  @@index([sessionId])
 }
 
 model Hotel {

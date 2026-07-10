@@ -20,3 +20,13 @@ export function getSpeakerById(id: string, meetingId?: string): Promise<Speaker 
   if (meetingId) where.meetingId = meetingId;
   return prisma.speaker.findFirst({ where });
 }
+
+export function getSpeakerSessions(speakerId: string, meetingId: string) {
+  return prisma.session.findMany({
+    where: {
+      meetingId,
+      speakers: { some: { speakerId } },
+    },
+    orderBy: [{ day: "asc" }, { startTime: "asc" }],
+  });
+}
