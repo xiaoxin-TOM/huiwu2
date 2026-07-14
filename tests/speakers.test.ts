@@ -5,12 +5,18 @@ import type { Speaker } from "@prisma/client";
 function spk(partial: Partial<Speaker>): Speaker {
   return {
     id: partial.id ?? "x",
+    meetingId: partial.meetingId ?? "default-meeting",
     name: partial.name ?? "",
     title: partial.title ?? "",
     organization: partial.organization ?? "",
     bio: partial.bio ?? "",
     photoUrl: partial.photoUrl ?? null,
     isModerator: partial.isModerator ?? false,
+    token: partial.token ?? null,
+    invitedAt: partial.invitedAt ?? null,
+    confirmed: partial.confirmed ?? false,
+    confirmedAt: partial.confirmedAt ?? null,
+    userId: partial.userId ?? null,
   };
 }
 

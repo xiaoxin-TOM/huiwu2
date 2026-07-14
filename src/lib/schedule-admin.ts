@@ -12,27 +12,31 @@ type SessionData = {
 
 const include = { speakers: { include: { speaker: true } } } as const;
 
-export function listSessionsAdmin(): Promise<SessionWithSpeakers[]> {
+export function listSessionsAdmin(meetingId: string): Promise<SessionWithSpeakers[]> {
   return prisma.session.findMany({
+    where: { meetingId },
     include,
     orderBy: [{ day: "asc" }, { startTime: "asc" }],
   });
 }
 
-export function getSessionAdmin(id: string): Promise<SessionWithSpeakers | null> {
-  return prisma.session.findUnique({ where: { id }, include });
+export function getSessionAdmin(id: string, meetingId?: string): Promise<SessionWithSpeakers | null> {
+  const where: { id: string; meetingId?: string } = { id };
+  if (meetingId) where.meetingId = meetingId;
+  return prisma.session.findFirst({ where, include });
 }
 
-export function createSession(data: SessionData) {
-  return prisma.session.create({ data });
+export function createSession(meetingId: string, data: SessionData) {
+  return prisma.session.create({ data: { ...data, meetingId } });
 }
 
 export async function createSessionWithSpeakers(
+  meetingId: string,
   data: SessionData,
   links: { speakerId: string; role: string }[],
 ) {
   return prisma.$transaction(async (tx) => {
-    const session = await tx.session.create({ data });
+    const session = await tx.session.create({ data: { ...data, meetingId } });
     if (links.length > 0) {
       const seen = new Set<string>();
       const uniqueLinks = links.filter((l) => {

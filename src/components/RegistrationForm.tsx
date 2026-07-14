@@ -6,7 +6,13 @@ import { inputClass, selectClass, buttonClass, labelClass } from "@/components/u
 
 type TypeOption = { id: string; name: string; fee: number };
 
-export default function RegistrationForm({ types }: { types: TypeOption[] }) {
+export default function RegistrationForm({
+  meetingId,
+  types,
+}: {
+  meetingId: string;
+  types: TypeOption[];
+}) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -21,6 +27,7 @@ export default function RegistrationForm({ types }: { types: TypeOption[] }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          meetingId,
           typeId: fd.get("typeId"),
           fullName: fd.get("fullName"),
           organization: fd.get("organization"),
@@ -33,7 +40,7 @@ export default function RegistrationForm({ types }: { types: TypeOption[] }) {
         setError(data.error ?? "报名失败");
         return;
       }
-      router.push("/me");
+      router.push(`/m/${meetingId}/me`);
       router.refresh();
     } catch {
       setError("网络错误，请重试");

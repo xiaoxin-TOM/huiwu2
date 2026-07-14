@@ -14,10 +14,15 @@ model User {
   phone        String?
   organization String?
   role         String         @default("USER") // USER | ADMIN
+  isActive     Boolean        @default(true)
   createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   registrations Registration[]
   submissions   Submission[]
   bookings      HotelBooking[]
+  ownedMeetings Meeting[]      @relation("MeetingOwner")
+  staffMeetings MeetingStaff[]
+  speakers      Speaker[]
 }
 
 model VerificationCode {
@@ -30,6 +35,7 @@ model VerificationCode {
   @@index([email])
 }
 
+// 全局站点兜底配置（当会议未单独配置时使用）
 model SiteConfig {
   id           Int      @id @default(1)
   confName     String   @default("")
@@ -48,18 +54,69 @@ model SiteConfig {
 }
 
 model Page {
-  slug        String   @id // welcome | venue | contact ...
+  id          String   @id @default(cuid())
+  meetingId   String   @default("default-meeting")
+  slug        String
   title       String
   contentHtml String   @default("")
   updatedAt   DateTime @updatedAt
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, slug])
+  @@index([meetingId])
 }
 
 model Notice {
   id          String   @id @default(cuid())
+  meetingId   String   @default("default-meeting")
   title       String
   contentHtml String   @default("")
   isPublished Boolean  @default(true)
   publishedAt DateTime @default(now())
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model Meeting {
+  id                String          @id @default(cuid())
+  title             String
+  description       String          @default("")
+  location          String          @default("")
+  startDate         String          @default("")
+  endDate           String          @default("")
+  isDefault         Boolean         @default(false)
+  requireApproval   Boolean         @default(false)
+  registrationLimit Int?
+  opensAt           String?
+  closesAt          String?
+  // 会议级站点配置
+  confDate          String          @default("")
+  welcomeHtml       String          @default("")
+  footerHtml        String          @default("")
+  contactHtml       String          @default("")
+  logoUrl           String?
+  liveUrl           String?
+  ownerId           String?
+  owner             User?           @relation("MeetingOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  registrations    Registration[]
+  bookings         HotelBooking[]
+  submissions      Submission[]
+  guests           Guest[]
+  channels         Channel[]
+  badgeTemplate    BadgeTemplate?
+  staff            MeetingStaff[]
+  notices          Notice[]
+  pages            Page[]
+  speakers         Speaker[]
+  sessions         Session[]
+  hotels           Hotel[]
+  albums           Album[]
+
+  @@index([isDefault])
 }
 
 model RegistrationType {
@@ -72,13 +129,13 @@ model RegistrationType {
 
 model Registration {
   id           String           @id @default(cuid())
-  // @unique: 每个用户仅一条报名(DB 级原子约束,防并发重复)
-  userId       String           @unique
-  // Restrict: deleting a User with registrations is blocked
+  userId       String
   user         User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+  meetingId    String
+  meeting      Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
   typeId       String
-  // Restrict: deleting a RegistrationType with registrations is blocked
   type         RegistrationType @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  channelId    String?
   fullName     String
   organization String           @default("")
   title        String           @default("")
@@ -90,6 +147,10 @@ model Registration {
   checkedInAt  DateTime?
   checkinLogs  CheckinLog[]
   createdAt    DateTime         @default(now())
+
+  @@unique([userId, meetingId])
+  @@index([meetingId])
+  @@index([channelId])
 }
 
 model CheckinLog {
@@ -107,35 +168,55 @@ model CheckinLog {
 model Submission {
   id        String   @id @default(cuid())
   userId    String
-  // Restrict: deleting a User with submissions is blocked
   user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  meetingId String
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
   title     String
   authors   String
   abstract  String
   fileUrl   String?
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
+
+  @@index([meetingId])
 }
 
 model Speaker {
   id           String           @id @default(cuid())
+  meetingId    String           @default("default-meeting")
   name         String
   title        String           @default("")
   organization String           @default("")
   bio          String           @default("")
   photoUrl     String?
   isModerator  Boolean          @default(false)
+  token        String?          @unique @default(uuid())
+  invitedAt    DateTime?
+  confirmed    Boolean          @default(false)
+  confirmedAt  DateTime?
+  userId       String?
+  user         User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
   sessions     SessionSpeaker[]
+  materials    SpeakerMaterial[]
+  meeting      Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+  @@index([userId])
 }
 
 model Session {
-  id        String           @id @default(cuid())
+  id        String            @id @default(cuid())
+  meetingId String            @default("default-meeting")
   day       String // 日期 YYYY-MM-DD
   startTime String
   endTime   String
-  room      String           @default("")
+  room      String            @default("")
   title     String
   speakers  SessionSpeaker[]
+  materials SpeakerMaterial[]
+  meeting   Meeting           @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
 }
 
 model SessionSpeaker {
@@ -147,8 +228,24 @@ model SessionSpeaker {
   @@id([sessionId, speakerId, role])
 }
 
+model SpeakerMaterial {
+  id         String   @id @default(cuid())
+  speakerId  String
+  sessionId  String
+  fileUrl    String
+  fileName   String
+  fileSize   Int
+  uploadedAt DateTime @default(now())
+  speaker    Speaker  @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([speakerId])
+  @@index([sessionId])
+}
+
 model Hotel {
   id          String         @id @default(cuid())
+  meetingId   String         @default("default-meeting")
   name        String
   description String         @default("")
   price       Int            @default(0)
@@ -156,29 +253,38 @@ model Hotel {
   imageUrl    String?
   distance    String         @default("")
   bookings    HotelBooking[]
+  meeting     Meeting        @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
 }
 
 model HotelBooking {
   id        String   @id @default(cuid())
   userId    String
-  // Restrict: deleting a User with hotel bookings is blocked
   user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  meetingId String
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
   hotelId   String
-  // Restrict: deleting a Hotel with bookings is blocked
   hotel     Hotel    @relation(fields: [hotelId], references: [id], onDelete: Restrict)
   checkIn   String
   checkOut  String
   rooms     Int      @default(1)
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
+
+  @@index([meetingId])
 }
 
 model Album {
-  id       String  @id @default(cuid())
-  title    String
-  date     String  @default("")
-  coverUrl String?
-  photos   Photo[]
+  id        String  @id @default(cuid())
+  meetingId String  @default("default-meeting")
+  title     String
+  date      String  @default("")
+  coverUrl  String?
+  photos    Photo[]
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
 }
 
 model Photo {
@@ -188,4 +294,115 @@ model Photo {
   url       String
   caption   String   @default("")
   createdAt DateTime @default(now())
+}
+
+model Guest {
+  id          String          @id @default(cuid())
+  meetingId   String
+  meeting     Meeting         @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  name        String
+  phone       String?
+  email       String?
+  company     String          @default("")
+  title       String          @default("")
+  level       String          @default("NORMAL") // VIP | NORMAL | MEDIA
+  avatarUrl   String?
+  bio         String          @default("")
+  token       String          @unique @default(uuid())
+  confirmed   Boolean         @default(false)
+  confirmedAt DateTime?
+  note        String          @default("")
+  seatInfo    String          @default("")
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  reception   GuestReception?
+
+  @@index([meetingId])
+  @@index([level])
+}
+
+model GuestReception {
+  id              String   @id @default(cuid())
+  guestId         String   @unique
+  guest           Guest    @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  arriveMode      String   @default("") // 航班/高铁/自驾
+  arriveNo        String   @default("")
+  arriveTime      String   @default("")
+  arrivePlace     String   @default("")
+  departMode      String   @default("")
+  departNo        String   @default("")
+  departTime      String   @default("")
+  hotelName       String   @default("")
+  hotelRoom       String   @default("")
+  hotelCheckIn    String   @default("")
+  hotelCheckOut   String   @default("")
+  carPlate        String   @default("")
+  carDriver       String   @default("")
+  carDriverPhone  String   @default("")
+  carContact      String   @default("")
+  remark          String   @default("")
+  updatedAt       DateTime @updatedAt
+}
+
+model BadgeTemplate {
+  id                String   @id @default(cuid())
+  meetingId         String   @unique
+  meeting           Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  pageWidthMm       Int      @default(86)
+  pageHeightMm      Int      @default(147)
+  bgImageUrl        String?
+  nameX             Int      @default(43)
+  nameY             Int      @default(52)
+  nameSize          Int      @default(12)
+  titleX            Int      @default(43)
+  titleY            Int      @default(40)
+  titleSize         Int      @default(11)
+  companyX          Int      @default(43)
+  companyY          Int      @default(28)
+  companySize       Int      @default(11)
+  qrX               Int      @default(43)
+  qrY               Int      @default(92)
+  qrSize            Int      @default(34)
+  meetingTitleX     Int      @default(43)
+  meetingTitleY     Int      @default(128)
+  meetingTitleSize  Int      @default(12)
+  updatedAt         DateTime @updatedAt
+}
+
+model Channel {
+  id        String         @id @default(cuid())
+  meetingId String
+  meeting   Meeting        @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  code      String
+  name      String
+  owner     String         @default("")
+  note      String         @default("")
+  createdAt DateTime       @default(now())
+  visits    ChannelVisit[]
+
+  @@unique([meetingId, code])
+  @@index([meetingId])
+}
+
+model ChannelVisit {
+  id        String   @id @default(cuid())
+  channelId String
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  ip        String?
+  ua        String?
+  sessionId String?
+  visitedAt DateTime @default(now())
+
+  @@index([channelId])
+  @@index([sessionId])
+}
+
+model MeetingStaff {
+  meetingId String
+  userId    String
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedAt DateTime @default(now())
+
+  @@id([meetingId, userId])
 }

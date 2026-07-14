@@ -115,3 +115,105 @@ export const hotelSchema = z.object({
 export const roleSchema = z.object({
   role: z.enum(["USER", "ADMIN"]),
 });
+
+export const adminUserCreateSchema = z.object({
+  name: z.string().min(1, "请填写姓名"),
+  email: z.string().email("邮箱格式不正确"),
+  password: z.string().min(6, "密码至少 6 位"),
+  role: z.enum(["USER", "ADMIN"]),
+  isActive: z.boolean(),
+});
+export type AdminUserCreateInput = z.infer<typeof adminUserCreateSchema>;
+
+export const adminUserUpdateSchema = z.object({
+  name: z.string().min(1, "请填写姓名"),
+  email: z.string().email("邮箱格式不正确"),
+  password: z.string().optional(),
+  role: z.enum(["USER", "ADMIN"]),
+  isActive: z.boolean(),
+});
+export type AdminUserUpdateInput = z.infer<typeof adminUserUpdateSchema>;
+
+export const userSearchParamsSchema = z.object({
+  q: z.string().optional().default(""),
+});
+
+export const submissionReviewSchema = z.object({
+  decision: z.enum(["APPROVED", "REJECTED"]),
+});
+
+export const meetingSchema = z.object({
+  title: z.string().min(1, "请填写会议名称"),
+  description: z.string().optional().default(""),
+  location: z.string().optional().default(""),
+  startDate: z.string().optional().default(""),
+  endDate: z.string().optional().default(""),
+  requireApproval: z.coerce.boolean().default(false),
+  registrationLimit: z.coerce.number().int().min(0).optional().nullable(),
+  opensAt: z.string().optional().nullable(),
+  closesAt: z.string().optional().nullable(),
+});
+export type MeetingInput = z.infer<typeof meetingSchema>;
+
+export const guestSchema = z.object({
+  name: z.string().min(1, "请填写姓名"),
+  phone: z.string().optional().default(""),
+  email: z.string().email("邮箱格式不正确").optional().or(z.literal("")),
+  company: z.string().optional().default(""),
+  title: z.string().optional().default(""),
+  level: z.enum(["VIP", "NORMAL", "MEDIA"]).default("NORMAL"),
+  bio: z.string().optional().default(""),
+  note: z.string().optional().default(""),
+  seatInfo: z.string().optional().default(""),
+});
+export type GuestInput = z.infer<typeof guestSchema>;
+
+export const receptionSchema = z.object({
+  arriveMode: z.string().optional().default(""),
+  arriveNo: z.string().optional().default(""),
+  arriveTime: z.string().optional().default(""),
+  arrivePlace: z.string().optional().default(""),
+  departMode: z.string().optional().default(""),
+  departNo: z.string().optional().default(""),
+  departTime: z.string().optional().default(""),
+  hotelName: z.string().optional().default(""),
+  hotelRoom: z.string().optional().default(""),
+  hotelCheckIn: z.string().optional().default(""),
+  hotelCheckOut: z.string().optional().default(""),
+  carPlate: z.string().optional().default(""),
+  carDriver: z.string().optional().default(""),
+  carDriverPhone: z.string().optional().default(""),
+  carContact: z.string().optional().default(""),
+  remark: z.string().optional().default(""),
+});
+export type ReceptionInput = z.infer<typeof receptionSchema>;
+
+export const channelSchema = z.object({
+  code: z.string().min(2, "短码至少 2 位").max(40, "短码过长"),
+  name: z.string().min(1, "请填写渠道名称"),
+  owner: z.string().optional().default(""),
+  note: z.string().optional().default(""),
+});
+export type ChannelInput = z.infer<typeof channelSchema>;
+
+export const badgeTemplateSchema = z.object({
+  pageWidthMm: z.coerce.number().int().min(1),
+  pageHeightMm: z.coerce.number().int().min(1),
+  bgImageUrl: z.string().optional().default(""),
+  nameX: z.coerce.number().int(),
+  nameY: z.coerce.number().int(),
+  nameSize: z.coerce.number().int().min(1),
+  titleX: z.coerce.number().int(),
+  titleY: z.coerce.number().int(),
+  titleSize: z.coerce.number().int().min(1),
+  companyX: z.coerce.number().int(),
+  companyY: z.coerce.number().int(),
+  companySize: z.coerce.number().int().min(1),
+  qrX: z.coerce.number().int(),
+  qrY: z.coerce.number().int(),
+  qrSize: z.coerce.number().int().min(1),
+  meetingTitleX: z.coerce.number().int(),
+  meetingTitleY: z.coerce.number().int(),
+  meetingTitleSize: z.coerce.number().int().min(1),
+});
+export type BadgeTemplateInput = z.infer<typeof badgeTemplateSchema>;

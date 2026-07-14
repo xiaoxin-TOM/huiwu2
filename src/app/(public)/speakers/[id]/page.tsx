@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { getSpeakerById } from "@/lib/speakers";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
+import { meetingHref } from "@/lib/public";
 import RichText from "@/components/RichText";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
@@ -7,16 +9,20 @@ import { UsersIcon } from "@/components/icons";
 
 export default async function SpeakerDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ m?: string }>;
 }) {
   const { id } = await params;
-  const s = await getSpeakerById(id);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
+  const s = await getSpeakerById(id, meeting.id);
   if (!s) notFound();
 
   return (
     <div className="space-y-4">
-      <PageHeader title="讲者详情" backHref="/speakers" />
+      <PageHeader title="讲者详情" backHref={meetingHref(meeting.id, "/speakers")} />
       <SectionCard>
         <div className="mb-4 flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">

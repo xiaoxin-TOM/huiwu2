@@ -1,11 +1,20 @@
 import { prisma } from "@/lib/prisma";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
+import { getPublicConfig } from "@/lib/public";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
 import { VideoIcon, ExternalLinkIcon } from "@/components/icons";
 
-export default async function LivePage() {
-  const cfg = await prisma.siteConfig.findUnique({ where: { id: 1 } });
-  const liveUrl = cfg?.liveUrl;
+export default async function LivePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ m?: string }>;
+}) {
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
+  const siteConfig = await prisma.siteConfig.findUnique({ where: { id: 1 } });
+  const cfg = getPublicConfig(meeting, siteConfig);
+  const liveUrl = cfg.liveUrl;
 
   return (
     <div className="space-y-4">

@@ -1,10 +1,18 @@
 import { getPublishedNotices } from "@/lib/content";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
+import { meetingHref } from "@/lib/public";
 import { DataCard } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { BellIcon } from "@/components/icons";
 
-export default async function NoticesPage() {
-  const notices = await getPublishedNotices();
+export default async function NoticesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ m?: string }>;
+}) {
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
+  const notices = await getPublishedNotices(meeting.id);
   return (
     <div className="space-y-4">
       <PageHeader title="会议通知" />
@@ -15,7 +23,7 @@ export default async function NoticesPage() {
           {notices.map((n) => (
             <DataCard
               key={n.id}
-              href={`/notices/${n.id}`}
+              href={meetingHref(meeting.id, `/notices/${n.id}`)}
               title={n.title}
               meta={n.publishedAt.toISOString().slice(0, 10)}
               icon={<BellIcon className="h-6 w-6" />}

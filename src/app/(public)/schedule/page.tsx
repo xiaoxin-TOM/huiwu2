@@ -1,10 +1,17 @@
 import { getDetailedSessions, groupByDayAndRoom } from "@/lib/schedule";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
 import { ClockIcon, UsersIcon, CalendarIcon } from "@/components/icons";
 
-export default async function SchedulePage() {
-  const grouped = groupByDayAndRoom(await getDetailedSessions());
+export default async function SchedulePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ m?: string }>;
+}) {
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
+  const grouped = groupByDayAndRoom(await getDetailedSessions(meeting.id));
   return (
     <div className="space-y-5">
       <PageHeader title="详细日程" />

@@ -1,9 +1,19 @@
-import Link from "next/link";
 import { listHotels } from "@/lib/hotels";
+import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminHotelsPage() {
-  const hotels = await listHotels();
+  const meeting = await getCurrentMeeting();
+  if (!meeting) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">酒店管理</h1>
+        <p className="text-red-600">未选择当前会议，请先到“会议管理”选择或创建一个会议。</p>
+      </div>
+    );
+  }
+  const hotels = await listHotels(meeting.id);
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">酒店管理</h1>
@@ -15,7 +25,9 @@ export default async function AdminHotelsPage() {
         <input name="distance" placeholder="距离" className="rounded border px-3 py-2" />
         <input name="imageUrl" placeholder="图片地址(可选)" className="col-span-2 rounded border px-3 py-2" />
         <textarea name="description" rows={2} placeholder="简介(HTML)" className="col-span-2 rounded border px-3 py-2 font-mono text-sm" />
-        <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-sm text-white">新建酒店</button>
+        <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
+          新建酒店
+        </button>
       </AdminForm>
 
       {hotels.length === 0 ? (
@@ -36,10 +48,14 @@ export default async function AdminHotelsPage() {
                   <td>{h.address}</td>
                   <td>{h.distance}</td>
                   <td className="py-2">
-                    <div className="flex gap-2">
-                      <Link href={`/admin/hotels/${h.id}`} className="text-sky-700 hover:underline">编辑</Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <ButtonLink href={`/admin/hotels/${h.id}`} variant="secondary" size="xs">
+                        编辑
+                      </ButtonLink>
                       <AdminForm action={`/api/admin/hotels/${h.id}/delete`} redirectTo="/admin/hotels">
-                        <button type="submit" className="text-red-600 hover:underline">删除</button>
+                        <button type="submit" className="rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100">
+                          删除
+                        </button>
                       </AdminForm>
                     </div>
                   </td>

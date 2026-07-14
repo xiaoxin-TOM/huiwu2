@@ -7,27 +7,31 @@ import {
 } from "@/lib/submissions";
 
 let userId: string;
+let meetingId: string;
 
 beforeAll(async () => {
   const u = await prisma.user.create({
-    data: { name: "投稿测试", email: "subtest@example.com", passwordHash: "x" },
+    data: { name: "投稿测试", email: "subtest@example.com", passwordHash: "x", isActive: true },
   });
   userId = u.id;
+  const m = await prisma.meeting.create({ data: { title: "测试会议" } });
+  meetingId = m.id;
 });
 
 afterAll(async () => {
   await prisma.submission.deleteMany({ where: { userId } });
+  await prisma.meeting.delete({ where: { id: meetingId } }).catch(() => {});
   await prisma.user.delete({ where: { id: userId } }).catch(() => {});
   await prisma.$disconnect();
 });
 
 test("创建投稿→列出用户投稿→审核回显", async () => {
-  const sub = await createSubmission(userId, {
+  const sub = await createSubmission(userId, meetingId, {
     title: "论文A", authors: "张三", abstract: "摘要", fileUrl: "/uploads/x.pdf",
   });
   expect(sub.status).toBe("PENDING");
 
-  const list = await listUserSubmissions(userId);
+  const list = await listUserSubmissions(userId, meetingId);
   expect(list).toHaveLength(1);
   expect(list[0].title).toBe("论文A");
 

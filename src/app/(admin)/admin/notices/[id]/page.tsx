@@ -1,10 +1,20 @@
 import { notFound } from "next/navigation";
 import { getNotice } from "@/lib/notices-admin";
+import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 
 export default async function EditNoticePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const notice = await getNotice(id);
+  const meeting = await getCurrentMeeting();
+  if (!meeting) {
+    return (
+      <div className="max-w-2xl space-y-4">
+        <h1 className="text-2xl font-bold">编辑通知</h1>
+        <p className="text-red-600">未选择当前会议，请先到“会议管理”选择或创建一个会议。</p>
+      </div>
+    );
+  }
+  const notice = await getNotice(id, meeting.id);
   if (!notice) notFound();
   return (
     <div className="max-w-2xl space-y-4">

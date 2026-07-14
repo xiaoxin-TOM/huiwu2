@@ -1,15 +1,21 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
 export default function CheckinQrCode({ token }: { token: string }) {
-  const src = useMemo(() => {
-    if (typeof window === "undefined") return "";
+  const [src, setSrc] = useState("");
+
+  useEffect(() => {
     const checkinUrl = `${window.location.origin}/checkin?token=${token}`;
-    return `/api/qr?text=${encodeURIComponent(checkinUrl)}`;
+    // Delay QR src computation until after hydration to avoid SSR/client mismatch,
+    // since window.location.origin is only available in the browser.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSrc(`/api/qr?text=${encodeURIComponent(checkinUrl)}`);
   }, [token]);
 
-  if (!src) return <div className="h-40 w-40 animate-pulse rounded-lg bg-slate-200" />;
+  if (!src) {
+    return <div className="h-40 w-40 animate-pulse rounded-lg bg-slate-200" />;
+  }
 
   return (
     <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 text-center">

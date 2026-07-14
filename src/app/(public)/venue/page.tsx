@@ -1,13 +1,20 @@
 import { getPage } from "@/lib/content";
 import { getSiteConfig } from "@/lib/siteconfig";
 import { parseVenueLocation, amapNavUrl } from "@/lib/venue";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import RichText from "@/components/RichText";
 import VenueMap from "@/components/VenueMap";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
 
-export default async function VenuePage() {
-  const [page, cfg] = await Promise.all([getPage("venue"), getSiteConfig()]);
+export default async function VenuePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ m?: string }>;
+}) {
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
+  const [page, cfg] = await Promise.all([getPage("venue", meeting.id), getSiteConfig()]);
   const venue = parseVenueLocation(cfg);
   return (
     <div className="space-y-4">

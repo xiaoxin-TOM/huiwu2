@@ -11,10 +11,22 @@ export function filterSpeakers(speakers: Speaker[], query: string): Speaker[] {
   );
 }
 
-export function getAllSpeakers(): Promise<Speaker[]> {
-  return prisma.speaker.findMany({ orderBy: { name: "asc" } });
+export function getAllSpeakers(meetingId: string): Promise<Speaker[]> {
+  return prisma.speaker.findMany({ where: { meetingId }, orderBy: { name: "asc" } });
 }
 
-export function getSpeakerById(id: string): Promise<Speaker | null> {
-  return prisma.speaker.findUnique({ where: { id } });
+export function getSpeakerById(id: string, meetingId?: string): Promise<Speaker | null> {
+  const where: { id: string; meetingId?: string } = { id };
+  if (meetingId) where.meetingId = meetingId;
+  return prisma.speaker.findFirst({ where });
+}
+
+export function getSpeakerSessions(speakerId: string, meetingId: string) {
+  return prisma.session.findMany({
+    where: {
+      meetingId,
+      speakers: { some: { speakerId } },
+    },
+    orderBy: [{ day: "asc" }, { startTime: "asc" }],
+  });
 }

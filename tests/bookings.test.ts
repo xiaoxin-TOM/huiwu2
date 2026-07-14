@@ -8,31 +8,35 @@ import {
 
 let userId: string;
 let hotelId: string;
+let meetingId: string;
 
 beforeAll(async () => {
   const u = await prisma.user.create({
-    data: { name: "预订测试", email: "booktest@example.com", passwordHash: "x" },
+    data: { name: "预订测试", email: "booktest@example.com", passwordHash: "x", isActive: true },
   });
   userId = u.id;
   const h = await prisma.hotel.create({ data: { name: "测试酒店", price: 500 } });
   hotelId = h.id;
+  const m = await prisma.meeting.create({ data: { title: "测试会议" } });
+  meetingId = m.id;
 });
 
 afterAll(async () => {
   await prisma.hotelBooking.deleteMany({ where: { userId } });
+  await prisma.meeting.delete({ where: { id: meetingId } }).catch(() => {});
   await prisma.hotel.delete({ where: { id: hotelId } }).catch(() => {});
   await prisma.user.delete({ where: { id: userId } }).catch(() => {});
   await prisma.$disconnect();
 });
 
 test("创建预订→列出用户预订→审核回显", async () => {
-  const b = await createBooking(userId, {
+  const b = await createBooking(userId, meetingId, {
     hotelId, checkIn: "2026-09-18", checkOut: "2026-09-20", rooms: 2,
   });
   expect(b.status).toBe("PENDING");
   expect(b.rooms).toBe(2);
 
-  const list = await listUserBookings(userId);
+  const list = await listUserBookings(userId, meetingId);
   expect(list).toHaveLength(1);
   expect(list[0].hotel.name).toBe("测试酒店");
 
@@ -42,7 +46,7 @@ test("创建预订→列出用户预订→审核回显", async () => {
 
 test("酒店不存在抛 HOTEL_NOT_FOUND", async () => {
   await expect(
-    createBooking(userId, {
+    createBooking(userId, meetingId, {
       hotelId: "no-such-hotel", checkIn: "2026-09-18", checkOut: "2026-09-20", rooms: 1,
     }),
   ).rejects.toThrow("HOTEL_NOT_FOUND");

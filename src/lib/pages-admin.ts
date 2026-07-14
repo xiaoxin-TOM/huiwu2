@@ -1,24 +1,34 @@
 import { prisma } from "@/lib/prisma";
 
-export function listPages() {
-  return prisma.page.findMany({ orderBy: { slug: "asc" } });
+export function listPages(meetingId: string) {
+  return prisma.page.findMany({ where: { meetingId }, orderBy: { slug: "asc" } });
 }
 
-export function getPage(slug: string) {
-  return prisma.page.findUnique({ where: { slug } });
-}
-
-export function upsertPage(slug: string, data: { title: string; contentHtml: string }) {
-  return prisma.page.upsert({
-    where: { slug },
-    update: data,
-    create: { slug, ...data },
+export function getPageBySlug(slug: string, meetingId: string) {
+  return prisma.page.findUnique({
+    where: { meetingId_slug: { meetingId, slug } },
   });
 }
 
-export function updatePage(slug: string, data: { title: string; contentHtml: string }) {
+export function upsertPage(
+  meetingId: string,
+  slug: string,
+  data: { title: string; contentHtml: string },
+) {
+  return prisma.page.upsert({
+    where: { meetingId_slug: { meetingId, slug } },
+    update: data,
+    create: { meetingId, slug, ...data },
+  });
+}
+
+export function updatePage(
+  meetingId: string,
+  slug: string,
+  data: { title: string; contentHtml: string },
+) {
   return prisma.page.update({
-    where: { slug },
+    where: { meetingId_slug: { meetingId, slug } },
     data,
   });
 }

@@ -1,30 +1,41 @@
-import Link from "next/link";
 import { listRegistrations } from "@/lib/registrations";
+import { requireCurrentMeeting } from "@/lib/meetings";
 import { STATUS_LABEL } from "@/lib/labels";
 import AdminForm from "@/components/AdminForm";
+import { ButtonLink } from "@/components/ui/Button";
 
 function ReviewButtons({ id }: { id: string }) {
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       <AdminForm action={`/api/admin/registrations/${id}`} redirectTo="/admin/registrations">
         <input type="hidden" name="decision" value="APPROVED" />
-        <button type="submit" className="rounded bg-green-600 px-2 py-1 text-xs text-white">通过</button>
+        <button type="submit" className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">
+          通过
+        </button>
       </AdminForm>
       <AdminForm action={`/api/admin/registrations/${id}`} redirectTo="/admin/registrations">
         <input type="hidden" name="decision" value="REJECTED" />
-        <button type="submit" className="rounded bg-red-600 px-2 py-1 text-xs text-white">拒绝</button>
+        <button type="submit" className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700">
+          拒绝
+        </button>
       </AdminForm>
     </div>
   );
 }
 
 export default async function AdminRegistrationsPage() {
-  const regs = await listRegistrations();
+  const meeting = await requireCurrentMeeting();
+  const regs = await listRegistrations(meeting.id);
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">报名管理</h1>
-        <Link href="/api/admin/registrations/export" download className="text-sm text-sky-700 hover:underline">导出 CSV</Link>
+        <div>
+          <h1 className="text-2xl font-bold">报名管理</h1>
+          <p className="text-sm text-gray-500">当前会议：{meeting.title}</p>
+        </div>
+        <ButtonLink href="/api/admin/registrations/export" download variant="secondary" size="sm">
+          导出 CSV
+        </ButtonLink>
       </div>
       {regs.length === 0 ? (
         <p className="text-gray-500">暂无报名。</p>

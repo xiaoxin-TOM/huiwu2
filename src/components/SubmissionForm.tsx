@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { inputClass, buttonClass, labelClass } from "@/components/ui/Card";
 
-export default function SubmissionForm() {
+export default function SubmissionForm({ meetingId }: { meetingId: string }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -14,10 +14,12 @@ export default function SubmissionForm() {
     setError("");
     setSubmitting(true);
     const form = e.currentTarget;
+    const formData = new FormData(form);
+    formData.append("meetingId", meetingId);
     try {
       const res = await fetch("/api/submissions", {
         method: "POST",
-        body: new FormData(form),
+        body: formData,
       });
       const data = await res.json().catch(() => ({ ok: false, error: "服务器错误" }));
       if (!data.ok) {

@@ -36,8 +36,9 @@ export function groupByDayAndRoom(sessions: SessionWithSpeakers[]): DayGroup[] {
 
 const include = { speakers: { include: { speaker: true } } } as const;
 
-export function getDetailedSessions(): Promise<SessionWithSpeakers[]> {
+export function getDetailedSessions(meetingId: string): Promise<SessionWithSpeakers[]> {
   return prisma.session.findMany({
+    where: { meetingId },
     include,
     orderBy: [{ day: "asc" }, { startTime: "asc" }],
   });

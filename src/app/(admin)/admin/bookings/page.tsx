@@ -1,4 +1,5 @@
 import { listBookings } from "@/lib/bookings";
+import { requireCurrentMeeting } from "@/lib/meetings";
 import { STATUS_LABEL } from "@/lib/labels";
 import AdminForm from "@/components/AdminForm";
 
@@ -18,10 +19,14 @@ function ReviewButtons({ id }: { id: string }) {
 }
 
 export default async function AdminBookingsPage() {
-  const bookings = await listBookings();
+  const meeting = await requireCurrentMeeting();
+  const bookings = await listBookings(meeting.id);
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">预订管理</h1>
+      <div>
+        <h1 className="text-2xl font-bold">预订管理</h1>
+        <p className="text-sm text-gray-500">当前会议：{meeting.title}</p>
+      </div>
       {bookings.length === 0 ? (
         <p className="text-gray-500">暂无预订。</p>
       ) : (

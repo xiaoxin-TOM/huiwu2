@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { speakerSchema } from "@/lib/validation";
 import { createSpeaker } from "@/lib/speakers-admin";
+import { getCurrentMeetingId } from "@/lib/meetings";
 
 function parse(form: FormData | null) {
   return speakerSchema.safeParse({
@@ -20,13 +21,17 @@ export async function POST(req: Request) {
   if (!isAdmin(session?.user?.role)) {
     return NextResponse.json({ ok: false, error: "无权限" }, { status: 403 });
   }
+  const meetingId = await getCurrentMeetingId();
+  if (!meetingId) {
+    return NextResponse.json({ ok: false, error: "未选择会议" }, { status: 400 });
+  }
   const form = await req.formData().catch(() => null);
   const parsed = parse(form);
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
   }
   try {
-    await createSpeaker(parsed.data);
+    await createSpeaker(meetingId, parsed.data);
   } catch {
     return NextResponse.json({ ok: false, error: "创建失败" }, { status: 500 });
   }

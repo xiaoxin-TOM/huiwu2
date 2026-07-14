@@ -1,15 +1,25 @@
 import { notFound } from "next/navigation";
 import { getAlbum } from "@/lib/albums";
+import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
+import { meetingHref } from "@/lib/public";
 import { PageHeader } from "@/components/ui/PageHeader";
 
-export default async function AlbumPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AlbumPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ m?: string }>;
+}) {
   const { id } = await params;
-  const album = await getAlbum(id);
+  const meeting = await requirePublicMeeting((await searchParams).m);
+  await guardPublicAccess(meeting.id);
+  const album = await getAlbum(id, meeting.id);
   if (!album) notFound();
 
   return (
     <div className="space-y-4">
-      <PageHeader title={album.title} subtitle={album.date} backHref="/photos" />
+      <PageHeader title={album.title} subtitle={album.date} backHref={meetingHref(meeting.id, "/photos")} />
       {album.photos.length === 0 ? (
         <p className="text-slate-500">该相册暂无照片。</p>
       ) : (

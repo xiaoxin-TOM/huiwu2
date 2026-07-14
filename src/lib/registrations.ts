@@ -3,8 +3,15 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { RegistrationInput } from "@/lib/validation";
 
-export async function createRegistration(userId: string, input: RegistrationInput) {
-  const existing = await prisma.registration.findFirst({ where: { userId } });
+export async function createRegistration(
+  userId: string,
+  meetingId: string,
+  input: RegistrationInput,
+  options?: { channelId?: string },
+) {
+  const existing = await prisma.registration.findUnique({
+    where: { userId_meetingId: { userId, meetingId } },
+  });
   if (existing) throw new Error("ALREADY_REGISTERED");
   const type = await prisma.registrationType.findUnique({ where: { id: input.typeId } });
   if (!type) throw new Error("TYPE_NOT_FOUND");
@@ -12,7 +19,9 @@ export async function createRegistration(userId: string, input: RegistrationInpu
     return await prisma.registration.create({
       data: {
         userId,
+        meetingId,
         typeId: input.typeId,
+        channelId: options?.channelId,
         fullName: input.fullName,
         organization: input.organization ?? "",
         title: input.title ?? "",
@@ -21,7 +30,6 @@ export async function createRegistration(userId: string, input: RegistrationInpu
       },
     });
   } catch (e) {
-    // 并发兜底:userId 唯一约束冲突(findFirst 与 create 之间的竞态)
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
       throw new Error("ALREADY_REGISTERED");
     }
@@ -29,15 +37,45 @@ export async function createRegistration(userId: string, input: RegistrationInpu
   }
 }
 
-export function getUserRegistration(userId: string) {
-  return prisma.registration.findFirst({
-    where: { userId },
+export function getUserRegistration(userId: string, meetingId: string) {
+  return prisma.registration.findUnique({
+    where: { userId_meetingId: { userId, meetingId } },
     include: { type: true },
   });
 }
 
-export function listRegistrations() {
+export function listUserRegistrationsAcrossMeetings(userId: string) {
   return prisma.registration.findMany({
+    where: { userId },
+    include: { meeting: true, type: true },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export function searchRegistrationsAcrossMeetings(query: string) {
+  const q = query.trim();
+  if (!q) return [];
+  const where: Prisma.RegistrationWhereInput = {
+    OR: [
+      { fullName: { contains: q, mode: "insensitive" } },
+      { phone: { contains: q } },
+      { organization: { contains: q, mode: "insensitive" } },
+      { user: { email: { contains: q, mode: "insensitive" } } },
+      { user: { name: { contains: q, mode: "insensitive" } } },
+      { meeting: { title: { contains: q, mode: "insensitive" } } },
+    ],
+  };
+  return prisma.registration.findMany({
+    where,
+    include: { user: true, meeting: true, type: true },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+}
+
+export function listRegistrations(meetingId: string) {
+  return prisma.registration.findMany({
+    where: { meetingId },
     include: { user: true, type: true },
     orderBy: { createdAt: "desc" },
   });
@@ -47,19 +85,18 @@ export function reviewRegistration(id: string, decision: "APPROVED" | "REJECTED"
   return prisma.registration.update({ where: { id }, data: { status: decision } });
 }
 
-/** 通过 token 查找报名记录 */
 export function findRegistrationByToken(token: string) {
   return prisma.registration.findUnique({
     where: { token },
-    include: { user: true, type: true },
+    include: { user: true, type: true, meeting: true },
   });
 }
 
-/** 搜索可签到的报名记录（姓名、手机、邮箱、单位） */
-export function searchRegistrations(query: string) {
+export function searchRegistrations(query: string, meetingId: string) {
   const q = query.trim();
   if (!q) return [];
   const where: Prisma.RegistrationWhereInput = {
+    meetingId,
     OR: [
       { fullName: { contains: q, mode: "insensitive" } },
       { phone: { contains: q } },
@@ -75,7 +112,6 @@ export function searchRegistrations(query: string) {
   });
 }
 
-/** 记录签到（幂等）：返回 { first, registration } */
 export async function recordCheckin(
   registrationId: string,
   options: { method: "SCAN" | "MANUAL" | "SELF"; byUserId?: string },
@@ -103,20 +139,27 @@ export async function recordCheckin(
   return { first, registration: reg };
 }
 
-/** 签到统计 */
-export async function getCheckinStats() {
+export async function getCheckinStats(meetingId: string) {
   const [total, checkedIn] = await Promise.all([
-    prisma.registration.count(),
-    prisma.registration.count({ where: { checkedIn: true } }),
+    prisma.registration.count({ where: { meetingId } }),
+    prisma.registration.count({ where: { meetingId, checkedIn: true } }),
   ]);
   return { total, checkedIn, unchecked: total - checkedIn };
 }
 
-/** 最近签到记录 */
-export function listRecentCheckins(take = 20) {
+export function listRecentCheckins(meetingId: string, take = 20) {
   return prisma.checkinLog.findMany({
+    where: { registration: { meetingId } },
     orderBy: { checkedAt: "desc" },
     take,
+    include: { registration: { include: { user: true, type: true } } },
+  });
+}
+
+export function listCheckinLogs(meetingId: string) {
+  return prisma.checkinLog.findMany({
+    where: { registration: { meetingId } },
+    orderBy: { checkedAt: "desc" },
     include: { registration: { include: { user: true, type: true } } },
   });
 }

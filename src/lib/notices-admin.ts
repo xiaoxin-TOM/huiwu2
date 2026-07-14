@@ -1,15 +1,23 @@
 import { prisma } from "@/lib/prisma";
 
-export function listAllNotices() {
-  return prisma.notice.findMany({ orderBy: { publishedAt: "desc" } });
+export function listAllNotices(meetingId: string) {
+  return prisma.notice.findMany({
+    where: { meetingId },
+    orderBy: { publishedAt: "desc" },
+  });
 }
 
-export function getNotice(id: string) {
-  return prisma.notice.findUnique({ where: { id } });
+export function getNotice(id: string, meetingId?: string) {
+  const where: { id: string; meetingId?: string } = { id };
+  if (meetingId) where.meetingId = meetingId;
+  return prisma.notice.findFirst({ where });
 }
 
-export function createNotice(data: { title: string; contentHtml: string; isPublished: boolean }) {
-  return prisma.notice.create({ data });
+export function createNotice(
+  meetingId: string,
+  data: { title: string; contentHtml: string; isPublished: boolean },
+) {
+  return prisma.notice.create({ data: { ...data, meetingId } });
 }
 
 export function updateNotice(
