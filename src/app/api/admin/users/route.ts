@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     email: form?.get("email") ?? "",
     password: form?.get("password") ?? "",
     role: form?.get("role") ?? "USER",
-    isActive: form?.get("isActive") ?? "on",
+    isActive: form?.get("isActive") === "on",
   });
   if (!parsed.success) {
     return NextResponse.json(
