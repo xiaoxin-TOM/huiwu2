@@ -1,6 +1,12 @@
 import { expect, test } from "vitest";
 import { isRichHtml, plainTextToHtml } from "@/lib/richtext";
 import { sanitizeRichHtml } from "@/lib/richtext-server";
+import RichText from "@/components/RichText";
+
+function renderedHtml(html: string): string {
+  const el = RichText({ html }) as { props: { dangerouslySetInnerHTML: { __html: string } } };
+  return el.props.dangerouslySetInnerHTML.__html;
+}
 
 test("isRichHtml 识别 HTML 标签内容", () => {
   expect(isRichHtml("<p>你好</p>")).toBe(true);
@@ -40,4 +46,13 @@ test("sanitizeRichHtml 链接只留安全协议并补 rel/target", () => {
 
 test("sanitizeRichHtml 空串返回空串", () => {
   expect(sanitizeRichHtml("")).toBe("");
+});
+
+test("RichText 对旧纯文本维持转义+换行", () => {
+  expect(renderedHtml("第一行\n<注意>")).toBe("第一行<br />&lt;注意&gt;");
+});
+
+test("RichText 对富文本走白名单过滤", () => {
+  expect(renderedHtml("<p>x</p><script>bad()</script>")).toBe("<p>x</p>");
+  expect(renderedHtml("<h2>标题</h2>")).toBe("<h2>标题</h2>");
 });
