@@ -1,6 +1,11 @@
 "use client";
 
-import { useEditor, EditorContent, type Editor } from "@tiptap/react";
+import {
+  useEditor,
+  useEditorState,
+  EditorContent,
+  type Editor,
+} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useState } from "react";
 import { isRichHtml, plainTextToHtml } from "@/lib/richtext";
@@ -77,6 +82,35 @@ function ToolbarButton({
 }
 
 function Toolbar({ editor }: { editor: Editor }) {
+  const {
+    isBold,
+    isItalic,
+    isStrike,
+    isH2,
+    isH3,
+    isBulletList,
+    isOrderedList,
+    isBlockquote,
+    isLink,
+    canUndo,
+    canRedo,
+  } = useEditorState({
+    editor,
+    selector: ({ editor }) => ({
+      isBold: editor.isActive("bold"),
+      isItalic: editor.isActive("italic"),
+      isStrike: editor.isActive("strike"),
+      isH2: editor.isActive("heading", { level: 2 }),
+      isH3: editor.isActive("heading", { level: 3 }),
+      isBulletList: editor.isActive("bulletList"),
+      isOrderedList: editor.isActive("orderedList"),
+      isBlockquote: editor.isActive("blockquote"),
+      isLink: editor.isActive("link"),
+      canUndo: editor.can().undo(),
+      canRedo: editor.can().redo(),
+    }),
+  });
+
   function setLink() {
     const prev = editor.getAttributes("link").href as string | undefined;
     const url = window.prompt("链接地址(http/https):", prev ?? "https://");
@@ -90,28 +124,28 @@ function Toolbar({ editor }: { editor: Editor }) {
 
   return (
     <div className="flex flex-wrap gap-1 border-b bg-slate-50 px-2 py-1.5">
-      <ToolbarButton label="B" title="加粗" active={editor.isActive("bold")}
+      <ToolbarButton label="B" title="加粗" active={isBold}
         onClick={() => editor.chain().focus().toggleBold().run()} />
-      <ToolbarButton label="I" title="斜体" active={editor.isActive("italic")}
+      <ToolbarButton label="I" title="斜体" active={isItalic}
         onClick={() => editor.chain().focus().toggleItalic().run()} />
-      <ToolbarButton label="S" title="删除线" active={editor.isActive("strike")}
+      <ToolbarButton label="S" title="删除线" active={isStrike}
         onClick={() => editor.chain().focus().toggleStrike().run()} />
-      <ToolbarButton label="H2" title="大标题" active={editor.isActive("heading", { level: 2 })}
+      <ToolbarButton label="H2" title="大标题" active={isH2}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} />
-      <ToolbarButton label="H3" title="小标题" active={editor.isActive("heading", { level: 3 })}
+      <ToolbarButton label="H3" title="小标题" active={isH3}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} />
-      <ToolbarButton label="• 列表" title="无序列表" active={editor.isActive("bulletList")}
+      <ToolbarButton label="• 列表" title="无序列表" active={isBulletList}
         onClick={() => editor.chain().focus().toggleBulletList().run()} />
-      <ToolbarButton label="1. 列表" title="有序列表" active={editor.isActive("orderedList")}
+      <ToolbarButton label="1. 列表" title="有序列表" active={isOrderedList}
         onClick={() => editor.chain().focus().toggleOrderedList().run()} />
-      <ToolbarButton label="引用" title="引用" active={editor.isActive("blockquote")}
+      <ToolbarButton label="引用" title="引用" active={isBlockquote}
         onClick={() => editor.chain().focus().toggleBlockquote().run()} />
-      <ToolbarButton label="链接" title="插入/编辑链接(留空取消)" active={editor.isActive("link")}
+      <ToolbarButton label="链接" title="插入/编辑链接(留空取消)" active={isLink}
         onClick={setLink} />
       <span className="mx-1 w-px self-stretch bg-slate-200" />
-      <ToolbarButton label="撤销" title="撤销" disabled={!editor.can().undo()}
+      <ToolbarButton label="撤销" title="撤销" disabled={!canUndo}
         onClick={() => editor.chain().focus().undo().run()} />
-      <ToolbarButton label="重做" title="重做" disabled={!editor.can().redo()}
+      <ToolbarButton label="重做" title="重做" disabled={!canRedo}
         onClick={() => editor.chain().focus().redo().run()} />
     </div>
   );
