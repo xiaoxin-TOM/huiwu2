@@ -2,8 +2,12 @@ import { getPageBySlug } from "@/lib/pages-admin";
 import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 import { ButtonLink } from "@/components/ui/Button";
+import RichTextEditor from "@/components/RichTextEditor";
 
 const KNOWN: Record<string, string> = {
+  intro: "活动简介",
+  guide: "活动说明",
+  notice: "活动须知",
   venue: "会场交通",
   contact: "联系方式",
 };
@@ -35,11 +39,12 @@ export default async function EditPagePage({ params }: { params: Promise<{ slug:
           <input name="title" required defaultValue={page?.title ?? ""}
             className="mt-1 w-full rounded border px-3 py-2" />
         </label>
-        <label className="block text-sm text-gray-600">
-          正文（纯文本，换行自动分段）
-          <textarea name="contentHtml" rows={12} defaultValue={page?.contentHtml ?? ""}
-            className="mt-1 w-full rounded border px-3 py-2 text-sm" />
-        </label>
+        <div className="block text-sm text-gray-600">
+          正文
+          <div className="mt-1">
+            <RichTextEditor defaultValue={page?.contentHtml ?? ""} />
+          </div>
+        </div>
         <div className="flex flex-wrap gap-3 pt-2">
           <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
             保存

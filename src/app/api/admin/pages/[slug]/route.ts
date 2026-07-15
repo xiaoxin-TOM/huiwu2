@@ -4,6 +4,7 @@ import { isAdmin } from "@/lib/access";
 import { pageSchema } from "@/lib/validation";
 import { upsertPage, updatePage } from "@/lib/pages-admin";
 import { getCurrentMeetingId } from "@/lib/meetings";
+import { sanitizeRichHtml } from "@/lib/richtext-server";
 
 async function parsePageForm(req: Request) {
   const session = await auth();
@@ -17,7 +18,7 @@ async function parsePageForm(req: Request) {
   const form = await req.formData().catch(() => null);
   const parsed = pageSchema.safeParse({
     title: form?.get("title") ?? "",
-    contentHtml: form?.get("contentHtml") ?? "",
+    contentHtml: sanitizeRichHtml(String(form?.get("contentHtml") ?? "")),
   });
   if (!parsed.success) {
     return { error: NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 }) };
