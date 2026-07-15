@@ -115,8 +115,24 @@ model Meeting {
   sessions         Session[]
   hotels           Hotel[]
   albums           Album[]
+  homeGridItems    HomeGridItem[]
 
   @@index([isDefault])
+}
+
+model HomeGridItem {
+  id              String  @id @default(cuid())
+  meetingId       String
+  title           String
+  href            String
+  icon            String  @default("file")
+  size            String  @default("SMALL") // SMALL | WIDE | TALL | LARGE
+  backgroundImage String?
+  sortOrder       Int     @default(0)
+  isVisible       Boolean @default(true)
+  meeting         Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId, sortOrder])
 }
 
 model RegistrationType {

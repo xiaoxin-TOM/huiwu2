@@ -1,10 +1,11 @@
 import { safeHtml } from "@/lib/html";
+import { isRichHtml } from "@/lib/richtext";
+import { sanitizeRichHtml } from "@/lib/richtext-server";
 
 /**
- * 将管理员输入的纯文本安全渲染为 HTML。
- * - 转义 HTML 特殊字符，防止 XSS
- * - 将换行符转为 <br />，实现段落效果
- * 内容字段虽以 Html 命名，但实际按纯文本处理，管理员无需手写标签。
+ * 内容渲染(仅服务端组件使用):
+ * - 富文本 HTML(编辑器产出)→ 白名单过滤后渲染(渲染端再过滤一次,纵深防御);
+ * - 存量纯文本 → 转义 + 换行转 <br>,显示与历史一致。
  */
 export default function RichText({
   html,
@@ -13,5 +14,6 @@ export default function RichText({
   html: string;
   className?: string;
 }) {
-  return <div className={className} dangerouslySetInnerHTML={{ __html: safeHtml(html) }} />;
+  const rendered = isRichHtml(html) ? sanitizeRichHtml(html) : safeHtml(html);
+  return <div className={className} dangerouslySetInnerHTML={{ __html: rendered }} />;
 }

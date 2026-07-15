@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { HOME_GRID_ICON_KEYS, HOME_GRID_SIZE_KEYS } from "@/lib/home-grid-config";
 
 export const registerSchema = z.object({
   name: z.string().min(1, "请填写姓名"),
@@ -154,6 +155,32 @@ export const meetingSchema = z.object({
   closesAt: z.string().optional().nullable(),
 });
 export type MeetingInput = z.infer<typeof meetingSchema>;
+
+const homeGridUrl = z.string().trim().min(1, "请填写跳转地址").max(500, "地址过长").refine(
+  (value) =>
+    (value.startsWith("/") && !value.startsWith("//")) ||
+    /^https?:\/\/[^\s]+$/i.test(value),
+  "请输入站内路径或 http(s) 链接",
+);
+
+export const homeGridItemSchema = z.object({
+  title: z.string().trim().min(1, "请填写入口名称").max(30, "入口名称不能超过 30 个字"),
+  href: homeGridUrl,
+  icon: z.enum(HOME_GRID_ICON_KEYS),
+  size: z.enum(HOME_GRID_SIZE_KEYS),
+  backgroundImage: z.string().trim().max(500, "背景图地址过长").refine(
+    (value) =>
+      value === "" ||
+      (value.startsWith("/") && !value.startsWith("//")) ||
+      /^https?:\/\/[^\s]+$/i.test(value),
+    "背景图请输入站内路径或 http(s) 链接",
+  ).default(""),
+  isVisible: z.boolean(),
+});
+
+export const homeGridSchema = z.object({
+  items: z.array(homeGridItemSchema).min(1, "至少保留一个功能入口").max(24, "功能入口最多 24 个"),
+});
 
 export const guestSchema = z.object({
   name: z.string().min(1, "请填写姓名"),

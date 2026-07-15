@@ -29,6 +29,7 @@ import { ButtonLink } from "@/components/ui/Button";
 const MENU = [
   { href: "/admin/meetings", label: "会议管理", icon: LayersIcon },
   { href: "/admin", label: "基础信息", icon: HomeIcon },
+  { href: "/admin/home-grid", label: "首页宫格", icon: StarIcon },
   { href: "/admin/notices", label: "通知管理", icon: BellIcon },
   { href: "/admin/pages", label: "内容页", icon: FileTextIcon },
   { href: "/admin/schedule", label: "日程管理", icon: CalendarIcon },
