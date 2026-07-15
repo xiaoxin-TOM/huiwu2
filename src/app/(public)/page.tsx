@@ -14,10 +14,16 @@ import {
   PhoneIcon,
   FileTextIcon,
   HotelIcon,
+  InfoIcon,
+  BookOpenIcon,
+  AlertCircleIcon,
 } from "@/components/icons";
 
 const FEATURES = [
   { href: "/register-conf", label: "注册报名", icon: FileTextIcon },
+  { href: "/intro", label: "活动简介", icon: InfoIcon },
+  { href: "/guide", label: "活动说明", icon: BookOpenIcon },
+  { href: "/notice", label: "活动须知", icon: AlertCircleIcon },
   { href: "/notices", label: "会议通知", icon: MailIcon },
   { href: "/schedule", label: "会议日程", icon: CalendarIcon },
   { href: "/speakers", label: "专家介绍", icon: UsersIcon },

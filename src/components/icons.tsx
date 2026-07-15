@@ -434,3 +434,22 @@ export const UploadIcon = (props?: IconProps) =>
     </>,
     props,
   );
+
+export const InfoIcon = (props?: IconProps) =>
+  baseIcon(
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </>,
+    props,
+  );
+
+export const BookOpenIcon = (props?: IconProps) =>
+  baseIcon(
+    <>
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    </>,
+    props,
+  );
