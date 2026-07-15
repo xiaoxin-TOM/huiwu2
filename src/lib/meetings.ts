@@ -1,5 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { defaultHomeGridCreateData } from "@/lib/home-grid";
 
 export function listMeetings() {
   return prisma.meeting.findMany({
@@ -47,6 +48,7 @@ export async function createMeeting(data: {
     data: {
       ...data,
       isDefault: count === 0,
+      homeGridItems: { create: defaultHomeGridCreateData() },
     },
   });
 }

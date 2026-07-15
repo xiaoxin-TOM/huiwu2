@@ -1,5 +1,6 @@
 import { prisma } from "../src/lib/prisma";
 import { hashPassword } from "../src/lib/password";
+import { DEFAULT_HOME_GRID_ITEMS } from "../src/lib/home-grid-config";
 
 async function main() {
   await prisma.siteConfig.upsert({
@@ -50,6 +51,18 @@ async function main() {
     },
   });
   console.log("默认会议:", defaultMeeting.title);
+
+  const homeGridCount = await prisma.homeGridItem.count({ where: { meetingId: defaultMeeting.id } });
+  if (homeGridCount === 0) {
+    await prisma.homeGridItem.createMany({
+      data: DEFAULT_HOME_GRID_ITEMS.map((item, sortOrder) => ({
+        meetingId: defaultMeeting.id,
+        ...item,
+        backgroundImage: item.backgroundImage || null,
+        sortOrder,
+      })),
+    });
+  }
 
   const types = ["普通代表", "学生代表", "现场注册"];
   for (const name of types) {
