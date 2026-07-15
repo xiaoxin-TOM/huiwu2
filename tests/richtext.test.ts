@@ -56,3 +56,8 @@ test("RichText 对富文本走白名单过滤", () => {
   expect(renderedHtml("<p>x</p><script>bad()</script>")).toBe("<p>x</p>");
   expect(renderedHtml("<h2>标题</h2>")).toBe("<h2>标题</h2>");
 });
+
+test("sanitizeRichHtml 拦截协议相对链接,保留站内相对路径", () => {
+  expect(sanitizeRichHtml('<a href="//evil.com">x</a>')).not.toContain("//evil.com");
+  expect(sanitizeRichHtml('<a href="/schedule">日程</a>')).toContain('href="/schedule"');
+});

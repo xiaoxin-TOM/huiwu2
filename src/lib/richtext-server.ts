@@ -5,6 +5,7 @@ const OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: ["p", "br", "strong", "em", "u", "s", "h2", "h3", "ul", "ol", "li", "blockquote", "a"],
   allowedAttributes: { a: ["href", "target", "rel"] },
   allowedSchemes: ["http", "https", "mailto"],
+  allowProtocolRelative: false,
   transformTags: {
     a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer", target: "_blank" }),
   },
