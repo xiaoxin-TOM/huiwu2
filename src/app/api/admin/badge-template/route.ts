@@ -23,6 +23,7 @@ export async function POST(req: Request) {
     pageWidthMm: g("pageWidthMm"),
     pageHeightMm: g("pageHeightMm"),
     bgImageUrl: g("bgImageUrl"),
+    labelGapMm: g("labelGapMm"),
     nameX: g("nameX"),
     nameY: g("nameY"),
     nameSize: g("nameSize"),

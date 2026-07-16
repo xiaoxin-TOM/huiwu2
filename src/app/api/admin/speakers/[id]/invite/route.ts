@@ -11,7 +11,9 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/speakers/
   const { id } = await ctx.params;
   try {
     const speaker = await ensureSpeakerToken(id);
-    const origin = process.env.AUTH_URL || new URL(req.url).origin;
+    const host = req.headers.get("host") || new URL(req.url).host;
+    const protocol = req.headers.get("x-forwarded-proto") || "http";
+    const origin = `${protocol}://${host}`;
     const link = `${origin}/s/${speaker.token}`;
     return NextResponse.json({ ok: true, token: speaker.token, link });
   } catch (error) {

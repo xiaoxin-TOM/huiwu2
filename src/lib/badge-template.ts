@@ -24,21 +24,22 @@ const DEFAULT_TEMPLATE: Omit<
   pageWidthMm: 86,
   pageHeightMm: 147,
   bgImageUrl: null,
+  labelGapMm: 2,
   nameX: 43,
   nameY: 52,
-  nameSize: 10,
+  nameSize: 14,
   titleX: 43,
   titleY: 40,
-  titleSize: 10,
+  titleSize: 14,
   companyX: 43,
   companyY: 28,
-  companySize: 10,
+  companySize: 14,
   qrX: 43,
   qrY: 92,
   qrSize: 34,
   meetingTitleX: 43,
   meetingTitleY: 128,
-  meetingTitleSize: 10,
+  meetingTitleSize: 17,
 };
 
 export async function getBadgeTemplate(meetingId: string): Promise<BadgeTemplate> {
@@ -173,9 +174,9 @@ async function drawBadgePage(
       const size = pxToPt(sizePx);
       const y = mmToPt(yMm);
       const valueXPos = mmToPt(valueX);
-      const labelRightX = mmToPt(valueX - 5);
+      const labelRightX = mmToPt(valueX - template.labelGapMm);
       const labelWidth = font.widthOfTextAtSize(label, size);
-      const labelX = Math.max(mmToPt(5), labelRightX - labelWidth);
+      const labelX = Math.max(mmToPt(2), labelRightX - labelWidth);
       page.drawText(label, {
         x: labelX,
         y,

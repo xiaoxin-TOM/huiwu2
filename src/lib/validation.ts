@@ -259,6 +259,7 @@ export const badgeTemplateSchema = z.object({
   pageWidthMm: z.coerce.number().int().min(1),
   pageHeightMm: z.coerce.number().int().min(1),
   bgImageUrl: z.string().optional().default(""),
+  labelGapMm: z.coerce.number().int().min(0),
   nameX: z.coerce.number().int(),
   nameY: z.coerce.number().int(),
   nameSize: z.coerce.number().int().min(1),

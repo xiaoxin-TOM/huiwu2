@@ -411,21 +411,22 @@ model BadgeTemplate {
   pageWidthMm       Int      @default(86)
   pageHeightMm      Int      @default(147)
   bgImageUrl        String?
+  labelGapMm        Int      @default(2)
   nameX             Int      @default(43)
   nameY             Int      @default(52)
-  nameSize          Int      @default(10)
+  nameSize          Int      @default(14)
   titleX            Int      @default(43)
   titleY            Int      @default(40)
-  titleSize         Int      @default(10)
+  titleSize         Int      @default(14)
   companyX          Int      @default(43)
   companyY          Int      @default(28)
-  companySize       Int      @default(10)
+  companySize       Int      @default(14)
   qrX               Int      @default(43)
   qrY               Int      @default(92)
   qrSize            Int      @default(34)
   meetingTitleX     Int      @default(43)
   meetingTitleY     Int      @default(128)
-  meetingTitleSize  Int      @default(10)
+  meetingTitleSize  Int      @default(17)
   updatedAt         DateTime @updatedAt
 }
 
