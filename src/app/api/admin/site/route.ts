@@ -27,7 +27,6 @@ export async function POST(req: Request) {
     liveUrl: g("liveUrl"),
     welcomeHtml: g("welcomeHtml"),
     footerHtml: g("footerHtml"),
-    venueName: g("venueName"),
     venueAddress: g("venueAddress"),
     venueLng: g("venueLng"),
     venueLat: g("venueLat"),
@@ -45,6 +44,9 @@ export async function POST(req: Request) {
       liveUrl: parsed.data.liveUrl || null,
       welcomeHtml: parsed.data.welcomeHtml,
       footerHtml: parsed.data.footerHtml,
+      venueAddress: parsed.data.venueAddress,
+      venueLng: parsed.data.venueLng,
+      venueLat: parsed.data.venueLat,
     });
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });

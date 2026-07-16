@@ -17,13 +17,12 @@ test("站点设置:会场坐标选填,非法值拒绝", () => {
   expect(empty.success).toBe(true);
   if (empty.success) {
     expect(empty.data.venueLng).toBe("");
-    expect(empty.data.venueName).toBe("");
   }
   // 合法坐标:通过
   expect(
     siteConfigSchema.safeParse({
       ...base, venueLng: "116.397", venueLat: "39.909",
-      venueName: "北京国际会议中心", venueAddress: "北辰东路8号",
+      venueAddress: "北辰东路8号",
     }).success
   ).toBe(true);
   // 非数字 / 越界:拒绝

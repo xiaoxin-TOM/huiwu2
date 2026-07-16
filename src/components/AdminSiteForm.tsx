@@ -11,7 +11,6 @@ interface SiteConfigValues {
   logoUrl?: string | null;
   heroImageUrl?: string | null;
   liveUrl?: string | null;
-  venueName?: string | null;
   venueAddress?: string | null;
   venueLng?: string | null;
   venueLat?: string | null;
@@ -22,6 +21,7 @@ interface SiteConfigValues {
 export default function AdminSiteForm({ defaultValues }: { defaultValues: SiteConfigValues }) {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -37,8 +37,8 @@ export default function AdminSiteForm({ defaultValues }: { defaultValues: SiteCo
       });
 
       if (res.ok) {
-        const data = await res.json().catch(() => ({}));
-        router.push(data.redirectTo ?? "/admin");
+        setSuccess("保存成功");
+        setTimeout(() => setSuccess(""), 3000);
         router.refresh();
         return;
       }
@@ -63,6 +63,21 @@ export default function AdminSiteForm({ defaultValues }: { defaultValues: SiteCo
       <input type="hidden" name="redirectTo" value="/admin" />
       {error && (
         <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</div>
+      )}
+      {success && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="rounded-lg bg-white px-8 py-6 shadow-xl">
+            <div className="mb-4 text-center text-2xl text-green-600">✓</div>
+            <p className="text-center text-lg font-medium text-gray-800">{success}</p>
+            <button
+              type="button"
+              onClick={() => setSuccess("")}
+              className="mt-6 w-full rounded bg-sky-700 px-4 py-2 text-white hover:bg-sky-800"
+            >
+              确定
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

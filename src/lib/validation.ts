@@ -66,7 +66,6 @@ export const siteConfigSchema = z.object({
   liveUrl: z.string().optional().default(""),
   welcomeHtml: z.string().optional().default(""),
   footerHtml: z.string().optional().default(""),
-  venueName: z.string().optional().default(""),
   venueAddress: z.string().optional().default(""),
   venueLng: coordField(-180, 180, "经度无效(-180~180)"),
   venueLat: coordField(-90, 90, "纬度无效(-90~90)"),

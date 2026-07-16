@@ -6,7 +6,7 @@ export type VenueLocation = {
 };
 
 export function parseVenueLocation(
-  cfg: { venueLng: string; venueLat: string; venueName: string; venueAddress: string } | null
+  cfg: { venueLng: string; venueLat: string; venueName?: string; venueAddress: string } | null
 ): VenueLocation | null {
   if (!cfg) return null;
   if (cfg.venueLng.trim() === "" || cfg.venueLat.trim() === "") return null;

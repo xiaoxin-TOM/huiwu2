@@ -99,6 +99,9 @@ model Meeting {
   logoUrl           String?
   heroImageUrl      String?
   liveUrl           String?
+  venueAddress      String          @default("")
+  venueLng          String          @default("")
+  venueLat          String          @default("")
   homeGridColumns   Int             @default(4)
   ownerId           String?
   owner             User?           @relation("MeetingOwner", fields: [ownerId], references: [id], onDelete: SetNull)

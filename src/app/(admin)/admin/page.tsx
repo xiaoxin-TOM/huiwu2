@@ -84,6 +84,9 @@ export default async function AdminDashboard() {
             liveUrl: meeting.liveUrl,
             welcomeHtml: meeting.welcomeHtml,
             footerHtml: meeting.footerHtml,
+            venueAddress: meeting.venueAddress,
+            venueLng: meeting.venueLng,
+            venueLat: meeting.venueLat,
           }} />
         </div>
 

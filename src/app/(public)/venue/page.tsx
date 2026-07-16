@@ -1,5 +1,4 @@
 import { getPage } from "@/lib/content";
-import { getSiteConfig } from "@/lib/siteconfig";
 import { parseVenueLocation, amapNavUrl } from "@/lib/venue";
 import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import RichText from "@/components/RichText";
@@ -14,8 +13,8 @@ export default async function VenuePage({
 }) {
   const meeting = await requirePublicMeeting((await searchParams).m);
   await guardPublicAccess(meeting.id);
-  const [page, cfg] = await Promise.all([getPage("venue", meeting.id), getSiteConfig()]);
-  const venue = parseVenueLocation(cfg);
+  const page = await getPage("venue", meeting.id);
+  const venue = parseVenueLocation(meeting);
   return (
     <div className="space-y-4">
       <PageHeader title={page?.title ?? "会场交通"} />

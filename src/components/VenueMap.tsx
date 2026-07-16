@@ -51,6 +51,21 @@ export default function VenueMap({ lng, lat, name, address }: Props) {
     };
   }, [key, lng, lat, name, address]);
 
-  if (!key || failed) return null;
+  if (!key) {
+    return (
+      <div className="flex h-80 flex-col items-center justify-center rounded-xl bg-slate-100 p-4 text-center text-sm text-slate-500">
+        <p>地图未配置</p>
+        <p className="mt-1">请在 .env 中设置 NEXT_PUBLIC_AMAP_KEY 后刷新页面</p>
+      </div>
+    );
+  }
+  if (failed) {
+    return (
+      <div className="flex h-80 flex-col items-center justify-center rounded-xl bg-slate-100 p-4 text-center text-sm text-slate-500">
+        <p>地图加载失败</p>
+        <p className="mt-1">请检查高德 Key 是否有效或网络连接</p>
+      </div>
+    );
+  }
   return <div ref={containerRef} className="h-80 w-full rounded-xl bg-slate-100" />;
 }

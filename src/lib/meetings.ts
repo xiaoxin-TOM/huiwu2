@@ -82,6 +82,9 @@ export function updateMeetingConfig(
     welcomeHtml?: string;
     footerHtml?: string;
     contactHtml?: string;
+    venueAddress?: string;
+    venueLng?: string;
+    venueLat?: string;
   },
 ) {
   return prisma.meeting.update({ where: { id }, data });
