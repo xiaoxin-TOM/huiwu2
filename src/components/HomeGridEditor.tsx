@@ -4,11 +4,13 @@ import { useMemo, useState } from "react";
 import HomeGrid from "@/components/HomeGrid";
 import {
   DEFAULT_HOME_GRID_ITEMS,
+  HOME_GRID_COLUMNS_OPTIONS,
   HOME_GRID_ICON_OPTIONS,
   HOME_GRID_ROUTE_OPTIONS,
   HOME_GRID_SIZE_OPTIONS,
   autoFillHomeGridRows,
   homeGridArea,
+  type HomeGridColumns,
   type HomeGridIconKey,
   type HomeGridItemInput,
   type HomeGridSize,
@@ -23,8 +25,9 @@ function defaultDrafts(): HomeGridItemView[] {
   return DEFAULT_HOME_GRID_ITEMS.map((item, index) => ({ ...item, id: `default-${index}` }));
 }
 
-export default function HomeGridEditor({ meetingId, initialItems }: { meetingId: string; initialItems: HomeGridItemView[] }) {
+export default function HomeGridEditor({ meetingId, initialItems, initialColumns }: { meetingId: string; initialItems: HomeGridItemView[]; initialColumns: HomeGridColumns }) {
   const [items, setItems] = useState(initialItems);
+  const [columns, setColumns] = useState<HomeGridColumns>(initialColumns);
   const [saving, setSaving] = useState(false);
   const [uploadingItemId, setUploadingItemId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -34,7 +37,7 @@ export default function HomeGridEditor({ meetingId, initialItems }: { meetingId:
     () => items.filter((item) => item.isVisible).reduce((sum, item) => sum + homeGridArea(item.size), 0),
     [items],
   );
-  const hasIncompleteDesktopRow = visibleArea % 4 !== 0;
+  const hasIncompleteDesktopRow = visibleArea % columns !== 0;
 
   function patchItem(id: string, patch: Partial<HomeGridItemView>) {
     setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)));
@@ -107,7 +110,8 @@ export default function HomeGridEditor({ meetingId, initialItems }: { meetingId:
   async function save() {
     setSaving(true);
     setMessage(null);
-    const payload: { items: HomeGridItemInput[] } = {
+    const payload: { columns: HomeGridColumns; items: HomeGridItemInput[] } = {
+      columns,
       items: items.map(({ title, href, icon, size, backgroundImage, isVisible }) => ({
         title,
         href,
@@ -142,9 +146,21 @@ export default function HomeGridEditor({ meetingId, initialItems }: { meetingId:
             <p className="text-sm text-slate-500">拖动卡片或使用箭头调整顺序，最多可配置 24 个入口。</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => setItems((current) => autoFillHomeGridRows(current))} className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100">
+            <button type="button" onClick={() => setItems((current) => autoFillHomeGridRows(current, columns))} className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100">
               自动铺满
             </button>
+            <label className="inline-flex items-center gap-2 text-sm text-slate-600">
+              每行数量
+              <select
+                value={columns}
+                onChange={(event) => setColumns(Number(event.target.value) as HomeGridColumns)}
+                className="rounded-lg border bg-white px-2 py-2"
+              >
+                {HOME_GRID_COLUMNS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
             <button type="button" onClick={() => setItems(defaultDrafts())} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
               恢复默认
             </button>
@@ -218,7 +234,7 @@ export default function HomeGridEditor({ meetingId, initialItems }: { meetingId:
                   </label>
                   <div className="flex flex-wrap items-center gap-2">
                     <label className={`cursor-pointer rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-100 ${uploadingItemId ? "pointer-events-none opacity-50" : ""}`}>
-                      {uploadingItemId === item.id ? "上传中..." : "上传图片到 OSS"}
+                      {uploadingItemId === item.id ? "上传中..." : "上传图片并记录"}
                       <input
                         type="file"
                         accept="image/jpeg,image/png,image/webp"
@@ -268,10 +284,10 @@ export default function HomeGridEditor({ meetingId, initialItems }: { meetingId:
           </div>
           {hasIncompleteDesktopRow && (
             <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
-              当前宽屏占用格数不是 4 的倍数，末行可能留空；可调整一个入口为横向或大卡片。
+              当前宽屏占用格数不是 {columns} 的倍数，末行可能留空；可调整一个入口为横向或大卡片。
             </p>
           )}
-          <HomeGrid meetingId={meetingId} items={items} preview />
+          <HomeGrid meetingId={meetingId} items={items} columns={columns} preview />
         </div>
 
         {message && (

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { speakerSchema } from "@/lib/validation";
 import { createSpeaker } from "@/lib/speakers-admin";
+import { createGuest } from "@/lib/guests-admin";
 import { getCurrentMeetingId } from "@/lib/meetings";
 
 function parse(form: FormData | null) {
@@ -12,7 +13,6 @@ function parse(form: FormData | null) {
     organization: form?.get("organization") ?? "",
     bio: form?.get("bio") ?? "",
     photoUrl: form?.get("photoUrl") ?? "",
-    isModerator: form?.get("isModerator") === "on",
   });
 }
 
@@ -31,7 +31,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
   }
   try {
-    await createSpeaker(meetingId, parsed.data);
+    const speaker = await createSpeaker(meetingId, parsed.data);
+    await createGuest(meetingId, {
+      name: speaker.name,
+      phone: "",
+      email: "",
+      company: speaker.organization,
+      title: speaker.title,
+      level: "NORMAL",
+      bio: speaker.bio,
+      note: "由讲者自动生成",
+      seatInfo: "",
+    });
   } catch {
     return NextResponse.json({ ok: false, error: "创建失败" }, { status: 500 });
   }

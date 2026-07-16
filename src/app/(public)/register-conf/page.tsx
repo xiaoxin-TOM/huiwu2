@@ -9,8 +9,8 @@ import { prisma } from "@/lib/prisma";
 import RegistrationForm from "@/components/RegistrationForm";
 import { STATUS_LABEL } from "@/lib/labels";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { SectionCard, IconCard } from "@/components/ui/Card";
-import { ClipboardListIcon, UserIcon, FileEditIcon } from "@/components/icons";
+import { SectionCard } from "@/components/ui/Card";
+import { ClipboardListIcon, UserIcon } from "@/components/icons";
 
 export default async function RegisterConfPage({
   searchParams,
@@ -69,12 +69,6 @@ export default async function RegisterConfPage({
   return (
     <div className="space-y-4">
       <PageHeader title={`${meeting.title} · 注册报名`} />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <IconCard href={meetingHref(meeting.id, "/schedule")} title="查看日程" icon={<ClipboardListIcon className="h-6 w-6" />} />
-        <IconCard href={meetingHref(meeting.id, "/speakers")} title="专家介绍" icon={<UserIcon className="h-6 w-6" />} />
-        <IconCard href={meetingHref(meeting.id, "/submissions")} title="论文提交" icon={<FileEditIcon className="h-6 w-6" />} />
-        <IconCard href={meetingHref(meeting.id, "/")} title="返回首页" icon={<ClipboardListIcon className="h-6 w-6" />} />
-      </div>
       <SectionCard title="填写报名信息">
         <RegistrationForm meetingId={meeting.id} types={types.map((t) => ({ id: t.id, name: t.name, fee: t.fee }))} />
       </SectionCard>

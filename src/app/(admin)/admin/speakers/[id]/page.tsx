@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getSpeakerById } from "@/lib/speakers";
 import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
+import ImageUploadField from "@/components/ImageUploadField";
 
 export default async function EditSpeakerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -23,12 +24,9 @@ export default async function EditSpeakerPage({ params }: { params: Promise<{ id
         <input name="name" required defaultValue={s.name} className="w-full rounded border px-3 py-2" />
         <input name="title" defaultValue={s.title} placeholder="职称" className="w-full rounded border px-3 py-2" />
         <input name="organization" defaultValue={s.organization} placeholder="单位" className="w-full rounded border px-3 py-2" />
-        <input name="photoUrl" defaultValue={s.photoUrl ?? ""} placeholder="照片地址" className="w-full rounded border px-3 py-2" />
+        <ImageUploadField name="photoUrl" defaultValue={s.photoUrl ?? ""} label="讲者照片" />
         <label className="block text-sm text-gray-600">简介（纯文本，换行自动分段）
           <textarea name="bio" rows={5} defaultValue={s.bio} className="mt-1 w-full rounded border px-3 py-2 text-sm" />
-        </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
-          <input type="checkbox" name="isModerator" defaultChecked={s.isModerator} /> 主持人
         </label>
         <button type="submit" className="rounded bg-sky-700 px-4 py-2 text-white">保存</button>
       </AdminForm>

@@ -46,8 +46,7 @@ export default async function SpeakersPage({
               key={s.id}
               href={meetingHref(meeting.id, `/speakers/${s.id}`)}
               title={s.name}
-              meta={s.isModerator ? "主持人" : `${s.title} · ${s.organization}`}
-              description={s.isModerator ? `${s.title} · ${s.organization}` : undefined}
+              meta={`${s.title} · ${s.organization}`}
               icon={<UsersIcon className="h-6 w-6" />}
             />
           ))}

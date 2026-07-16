@@ -103,7 +103,6 @@ export default async function MePage({
                       {meetingSpeaker && (
                         <p className="mt-1 text-sm text-sky-600">
                           讲者身份：{meetingSpeaker.name}
-                          {meetingSpeaker.isModerator && "（主持人）"}
                         </p>
                       )}
                     </div>

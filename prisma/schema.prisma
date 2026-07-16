@@ -37,20 +37,21 @@ model VerificationCode {
 
 // 全局站点兜底配置（当会议未单独配置时使用）
 model SiteConfig {
-  id           Int      @id @default(1)
-  confName     String   @default("")
-  confDate     String   @default("")
-  confLocation String   @default("")
-  logoUrl      String?
-  welcomeHtml  String   @default("")
-  liveUrl      String?
-  contactHtml  String   @default("")
-  venueName    String   @default("")
-  venueAddress String   @default("")
-  venueLng     String   @default("")
-  venueLat     String   @default("")
-  footerHtml   String   @default("")
-  updatedAt    DateTime @updatedAt
+  id            Int      @id @default(1)
+  confName      String   @default("")
+  confDate      String   @default("")
+  confLocation  String   @default("")
+  logoUrl       String?
+  heroImageUrl  String?
+  welcomeHtml   String   @default("")
+  liveUrl       String?
+  contactHtml   String   @default("")
+  venueName     String   @default("")
+  venueAddress  String   @default("")
+  venueLng      String   @default("")
+  venueLat      String   @default("")
+  footerHtml    String   @default("")
+  updatedAt     DateTime @updatedAt
 }
 
 model Page {
@@ -96,7 +97,9 @@ model Meeting {
   footerHtml        String          @default("")
   contactHtml       String          @default("")
   logoUrl           String?
+  heroImageUrl      String?
   liveUrl           String?
+  homeGridColumns   Int             @default(4)
   ownerId           String?
   owner             User?           @relation("MeetingOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   createdAt         DateTime        @default(now())
@@ -116,8 +119,26 @@ model Meeting {
   hotels           Hotel[]
   albums           Album[]
   homeGridItems    HomeGridItem[]
+  liveStreams      LiveStream[]
 
   @@index([isDefault])
+}
+
+model LiveStream {
+  id          String  @id @default(cuid())
+  meetingId   String
+  name        String
+  url         String
+  coverImage  String?
+  description String  @default("")
+  time        String  @default("")
+  sortOrder   Int     @default(0)
+  isVisible   Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  meeting     Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId, sortOrder])
 }
 
 model HomeGridItem {
@@ -144,25 +165,26 @@ model RegistrationType {
 }
 
 model Registration {
-  id           String           @id @default(cuid())
+  id           String                  @id @default(cuid())
   userId       String
-  user         User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user         User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
   meetingId    String
-  meeting      Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  meeting      Meeting                 @relation(fields: [meetingId], references: [id], onDelete: Cascade)
   typeId       String
-  type         RegistrationType @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  type         RegistrationType        @relation(fields: [typeId], references: [id], onDelete: Restrict)
   channelId    String?
   fullName     String
-  organization String           @default("")
-  title        String           @default("")
-  phone        String           @default("")
-  status       String           @default("PENDING") // PENDING | APPROVED | REJECTED
+  organization String                  @default("")
+  title        String                  @default("")
+  phone        String                  @default("")
+  status       String                  @default("PENDING") // PENDING | APPROVED | REJECTED
   // 签到凭证与状态
-  token        String           @unique @default(uuid())
-  checkedIn    Boolean          @default(false)
+  token        String                  @unique @default(uuid())
+  checkedIn    Boolean                 @default(false)
   checkedInAt  DateTime?
   checkinLogs  CheckinLog[]
-  createdAt    DateTime         @default(now())
+  createdAt    DateTime                @default(now())
+  reception    RegistrationReception?
 
   @@unique([userId, meetingId])
   @@index([meetingId])
@@ -205,7 +227,6 @@ model Speaker {
   organization String           @default("")
   bio          String           @default("")
   photoUrl     String?
-  isModerator  Boolean          @default(false)
   token        String?          @unique @default(uuid())
   invitedAt    DateTime?
   confirmed    Boolean          @default(false)
@@ -360,6 +381,29 @@ model GuestReception {
   updatedAt       DateTime @updatedAt
 }
 
+model RegistrationReception {
+  id              String       @id @default(cuid())
+  registrationId  String       @unique
+  registration    Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  arriveMode      String       @default("") // 航班/高铁/自驾
+  arriveNo        String       @default("")
+  arriveTime      String       @default("")
+  arrivePlace     String       @default("")
+  departMode      String       @default("")
+  departNo        String       @default("")
+  departTime      String       @default("")
+  hotelName       String       @default("")
+  hotelRoom       String       @default("")
+  hotelCheckIn    String       @default("")
+  hotelCheckOut   String       @default("")
+  carPlate        String       @default("")
+  carDriver       String       @default("")
+  carDriverPhone  String       @default("")
+  carContact      String       @default("")
+  remark          String       @default("")
+  updatedAt       DateTime     @updatedAt
+}
+
 model BadgeTemplate {
   id                String   @id @default(cuid())
   meetingId         String   @unique
@@ -369,19 +413,19 @@ model BadgeTemplate {
   bgImageUrl        String?
   nameX             Int      @default(43)
   nameY             Int      @default(52)
-  nameSize          Int      @default(12)
+  nameSize          Int      @default(10)
   titleX            Int      @default(43)
   titleY            Int      @default(40)
-  titleSize         Int      @default(11)
+  titleSize         Int      @default(10)
   companyX          Int      @default(43)
   companyY          Int      @default(28)
-  companySize       Int      @default(11)
+  companySize       Int      @default(10)
   qrX               Int      @default(43)
   qrY               Int      @default(92)
   qrSize            Int      @default(34)
   meetingTitleX     Int      @default(43)
   meetingTitleY     Int      @default(128)
-  meetingTitleSize  Int      @default(12)
+  meetingTitleSize  Int      @default(10)
   updatedAt         DateTime @updatedAt
 }
 

@@ -72,23 +72,24 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="max-w-2xl space-y-4 rounded-xl bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold">站点设置</h2>
+      <div className="rounded-xl bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold">站点设置</h2>
+        <div className="mt-4">
           <AdminSiteForm defaultValues={{
             confName: meeting.title,
             confDate: meeting.confDate,
             confLocation: meeting.location,
             logoUrl: meeting.logoUrl,
+            heroImageUrl: meeting.heroImageUrl,
             liveUrl: meeting.liveUrl,
             welcomeHtml: meeting.welcomeHtml,
             footerHtml: meeting.footerHtml,
           }} />
         </div>
 
-        <div className="space-y-4 rounded-xl bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold">数据导出</h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="mt-6 border-t border-slate-100 pt-5">
+          <h3 className="mb-3 text-sm font-semibold text-slate-700">数据导出</h3>
+          <div className="grid grid-cols-2 gap-3">
             <ButtonLink href="/api/admin/registrations/export" download variant="secondary" size="sm" className="flex items-center justify-start gap-2 p-3">
               <DownloadIcon className="h-4 w-4" /> 报名名单 CSV
             </ButtonLink>

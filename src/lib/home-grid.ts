@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import {
   DEFAULT_HOME_GRID_ITEMS,
+  DEFAULT_HOME_GRID_COLUMNS,
+  type HomeGridColumns,
   type HomeGridIconKey,
   type HomeGridItemInput,
   type HomeGridSize,
@@ -49,6 +51,21 @@ export async function replaceHomeGridItems(meetingId: string, items: HomeGridIte
         isVisible: item.isVisible,
       })),
     });
+  });
+}
+
+export async function getHomeGridColumns(meetingId: string): Promise<HomeGridColumns> {
+  const meeting = await prisma.meeting.findUnique({
+    where: { id: meetingId },
+    select: { homeGridColumns: true },
+  });
+  return (meeting?.homeGridColumns as HomeGridColumns | undefined) ?? DEFAULT_HOME_GRID_COLUMNS;
+}
+
+export async function setHomeGridColumns(meetingId: string, columns: HomeGridColumns) {
+  await prisma.meeting.update({
+    where: { id: meetingId },
+    data: { homeGridColumns: columns },
   });
 }
 

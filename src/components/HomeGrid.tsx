@@ -1,28 +1,29 @@
 import Link from "next/link";
 import HomeGridIcon from "@/components/HomeGridIcon";
-import { homeGridSizeClass, isExternalHomeGridHref } from "@/lib/home-grid-config";
+import { homeGridSizeClass, isExternalHomeGridHref, type HomeGridColumns } from "@/lib/home-grid-config";
 import type { HomeGridItemView } from "@/lib/home-grid";
 import { meetingHref } from "@/lib/public";
 
 export default function HomeGrid({
   meetingId,
   items,
+  columns = 4,
   preview = false,
 }: {
   meetingId: string;
   items: HomeGridItemView[];
+  columns?: HomeGridColumns;
   preview?: boolean;
 }) {
   const visibleItems = items.filter((item) => item.isVisible);
+  const gridColsClass = columns === 3 ? "grid-cols-3" : columns === 2 ? "grid-cols-2" : "grid-cols-4";
 
   return (
-    <div className="grid grid-flow-dense grid-cols-2 auto-rows-[104px] gap-3 sm:grid-cols-4 sm:auto-rows-[120px]">
+    <div className={`grid grid-flow-dense auto-rows-[120px] gap-3 ${gridColsClass}`}>
       {visibleItems.map((item) => {
         const sizeClass = homeGridSizeClass(item.size);
         const large = item.size === "LARGE" || item.size === "TALL";
-        const className = `${sizeClass} group relative flex min-h-0 overflow-hidden rounded-2xl border border-sky-100/70 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-          large ? "items-end" : "items-center justify-center"
-        }`;
+        const className = `${sizeClass} group relative flex min-h-0 overflow-hidden rounded-2xl border border-sky-100/70 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md items-center justify-center`;
         const content = (
           <>
             {item.backgroundImage && (
@@ -33,11 +34,11 @@ export default function HomeGrid({
               />
             )}
             <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/95 via-white/75 to-sky-100/45" aria-hidden="true" />
-            <span className={`relative z-10 flex min-w-0 ${large ? "w-full items-end justify-between gap-3" : "flex-col items-center gap-2 text-center"}`}>
+            <span className={`relative z-10 flex min-w-0 flex-col items-center text-center ${large ? "gap-3" : "gap-2"}`}>
               <span className={`flex shrink-0 items-center justify-center rounded-xl bg-sky-600 text-white shadow-sm transition group-hover:scale-105 ${large ? "h-12 w-12" : "h-10 w-10"}`}>
                 <HomeGridIcon icon={item.icon} className={large ? "h-6 w-6" : "h-5 w-5"} />
               </span>
-              <span className={`min-w-0 font-bold leading-snug text-sky-800 ${large ? "text-left text-base sm:text-lg" : "text-sm"}`}>
+              <span className={`min-w-0 font-bold leading-snug text-sky-800 ${large ? "text-base" : "text-sm"}`}>
                 {item.title}
               </span>
             </span>

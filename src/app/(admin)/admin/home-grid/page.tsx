@@ -1,10 +1,13 @@
 import HomeGridEditor from "@/components/HomeGridEditor";
-import { listHomeGridItems } from "@/lib/home-grid";
+import { getHomeGridColumns, listHomeGridItems } from "@/lib/home-grid";
 import { requireCurrentMeeting } from "@/lib/meetings";
 
 export default async function AdminHomeGridPage() {
   const meeting = await requireCurrentMeeting();
-  const items = await listHomeGridItems(meeting.id);
+  const [items, columns] = await Promise.all([
+    listHomeGridItems(meeting.id),
+    getHomeGridColumns(meeting.id),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -14,7 +17,7 @@ export default async function AdminHomeGridPage() {
           当前会议：{meeting.title}。自由配置入口数量、顺序、尺寸、图标和背景图。
         </p>
       </div>
-      <HomeGridEditor meetingId={meeting.id} initialItems={items} />
+      <HomeGridEditor meetingId={meeting.id} initialItems={items} initialColumns={columns} />
     </div>
   );
 }

@@ -64,6 +64,16 @@ async function main() {
     });
   }
 
+  const liveStreamCount = await prisma.liveStream.count({ where: { meetingId: defaultMeeting.id } });
+  if (liveStreamCount === 0) {
+    await prisma.liveStream.createMany({
+      data: [
+        { meetingId: defaultMeeting.id, name: "主会场直播", url: "https://www.bilibili.com/", coverImage: null, description: "开幕式与主旨报告", time: "2026-09-18 09:00-12:00", sortOrder: 0, isVisible: true },
+        { meetingId: defaultMeeting.id, name: "分会场 A 直播", url: "https://www.bilibili.com/", coverImage: null, description: "材料科学分论坛", time: "2026-09-19 14:00-17:00", sortOrder: 1, isVisible: true },
+      ],
+    });
+  }
+
   const types = ["普通代表", "学生代表", "现场注册"];
   for (const name of types) {
     const found = await prisma.registrationType.findFirst({ where: { name } });
@@ -121,7 +131,7 @@ async function main() {
   const speakers = [
     { name: "张三", title: "教授", organization: "清华大学", bio: "<p>研究方向:人工智能。</p>" },
     { name: "李四", title: "研究员", organization: "北京大学", bio: "<p>研究方向:材料科学。</p>" },
-    { name: "王五", title: "主任", organization: "中科院", bio: "<p>大会主持人。</p>", isModerator: true },
+    { name: "王五", title: "主任", organization: "中科院", bio: "<p>大会主持人。</p>" },
   ];
   for (const s of speakers) {
     const found = await prisma.speaker.findFirst({ where: { meetingId, name: s.name } });

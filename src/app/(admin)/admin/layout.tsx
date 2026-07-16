@@ -20,6 +20,7 @@ import {
   StarIcon,
   LinkIcon,
   FileEditIcon,
+  VideoIcon,
 } from "@/components/icons";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import AdminShell from "@/components/AdminShell";
@@ -30,6 +31,7 @@ const MENU = [
   { href: "/admin/meetings", label: "会议管理", icon: LayersIcon },
   { href: "/admin", label: "基础信息", icon: HomeIcon },
   { href: "/admin/home-grid", label: "首页宫格", icon: StarIcon },
+  { href: "/admin/live", label: "直播管理", icon: VideoIcon },
   { href: "/admin/notices", label: "通知管理", icon: BellIcon },
   { href: "/admin/pages", label: "内容页", icon: FileTextIcon },
   { href: "/admin/schedule", label: "日程管理", icon: CalendarIcon },
@@ -38,7 +40,7 @@ const MENU = [
   { href: "/admin/hotels", label: "酒店管理", icon: HotelIcon },
   { href: "/admin/bookings", label: "预订管理", icon: BookmarkIcon },
   { href: "/admin/submissions", label: "投稿审核", icon: FileEditIcon },
-  { href: "/admin/albums", label: "图片直播", icon: ImageIcon },
+  { href: "/admin/albums", label: "直播图片", icon: ImageIcon },
   { href: "/admin/guests", label: "嘉宾管理", icon: StarIcon },
   { href: "/admin/receptions", label: "接待管理", icon: UsersIcon },
   { href: "/admin/channels", label: "渠道推广", icon: LinkIcon },

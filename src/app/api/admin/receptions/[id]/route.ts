@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { receptionSchema } from "@/lib/validation";
-import { updateReception } from "@/lib/guests-admin";
+import { updateReception, getReceptionById } from "@/lib/guests-admin";
+import { updateRegistrationReception, getRegistrationReceptionById } from "@/lib/registrations";
 
 function parse(form: FormData | null) {
   return receptionSchema.safeParse({
@@ -37,7 +38,16 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/reception
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
   }
   try {
-    await updateReception(id, parsed.data);
+    const guestReception = await getReceptionById(id);
+    if (guestReception) {
+      await updateReception(id, parsed.data);
+    } else {
+      const regReception = await getRegistrationReceptionById(id);
+      if (!regReception) {
+        return NextResponse.json({ ok: false, error: "记录不存在" }, { status: 404 });
+      }
+      await updateRegistrationReception(id, parsed.data);
+    }
   } catch {
     return NextResponse.json({ ok: false, error: "更新失败" }, { status: 400 });
   }

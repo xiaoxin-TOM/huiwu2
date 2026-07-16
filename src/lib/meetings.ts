@@ -77,6 +77,7 @@ export function updateMeetingConfig(
     confDate?: string;
     location?: string;
     logoUrl?: string | null;
+    heroImageUrl?: string | null;
     liveUrl?: string | null;
     welcomeHtml?: string;
     footerHtml?: string;

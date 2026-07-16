@@ -54,10 +54,12 @@ export default function RegistrationForm({
       <div>
         <label className={labelClass}>参会类型</label>
         <select name="typeId" required className={selectClass}>
-          <option value="">请选择参会类型</option>
+          <option value="" disabled hidden>
+            请选择参会类型
+          </option>
           {types.map((t) => (
             <option key={t.id} value={t.id}>
-              {t.name}（¥{t.fee}）
+              {t.name}
             </option>
           ))}
         </select>

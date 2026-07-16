@@ -1,73 +1,47 @@
 "use client";
 
 import { toCsv } from "@/lib/csv";
+import type { ReceptionRow } from "@/types/reception";
 
-type GuestWithReception = {
-  id: string;
-  name: string;
-  company: string;
-  level: string;
-  phone: string | null;
-  email: string | null;
-  reception: {
-    hotelName: string;
-    hotelRoom: string;
-    hotelCheckIn: string;
-    hotelCheckOut: string;
-    arriveMode: string;
-    arriveNo: string;
-    arriveTime: string;
-    arrivePlace: string;
-    departMode: string;
-    departNo: string;
-    departTime: string;
-    carPlate: string;
-    carDriver: string;
-    carDriverPhone: string;
-    carContact: string;
-    remark: string;
-  } | null;
+const KIND_LABEL: Record<string, string> = {
+  guest: "嘉宾",
+  registration: "报名人员",
 };
 
-const LEVEL_LABEL: Record<string, string> = {
-  VIP: "VIP",
-  NORMAL: "嘉宾",
-  MEDIA: "媒体",
-};
-
-export default function ReceptionExportButton({ guests }: { guests: GuestWithReception[] }) {
+export default function ReceptionExportButton({ rows }: { rows: ReceptionRow[] }) {
   function exportCsv() {
     const headers = [
-      "姓名", "单位", "级别", "手机", "邮箱",
+      "来源", "姓名", "单位", "分类", "手机", "邮箱",
       "抵达方式", "抵达班次", "抵达时间", "抵达地点",
       "返程方式", "返程班次", "返程时间",
       "酒店", "房间号", "入住", "退房",
       "车牌", "司机", "司机电话", "接待联系人", "备注",
     ];
-    const rows = guests.map((g) => [
-      g.name,
-      g.company,
-      LEVEL_LABEL[g.level] ?? g.level,
-      g.phone ?? "",
-      g.email ?? "",
-      g.reception?.arriveMode ?? "",
-      g.reception?.arriveNo ?? "",
-      g.reception?.arriveTime ?? "",
-      g.reception?.arrivePlace ?? "",
-      g.reception?.departMode ?? "",
-      g.reception?.departNo ?? "",
-      g.reception?.departTime ?? "",
-      g.reception?.hotelName ?? "",
-      g.reception?.hotelRoom ?? "",
-      g.reception?.hotelCheckIn ?? "",
-      g.reception?.hotelCheckOut ?? "",
-      g.reception?.carPlate ?? "",
-      g.reception?.carDriver ?? "",
-      g.reception?.carDriverPhone ?? "",
-      g.reception?.carContact ?? "",
-      g.reception?.remark ?? "",
+    const csvRows = rows.map((r) => [
+      KIND_LABEL[r.kind] ?? r.kind,
+      r.name,
+      r.company,
+      r.category,
+      r.phone ?? "",
+      r.email ?? "",
+      r.reception?.arriveMode ?? "",
+      r.reception?.arriveNo ?? "",
+      r.reception?.arriveTime ?? "",
+      r.reception?.arrivePlace ?? "",
+      r.reception?.departMode ?? "",
+      r.reception?.departNo ?? "",
+      r.reception?.departTime ?? "",
+      r.reception?.hotelName ?? "",
+      r.reception?.hotelRoom ?? "",
+      r.reception?.hotelCheckIn ?? "",
+      r.reception?.hotelCheckOut ?? "",
+      r.reception?.carPlate ?? "",
+      r.reception?.carDriver ?? "",
+      r.reception?.carDriverPhone ?? "",
+      r.reception?.carContact ?? "",
+      r.reception?.remark ?? "",
     ]);
-    const csv = toCsv(headers, rows);
+    const csv = toCsv(headers, csvRows);
     const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

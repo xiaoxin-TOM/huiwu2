@@ -43,9 +43,7 @@ export default async function SpeakerInvitationPage({
           <p className="text-slate-600">
             {speaker.organization} {speaker.title}
           </p>
-          <span className="inline-block rounded-full bg-sky-200 px-3 py-1 text-xs text-sky-800">
-            {speaker.isModerator ? "主持人" : "讲者"}
-          </span>
+          <span className="inline-block rounded-full bg-sky-200 px-3 py-1 text-xs text-sky-800">讲者</span>
         </div>
 
         {speaker.bio && (

@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { RegistrationInput } from "@/lib/validation";
+import type { RegistrationInput, ReceptionInput } from "@/lib/validation";
 
 export async function createRegistration(
   userId: string,
@@ -79,6 +79,53 @@ export function listRegistrations(meetingId: string) {
     include: { user: true, type: true },
     orderBy: { createdAt: "desc" },
   });
+}
+
+export type RegistrationFilters = {
+  status?: "ALL" | "PENDING" | "APPROVED" | "REJECTED";
+  typeId?: "ALL" | string;
+  q?: string;
+};
+
+export function listRegistrationsWithReception(meetingId: string, filters: RegistrationFilters = {}) {
+  const where: { meetingId: string; status?: string; typeId?: string; fullName?: { contains: string; mode: "insensitive" } } = { meetingId };
+  if (filters.status && filters.status !== "ALL") {
+    where.status = filters.status;
+  }
+  if (filters.typeId && filters.typeId !== "ALL") {
+    where.typeId = filters.typeId;
+  }
+  if (filters.q?.trim()) {
+    where.fullName = { contains: filters.q.trim(), mode: "insensitive" };
+  }
+  return prisma.registration.findMany({
+    where,
+    include: { user: true, type: true, reception: true },
+    orderBy: [{ type: { name: "asc" } }, { createdAt: "desc" }],
+  });
+}
+
+export function getRegistrationWithReception(id: string) {
+  return prisma.registration.findUnique({
+    where: { id },
+    include: { user: true, type: true, reception: true },
+  });
+}
+
+export function upsertRegistrationReception(registrationId: string, input: ReceptionInput) {
+  return prisma.registrationReception.upsert({
+    where: { registrationId },
+    create: { registrationId, ...input },
+    update: { ...input },
+  });
+}
+
+export function getRegistrationReceptionById(id: string) {
+  return prisma.registrationReception.findUnique({ where: { id }, include: { registration: true } });
+}
+
+export function updateRegistrationReception(id: string, input: ReceptionInput) {
+  return prisma.registrationReception.update({ where: { id }, data: { ...input } });
 }
 
 export function reviewRegistration(id: string, decision: "APPROVED" | "REJECTED") {
@@ -161,5 +208,57 @@ export function listCheckinLogs(meetingId: string) {
     where: { registration: { meetingId } },
     orderBy: { checkedAt: "desc" },
     include: { registration: { include: { user: true, type: true } } },
+  });
+}
+
+export function listRegistrationTypes() {
+  return prisma.registrationType.findMany({ orderBy: { fee: "asc" } });
+}
+
+export function createRegistrationType(data: { name: string; fee: number; description?: string }) {
+  return prisma.registrationType.create({
+    data: {
+      name: data.name.trim(),
+      fee: Math.max(0, data.fee),
+      description: data.description?.trim() ?? "",
+    },
+  });
+}
+
+export function updateRegistrationType(id: string, data: { name: string; fee: number; description?: string }) {
+  return prisma.registrationType.update({
+    where: { id },
+    data: {
+      name: data.name.trim(),
+      fee: Math.max(0, data.fee),
+      description: data.description?.trim() ?? "",
+    },
+  });
+}
+
+export function deleteRegistrationType(id: string) {
+  return prisma.registrationType.delete({ where: { id } });
+}
+
+export function countRegistrationsByType(typeId: string) {
+  return prisma.registration.count({ where: { typeId } });
+}
+
+export async function transferRegistrationsToType(fromTypeId: string, toTypeId: string) {
+  await prisma.registration.updateMany({
+    where: { typeId: fromTypeId },
+    data: { typeId: toTypeId },
+  });
+}
+
+export async function deleteRegistrationTypeWithTransfer(id: string, targetTypeId?: string) {
+  await prisma.$transaction(async (tx) => {
+    if (targetTypeId) {
+      await tx.registration.updateMany({
+        where: { typeId: id },
+        data: { typeId: targetTypeId },
+      });
+    }
+    await tx.registrationType.delete({ where: { id } });
   });
 }

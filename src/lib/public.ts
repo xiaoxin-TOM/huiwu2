@@ -11,6 +11,7 @@ export interface PublicConfig {
   confDate: string;
   confLocation: string;
   logoUrl: string | null;
+  heroImageUrl: string | null;
   liveUrl: string | null;
   welcomeHtml: string;
   footerHtml: string;
@@ -23,6 +24,7 @@ export function getPublicConfig(meeting: Meeting, siteConfig?: SiteConfig | null
     confDate: meeting.confDate || siteConfig?.confDate || "",
     confLocation: meeting.location || siteConfig?.confLocation || "",
     logoUrl: meeting.logoUrl ?? siteConfig?.logoUrl ?? null,
+    heroImageUrl: meeting.heroImageUrl ?? siteConfig?.heroImageUrl ?? null,
     liveUrl: meeting.liveUrl ?? siteConfig?.liveUrl ?? null,
     welcomeHtml: meeting.welcomeHtml || siteConfig?.welcomeHtml || "",
     footerHtml: meeting.footerHtml || siteConfig?.footerHtml || "",

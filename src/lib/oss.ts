@@ -122,3 +122,49 @@ export async function uploadHomeGridImageToOSS(params: {
   if (!result.url) throw new Error("OSS 上传失败，未返回文件 URL");
   return `${getPublicBaseUrl()}/${key}`;
 }
+
+export async function uploadLiveStreamCoverToOSS(params: {
+  meetingId: string;
+  buffer: Buffer;
+  mime: string;
+  req?: Request;
+}): Promise<string> {
+  const ext = IMAGE_TYPES[params.mime];
+  if (!ext) throw new Error("仅支持 JPG/PNG/WebP 图片");
+  const client = getClient();
+  const safeMeetingId = params.meetingId.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const key = `${getBasePath()}/meetings/${safeMeetingId}/live-streams/${randomUUID()}.${ext}`;
+  const result = await client.put(key, params.buffer, {
+    mime: params.mime,
+    headers: {
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "Content-Disposition": "inline",
+      ...uploaderMetadata(params.req),
+    },
+  });
+  if (!result.url) throw new Error("OSS 上传失败，未返回文件 URL");
+  return `${getPublicBaseUrl()}/${key}`;
+}
+
+export async function uploadAdminImageToOSS(params: {
+  meetingId: string;
+  buffer: Buffer;
+  mime: string;
+  req?: Request;
+}): Promise<string> {
+  const ext = IMAGE_TYPES[params.mime];
+  if (!ext) throw new Error("仅支持 JPG/PNG/WebP 图片");
+  const client = getClient();
+  const safeMeetingId = params.meetingId.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const key = `${getBasePath()}/meetings/${safeMeetingId}/admin-images/${randomUUID()}.${ext}`;
+  const result = await client.put(key, params.buffer, {
+    mime: params.mime,
+    headers: {
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "Content-Disposition": "inline",
+      ...uploaderMetadata(params.req),
+    },
+  });
+  if (!result.url) throw new Error("OSS 上传失败，未返回文件 URL");
+  return `${getPublicBaseUrl()}/${key}`;
+}

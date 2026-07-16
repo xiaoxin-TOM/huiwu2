@@ -11,7 +11,6 @@ function spk(partial: Partial<Speaker>): Speaker {
     organization: partial.organization ?? "",
     bio: partial.bio ?? "",
     photoUrl: partial.photoUrl ?? null,
-    isModerator: partial.isModerator ?? false,
     token: partial.token ?? null,
     invitedAt: partial.invitedAt ?? null,
     confirmed: partial.confirmed ?? false,

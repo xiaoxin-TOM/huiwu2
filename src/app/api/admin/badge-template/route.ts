@@ -4,6 +4,7 @@ import { isAdmin } from "@/lib/access";
 import { badgeTemplateSchema } from "@/lib/validation";
 import { requireCurrentMeetingForRequest } from "@/lib/meetings";
 import { upsertBadgeTemplate } from "@/lib/badge-template";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -50,6 +51,23 @@ export async function POST(req: Request) {
     await upsertBadgeTemplate(meeting.id, parsed.data);
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(req: Request) {
+  const session = await auth();
+  if (!isAdmin(session?.user?.role)) {
+    return NextResponse.json({ ok: false, error: "无权限" }, { status: 403 });
+  }
+
+  const meeting = await requireCurrentMeetingForRequest(req);
+
+  try {
+    await prisma.badgeTemplate.deleteMany({ where: { meetingId: meeting.id } });
+  } catch {
+    return NextResponse.json({ ok: false, error: "恢复失败" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

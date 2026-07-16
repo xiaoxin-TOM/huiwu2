@@ -17,7 +17,6 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/speakers/
     organization: form?.get("organization") ?? "",
     bio: form?.get("bio") ?? "",
     photoUrl: form?.get("photoUrl") ?? "",
-    isModerator: form?.get("isModerator") === "on",
   });
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });

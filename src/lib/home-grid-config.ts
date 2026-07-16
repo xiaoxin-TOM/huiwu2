@@ -30,6 +30,15 @@ export const HOME_GRID_SIZE_OPTIONS = [
   { value: "LARGE", label: "大卡片 2×2" },
 ] as const;
 
+export const HOME_GRID_COLUMNS_OPTIONS = [
+  { value: 2, label: "每行 2 个" },
+  { value: 3, label: "每行 3 个" },
+  { value: 4, label: "每行 4 个" },
+] as const;
+
+export type HomeGridColumns = (typeof HOME_GRID_COLUMNS_OPTIONS)[number]["value"];
+export const DEFAULT_HOME_GRID_COLUMNS: HomeGridColumns = 4;
+
 export const HOME_GRID_ROUTE_OPTIONS = [
   { value: "/register-conf", label: "注册报名" },
   { value: "/intro", label: "活动简介" },
@@ -95,13 +104,14 @@ export function homeGridArea(size: HomeGridSize): number {
 
 export function autoFillHomeGridRows<T extends { size: HomeGridSize; isVisible: boolean }>(
   items: T[],
+  columns: HomeGridColumns = DEFAULT_HOME_GRID_COLUMNS,
 ): Array<Omit<T, "size"> & { size: HomeGridSize }> {
   const next: Array<Omit<T, "size"> & { size: HomeGridSize }> = items.map((item) => ({
     ...item,
     size: item.size,
   }));
   const area = next.filter((item) => item.isVisible).reduce((sum, item) => sum + homeGridArea(item.size), 0);
-  let missing = (4 - (area % 4)) % 4;
+  let missing = (columns - (area % columns)) % columns;
   if (missing === 0) return next;
 
   if (missing === 3) {

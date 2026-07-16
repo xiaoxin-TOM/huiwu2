@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ImageUploadField from "@/components/ImageUploadField";
 
 interface SiteConfigValues {
   confName?: string | null;
   confDate?: string | null;
   confLocation?: string | null;
   logoUrl?: string | null;
+  heroImageUrl?: string | null;
   liveUrl?: string | null;
   venueName?: string | null;
   venueAddress?: string | null;
@@ -62,64 +64,41 @@ export default function AdminSiteForm({ defaultValues }: { defaultValues: SiteCo
       {error && (
         <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</div>
       )}
-      <label className="block text-sm text-gray-600">
-        会议名称
-        <input
-          name="confName"
-          required
-          defaultValue={defaultValues.confName ?? ""}
-          className="mt-1 w-full rounded border px-3 py-2"
-        />
-      </label>
-      <label className="block text-sm text-gray-600">
-        会议时间
-        <input
-          name="confDate"
-          defaultValue={defaultValues.confDate ?? ""}
-          className="mt-1 w-full rounded border px-3 py-2"
-        />
-      </label>
-      <label className="block text-sm text-gray-600">
-        会议地点
-        <input
-          name="confLocation"
-          defaultValue={defaultValues.confLocation ?? ""}
-          className="mt-1 w-full rounded border px-3 py-2"
-        />
-      </label>
-      <label className="block text-sm text-gray-600">
-        Logo 图片地址
-        <input
-          name="logoUrl"
-          defaultValue={defaultValues.logoUrl ?? ""}
-          className="mt-1 w-full rounded border px-3 py-2"
-        />
-      </label>
-      <label className="block text-sm text-gray-600">
-        直播地址(外部链接)
-        <input
-          name="liveUrl"
-          defaultValue={defaultValues.liveUrl ?? ""}
-          className="mt-1 w-full rounded border px-3 py-2"
-        />
-      </label>
-      <label className="block text-sm text-gray-600">
-        会场名称
-        <input
-          name="venueName"
-          defaultValue={defaultValues.venueName ?? ""}
-          className="mt-1 w-full rounded border px-3 py-2"
-        />
-      </label>
-      <label className="block text-sm text-gray-600">
-        会场地址
-        <input
-          name="venueAddress"
-          defaultValue={defaultValues.venueAddress ?? ""}
-          className="mt-1 w-full rounded border px-3 py-2"
-        />
-      </label>
-      <div className="grid grid-cols-2 gap-3">
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <label className="block text-sm text-gray-600">
+          会议名称
+          <input
+            name="confName"
+            required
+            defaultValue={defaultValues.confName ?? ""}
+            className="mt-1 w-full rounded border px-3 py-2"
+          />
+        </label>
+        <label className="block text-sm text-gray-600">
+          会议时间
+          <input
+            name="confDate"
+            defaultValue={defaultValues.confDate ?? ""}
+            className="mt-1 w-full rounded border px-3 py-2"
+          />
+        </label>
+        <label className="block text-sm text-gray-600">
+          会议地点
+          <input
+            name="confLocation"
+            defaultValue={defaultValues.confLocation ?? ""}
+            className="mt-1 w-full rounded border px-3 py-2"
+          />
+        </label>
+        <label className="block text-sm text-gray-600">
+          会场地址
+          <input
+            name="venueAddress"
+            defaultValue={defaultValues.venueAddress ?? ""}
+            className="mt-1 w-full rounded border px-3 py-2"
+          />
+        </label>
         <label className="block text-sm text-gray-600">
           会场经度
           <input
@@ -138,37 +117,52 @@ export default function AdminSiteForm({ defaultValues }: { defaultValues: SiteCo
             className="mt-1 w-full rounded border px-3 py-2"
           />
         </label>
+        <p className="col-span-1 text-xs text-gray-400 sm:col-span-2">
+          坐标可在
+          <a
+            href="https://lbs.amap.com/tools/picker"
+            target="_blank"
+            rel="noreferrer"
+            className="text-sky-700 underline"
+          >
+            高德坐标拾取器
+          </a>
+          中点选复制(经纬度填写后前台会场交通页将显示地图与导航按钮)
+        </p>
+        <div className="col-span-1 sm:col-span-2">
+          <ImageUploadField name="logoUrl" defaultValue={defaultValues.logoUrl ?? ""} label="Logo 图片地址" />
+        </div>
+        <div className="col-span-1 sm:col-span-2">
+          <ImageUploadField
+            name="heroImageUrl"
+            defaultValue={defaultValues.heroImageUrl ?? ""}
+            label="首页头图/宣传海报地址"
+            placeholder="上传图片后自动填写，也可粘贴图片地址，建议比例 16:9"
+          />
+        </div>
       </div>
-      <p className="text-xs text-gray-400">
-        坐标可在
-        <a
-          href="https://lbs.amap.com/tools/picker"
-          target="_blank"
-          rel="noreferrer"
-          className="text-sky-700 underline"
-        >
-          高德坐标拾取器
-        </a>
-        中点选复制(经纬度填写后前台会场交通页将显示地图与导航按钮)
-      </p>
-      <label className="block text-sm text-gray-600">
-        欢迎致辞（纯文本，换行自动分段）
-        <textarea
-          name="welcomeHtml"
-          rows={6}
-          defaultValue={defaultValues.welcomeHtml ?? ""}
-          className="mt-1 w-full rounded border px-3 py-2 text-sm"
-        />
-      </label>
-      <label className="block text-sm text-gray-600">
-        页脚内容（纯文本，每行一段）
-        <textarea
-          name="footerHtml"
-          rows={4}
-          defaultValue={defaultValues.footerHtml ?? ""}
-          className="mt-1 w-full rounded border px-3 py-2 text-sm"
-        />
-      </label>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <label className="block text-sm text-gray-600">
+          欢迎致辞（纯文本，换行自动分段）
+          <textarea
+            name="welcomeHtml"
+            rows={6}
+            defaultValue={defaultValues.welcomeHtml ?? ""}
+            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+          />
+        </label>
+        <label className="block text-sm text-gray-600">
+          页脚内容（纯文本，每行一段）
+          <textarea
+            name="footerHtml"
+            rows={6}
+            defaultValue={defaultValues.footerHtml ?? ""}
+            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+          />
+        </label>
+      </div>
+
       <button
         type="submit"
         disabled={loading}

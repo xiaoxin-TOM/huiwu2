@@ -1,16 +1,17 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
 vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
-vi.mock("@/lib/home-grid", () => ({ replaceHomeGridItems: vi.fn() }));
+vi.mock("@/lib/home-grid", () => ({ replaceHomeGridItems: vi.fn(), setHomeGridColumns: vi.fn() }));
 vi.mock("@/lib/meetings", () => ({ requireCurrentMeetingForRequest: vi.fn() }));
 
 import { auth } from "@/lib/auth";
-import { replaceHomeGridItems } from "@/lib/home-grid";
+import { replaceHomeGridItems, setHomeGridColumns } from "@/lib/home-grid";
 import { requireCurrentMeetingForRequest } from "@/lib/meetings";
 import { POST } from "@/app/api/admin/home-grid/route";
 
 const mockedAuth = vi.mocked(auth);
 const mockedReplace = vi.mocked(replaceHomeGridItems);
+const mockedSetColumns = vi.mocked(setHomeGridColumns);
 const mockedMeeting = vi.mocked(requireCurrentMeetingForRequest);
 
 beforeEach(() => {
@@ -22,6 +23,7 @@ test("首页宫格保存接口拒绝普通用户", async () => {
   const response = await POST(new Request("http://localhost/api/admin/home-grid", { method: "POST" }));
   expect(response.status).toBe(403);
   expect(mockedReplace).not.toHaveBeenCalled();
+  expect(mockedSetColumns).not.toHaveBeenCalled();
 });
 
 test("管理员可保存当前会议的宫格配置", async () => {
@@ -38,9 +40,10 @@ test("管理员可保存当前会议的宫格配置", async () => {
   const response = await POST(new Request("http://localhost/api/admin/home-grid", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ items }),
+    body: JSON.stringify({ columns: 3, items }),
   }));
 
   expect(response.status).toBe(200);
+  expect(mockedSetColumns).toHaveBeenCalledWith("meeting-1", 3);
   expect(mockedReplace).toHaveBeenCalledWith("meeting-1", items);
 });

@@ -30,10 +30,7 @@ export default async function SpeakerDetailPage({
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-800">{s.name}</h2>
-            <p className="text-sm text-slate-500">
-              {s.title} · {s.organization}
-              {s.isModerator && <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700">主持人</span>}
-            </p>
+            <p className="text-sm text-slate-500">{s.title} · {s.organization}</p>
           </div>
         </div>
         <div className="prose max-w-none text-slate-600">

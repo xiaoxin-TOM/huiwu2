@@ -62,6 +62,7 @@ export const siteConfigSchema = z.object({
   confDate: z.string().optional().default(""),
   confLocation: z.string().optional().default(""),
   logoUrl: z.string().optional().default(""),
+  heroImageUrl: z.string().optional().default(""),
   liveUrl: z.string().optional().default(""),
   welcomeHtml: z.string().optional().default(""),
   footerHtml: z.string().optional().default(""),
@@ -88,7 +89,6 @@ export const speakerSchema = z.object({
   organization: z.string().optional().default(""),
   bio: z.string().optional().default(""),
   photoUrl: z.string().optional().default(""),
-  isModerator: z.boolean(),
 });
 
 export const sessionSchema = z.object({
@@ -179,6 +179,7 @@ export const homeGridItemSchema = z.object({
 });
 
 export const homeGridSchema = z.object({
+  columns: z.coerce.number().int().min(2).max(4).default(4),
   items: z.array(homeGridItemSchema).min(1, "至少保留一个功能入口").max(24, "功能入口最多 24 个"),
 });
 
@@ -222,6 +223,37 @@ export const channelSchema = z.object({
   note: z.string().optional().default(""),
 });
 export type ChannelInput = z.infer<typeof channelSchema>;
+
+export const registrationTypeSchema = z.object({
+  name: z.string().min(1, "请填写类型名称"),
+  fee: z.coerce.number().int().min(0, "费用不能为负"),
+  description: z.string().optional().default(""),
+});
+export type RegistrationTypeInput = z.infer<typeof registrationTypeSchema>;
+
+const liveStreamUrl = z.string().trim().min(1, "请填写直播地址").max(500, "直播地址过长").refine(
+  (value) => /^https?:\/\/[^\s]+$/i.test(value),
+  "请输入 http(s) 外部直播链接",
+);
+
+export const liveStreamSchema = z.object({
+  name: z.string().trim().min(1, "请填写会场名称").max(50, "会场名称不能超过 50 个字"),
+  url: liveStreamUrl,
+  coverImage: z.string().trim().max(500, "封面图地址过长").refine(
+    (value) =>
+      value === "" ||
+      (value.startsWith("/") && !value.startsWith("//")) ||
+      /^https?:\/\/[^\s]+$/i.test(value),
+    "封面图请输入站内路径或 http(s) 链接",
+  ).default(""),
+  description: z.string().trim().max(200, "会场描述不能超过 200 个字").default(""),
+  time: z.string().trim().max(100, "观看时间不能超过 100 个字").default(""),
+  isVisible: z.boolean(),
+});
+
+export const liveStreamsSchema = z.object({
+  items: z.array(liveStreamSchema).max(20, "直播会场最多 20 个"),
+});
 
 export const badgeTemplateSchema = z.object({
   pageWidthMm: z.coerce.number().int().min(1),

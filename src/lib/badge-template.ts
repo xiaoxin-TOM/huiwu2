@@ -1,15 +1,20 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { PDFDocument, PDFImage, PDFFont, rgb } from "pdf-lib";
-import QRCode from "qrcode";
+import fontkit from "@pdf-lib/fontkit";
 import { prisma } from "@/lib/prisma";
 import type { BadgeTemplateInput } from "@/lib/validation";
 import type { Meeting, Registration, BadgeTemplate } from "@prisma/client";
 
 const MM_TO_PT = 2.83465;
+const PX_TO_PT = 1;
 
 export function mmToPt(mm: number): number {
   return mm * MM_TO_PT;
+}
+
+export function pxToPt(px: number): number {
+  return px * PX_TO_PT;
 }
 
 const DEFAULT_TEMPLATE: Omit<
@@ -21,19 +26,19 @@ const DEFAULT_TEMPLATE: Omit<
   bgImageUrl: null,
   nameX: 43,
   nameY: 52,
-  nameSize: 12,
+  nameSize: 10,
   titleX: 43,
   titleY: 40,
-  titleSize: 11,
+  titleSize: 10,
   companyX: 43,
   companyY: 28,
-  companySize: 11,
+  companySize: 10,
   qrX: 43,
   qrY: 92,
   qrSize: 34,
   meetingTitleX: 43,
   meetingTitleY: 128,
-  meetingTitleSize: 12,
+  meetingTitleSize: 10,
 };
 
 export async function getBadgeTemplate(meetingId: string): Promise<BadgeTemplate> {
@@ -52,8 +57,12 @@ export function upsertBadgeTemplate(meetingId: string, data: BadgeTemplateInput)
   });
 }
 
-async function fetchImageBytes(url: string): Promise<Uint8Array | null> {
+async function loadImageBytes(url: string): Promise<Uint8Array | null> {
   try {
+    if (url.startsWith("/")) {
+      const filePath = path.join(process.cwd(), "public", url);
+      return await readFile(filePath);
+    }
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
     const buf = await res.arrayBuffer();
@@ -68,7 +77,7 @@ async function embedBackground(
   bgImageUrl: string | null,
 ): Promise<PDFImage | null> {
   if (!bgImageUrl) return null;
-  const bytes = await fetchImageBytes(bgImageUrl);
+  const bytes = await loadImageBytes(bgImageUrl);
   if (!bytes) return null;
   try {
     if (
@@ -110,11 +119,11 @@ async function drawBadgePage(
     text: string,
     xMm: number,
     yMm: number,
-    sizeMm: number,
+    sizePx: number,
     options: { color?: ReturnType<typeof rgb> } = {},
   ) {
     if (!text) return;
-    const size = mmToPt(sizeMm);
+    const size = pxToPt(sizePx);
     const x = mmToPt(xMm);
     const y = mmToPt(yMm);
     const textWidth = font.widthOfTextAtSize(text, size);
@@ -127,47 +136,121 @@ async function drawBadgePage(
     });
   }
 
-  drawCenteredText(
-    meeting.title,
-    template.meetingTitleX,
-    template.meetingTitleY,
-    template.meetingTitleSize,
-  );
-  drawCenteredText(
-    registration.fullName,
-    template.nameX,
-    template.nameY,
-    template.nameSize,
-  );
-  drawCenteredText(
-    registration.title,
-    template.titleX,
-    template.titleY,
-    template.titleSize,
-  );
-  drawCenteredText(
-    registration.organization,
-    template.companyX,
-    template.companyY,
-    template.companySize,
-  );
+  if (template.bgImageUrl) {
+    drawCenteredText(
+      meeting.title,
+      template.meetingTitleX,
+      template.meetingTitleY,
+      template.meetingTitleSize,
+    );
+    drawCenteredText(
+      registration.fullName,
+      template.nameX,
+      template.nameY,
+      template.nameSize,
+    );
+    drawCenteredText(
+      registration.title,
+      template.titleX,
+      template.titleY,
+      template.titleSize,
+    );
+    drawCenteredText(
+      registration.organization,
+      template.companyX,
+      template.companyY,
+      template.companySize,
+    );
+  } else {
+    function drawLabeledText(
+      label: string,
+      value: string,
+      valueX: number,
+      yMm: number,
+      sizePx: number,
+    ) {
+      if (!value) return;
+      const size = pxToPt(sizePx);
+      const y = mmToPt(yMm);
+      const valueXPos = mmToPt(valueX);
+      const labelRightX = mmToPt(valueX - 5);
+      const labelWidth = font.widthOfTextAtSize(label, size);
+      const labelX = Math.max(mmToPt(5), labelRightX - labelWidth);
+      page.drawText(label, {
+        x: labelX,
+        y,
+        size,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(value, {
+        x: valueXPos,
+        y,
+        size,
+        font,
+        color: rgb(0, 0, 0),
+      });
+    }
 
-  // QR code
-  const qrText = `/c/${registration.token}`;
-  const qrDataUrl = await QRCode.toDataURL(qrText, {
-    width: 256,
-    margin: 1,
-    errorCorrectionLevel: "M",
-  });
-  const qrBase64 = qrDataUrl.split(",")[1];
-  if (qrBase64) {
-    const qrBytes = Buffer.from(qrBase64, "base64");
-    const qrImage = await pdfDoc.embedPng(qrBytes);
-    const qrSize = mmToPt(template.qrSize);
-    const qrX = mmToPt(template.qrX) - qrSize / 2;
-    const qrY = mmToPt(template.qrY) - qrSize / 2;
-    page.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
+    drawCenteredText(
+      meeting.title,
+      template.meetingTitleX,
+      template.meetingTitleY,
+      template.meetingTitleSize,
+    );
+    drawLabeledText(
+      "姓名：",
+      registration.fullName,
+      template.nameX,
+      template.nameY,
+      template.nameSize,
+    );
+    drawLabeledText(
+      "职位：",
+      registration.title,
+      template.titleX,
+      template.titleY,
+      template.titleSize,
+    );
+    drawLabeledText(
+      "单位：",
+      registration.organization,
+      template.companyX,
+      template.companyY,
+      template.companySize,
+    );
   }
+
+  // Photo placeholder (square border)
+  function drawPhotoPlaceholder(
+    centerX: number,
+    centerY: number,
+    sizeMm: number,
+  ) {
+    const size = mmToPt(sizeMm);
+    const x = mmToPt(centerX) - size / 2;
+    const y = mmToPt(centerY) - size / 2;
+    page.drawRectangle({
+      x,
+      y,
+      width: size,
+      height: size,
+      borderColor: rgb(0, 0, 0),
+      borderWidth: 1,
+    });
+    const text = "贴照片处";
+    const textSize = size / 5;
+    const textWidth = font.widthOfTextAtSize(text, textSize);
+    page.drawText(text, {
+      x: mmToPt(centerX) - textWidth / 2,
+      y: mmToPt(centerY) - textSize / 2,
+      size: textSize,
+      font,
+      color: rgb(0.5, 0.5, 0.5),
+    });
+  }
+
+  drawPhotoPlaceholder(template.qrX, template.qrY, template.qrSize);
 }
 
 export async function renderBadgePdf(
@@ -176,6 +259,7 @@ export async function renderBadgePdf(
   template: BadgeTemplate,
 ): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
   const fontBytes = await loadChineseFont();
   const font = await pdfDoc.embedFont(fontBytes);
   await drawBadgePage(pdfDoc, font, registration, meeting, template);
@@ -188,6 +272,7 @@ export async function renderBadgesPdf(
   template: BadgeTemplate,
 ): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
   const fontBytes = await loadChineseFont();
   const font = await pdfDoc.embedFont(fontBytes);
   for (const registration of registrations) {

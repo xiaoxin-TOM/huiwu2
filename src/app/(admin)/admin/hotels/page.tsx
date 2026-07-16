@@ -1,6 +1,7 @@
 import { listHotels } from "@/lib/hotels";
 import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
+import ImageUploadField from "@/components/ImageUploadField";
 import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminHotelsPage() {
@@ -23,7 +24,9 @@ export default async function AdminHotelsPage() {
         <input name="price" type="number" min={0} defaultValue={0} placeholder="价格/晚" className="rounded border px-3 py-2" />
         <input name="address" placeholder="地址" className="rounded border px-3 py-2" />
         <input name="distance" placeholder="距离" className="rounded border px-3 py-2" />
-        <input name="imageUrl" placeholder="图片地址(可选)" className="col-span-2 rounded border px-3 py-2" />
+        <div className="col-span-2">
+          <ImageUploadField name="imageUrl" label="酒店图片" />
+        </div>
         <textarea name="description" rows={2} placeholder="简介(HTML)" className="col-span-2 rounded border px-3 py-2 font-mono text-sm" />
         <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
           新建酒店

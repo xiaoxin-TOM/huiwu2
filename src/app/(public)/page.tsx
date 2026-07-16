@@ -4,7 +4,7 @@ import RichText from "@/components/RichText";
 import HomeGrid from "@/components/HomeGrid";
 import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { getPublicConfig } from "@/lib/public";
-import { listHomeGridItems } from "@/lib/home-grid";
+import { getHomeGridColumns, listHomeGridItems } from "@/lib/home-grid";
 
 export default async function HomePage({
   searchParams,
@@ -13,9 +13,10 @@ export default async function HomePage({
 }) {
   const meeting = await requirePublicMeeting((await searchParams).m);
   await guardPublicAccess(meeting.id);
-  const [siteConfig, homeGridItems] = await Promise.all([
+  const [siteConfig, homeGridItems, homeGridColumns] = await Promise.all([
     prisma.siteConfig.findUnique({ where: { id: 1 } }),
     listHomeGridItems(meeting.id),
+    getHomeGridColumns(meeting.id),
   ]);
   const cfg = getPublicConfig(meeting, siteConfig);
 
@@ -24,7 +25,7 @@ export default async function HomePage({
       {/* Hero banner */}
       <section className="relative aspect-video w-full overflow-hidden">
         <Image
-          src="/imgs/ui.jpg"
+          src={cfg.heroImageUrl ?? "/imgs/ui.jpg"}
           alt="学术年会"
           fill
           priority
@@ -36,7 +37,7 @@ export default async function HomePage({
       {/* Feature grid */}
       <section className="mx-auto max-w-6xl px-4 py-6 md:px-8">
         <h2 className="mb-4 text-lg font-bold text-slate-800">会议服务</h2>
-        <HomeGrid meetingId={meeting.id} items={homeGridItems} />
+        <HomeGrid meetingId={meeting.id} items={homeGridItems} columns={homeGridColumns} />
       </section>
 
       {/* Welcome content */}

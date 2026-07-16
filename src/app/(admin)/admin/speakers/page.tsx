@@ -3,6 +3,7 @@ import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 import { ButtonLink } from "@/components/ui/Button";
 import SpeakerInviteButton from "@/components/SpeakerInviteButton";
+import ImageUploadField from "@/components/ImageUploadField";
 
 export default async function AdminSpeakersPage() {
   const meeting = await getCurrentMeeting();
@@ -24,11 +25,8 @@ export default async function AdminSpeakersPage() {
         <input name="name" required placeholder="姓名" className="w-full rounded border px-3 py-2" />
         <input name="title" placeholder="职称" className="w-full rounded border px-3 py-2" />
         <input name="organization" placeholder="单位" className="w-full rounded border px-3 py-2" />
-        <input name="photoUrl" placeholder="照片地址(可选)" className="w-full rounded border px-3 py-2" />
+        <ImageUploadField name="photoUrl" label="讲者照片" />
         <textarea name="bio" rows={3} placeholder="简介(HTML)" className="w-full rounded border px-3 py-2 font-mono text-sm" />
-        <label className="flex items-center gap-2 text-sm text-gray-600">
-          <input type="checkbox" name="isModerator" /> 主持人
-        </label>
         <button type="submit" className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-800">
           新建
         </button>
@@ -44,7 +42,7 @@ export default async function AdminSpeakersPage() {
                 <th className="py-2">姓名</th>
                 <th>职称</th>
                 <th>单位</th>
-                <th>角色</th>
+
                 <th>认证状态</th>
                 <th>操作</th>
               </tr>
@@ -55,7 +53,6 @@ export default async function AdminSpeakersPage() {
                   <td className="py-2">{s.name}</td>
                   <td>{s.title}</td>
                   <td>{s.organization}</td>
-                  <td>{s.isModerator ? "主持人" : "讲者"}</td>
                   <td>
                     {s.confirmed ? (
                       <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">

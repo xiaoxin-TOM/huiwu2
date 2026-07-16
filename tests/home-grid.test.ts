@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   DEFAULT_HOME_GRID_ITEMS,
+  HOME_GRID_COLUMNS_OPTIONS,
   autoFillHomeGridRows,
   homeGridArea,
   homeGridSizeClass,
@@ -66,5 +67,29 @@ describe("首页入口宫格", () => {
     } as const;
     expect(homeGridSchema.safeParse({ items: Array.from({ length: 24 }, () => item) }).success).toBe(true);
     expect(homeGridSchema.safeParse({ items: Array.from({ length: 25 }, () => item) }).success).toBe(false);
+  });
+
+  test("每行数量支持 2/3/4 且默认 4", () => {
+    expect(HOME_GRID_COLUMNS_OPTIONS.map((o) => o.value)).toEqual([2, 3, 4]);
+    const item = {
+      title: "入口",
+      href: "/",
+      icon: "link",
+      size: "SMALL",
+      backgroundImage: "",
+      isVisible: true,
+    } as const;
+    expect(homeGridSchema.safeParse({ items: [item] }).data?.columns).toBe(4);
+    expect(homeGridSchema.safeParse({ columns: 3, items: [item] }).data?.columns).toBe(3);
+    expect(homeGridSchema.safeParse({ columns: 1, items: [item] }).success).toBe(false);
+    expect(homeGridSchema.safeParse({ columns: 5, items: [item] }).success).toBe(false);
+  });
+
+  test("自动铺满按每行数量补全", () => {
+    const items = Array.from({ length: 5 }, () => ({ size: "SMALL" as const, isVisible: true }));
+    const filled4 = autoFillHomeGridRows(items, 4);
+    expect(filled4.reduce((sum, item) => sum + homeGridArea(item.size), 0)).toBe(8);
+    const filled3 = autoFillHomeGridRows(items, 3);
+    expect(filled3.reduce((sum, item) => sum + homeGridArea(item.size), 0)).toBe(6);
   });
 });
