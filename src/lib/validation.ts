@@ -179,6 +179,7 @@ export const homeGridItemSchema = z.object({
 
 export const homeGridSchema = z.object({
   columns: z.coerce.number().int().min(2).max(4).default(4),
+  rounded: z.boolean().default(true),
   items: z.array(homeGridItemSchema).min(1, "至少保留一个功能入口").max(24, "功能入口最多 24 个"),
 });
 

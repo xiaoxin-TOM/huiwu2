@@ -35,9 +35,11 @@ const ICONS = {
   home: HomeIcon,
   star: StarIcon,
   link: LinkIcon,
+  blank: FileTextIcon,
 } satisfies Record<HomeGridIconKey, typeof FileTextIcon>;
 
 export default function HomeGridIcon({ icon, className }: { icon: HomeGridIconKey; className?: string }) {
+  if (icon === "blank") return null;
   const Icon = ICONS[icon] ?? FileTextIcon;
   return <Icon className={className} />;
 }

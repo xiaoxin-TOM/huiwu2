@@ -27,7 +27,14 @@ export function createAlbum(meetingId: string, data: { title: string; date: stri
 }
 
 export function addPhoto(albumId: string, url: string, caption: string) {
-  return prisma.photo.create({ data: { albumId, url, caption } });
+  return prisma.$transaction(async (tx) => {
+    const photo = await tx.photo.create({ data: { albumId, url, caption } });
+    const album = await tx.album.findUnique({ where: { id: albumId }, select: { coverUrl: true } });
+    if (album && !album.coverUrl) {
+      await tx.album.update({ where: { id: albumId }, data: { coverUrl: url } });
+    }
+    return photo;
+  });
 }
 
 export function deletePhoto(id: string) {

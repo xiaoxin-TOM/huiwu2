@@ -103,6 +103,7 @@ model Meeting {
   venueLng          String          @default("")
   venueLat          String          @default("")
   homeGridColumns   Int             @default(4)
+  homeGridRounded   Boolean         @default(true)
   ownerId           String?
   owner             User?           @relation("MeetingOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   createdAt         DateTime        @default(now())

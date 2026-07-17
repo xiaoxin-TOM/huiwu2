@@ -69,6 +69,21 @@ export async function setHomeGridColumns(meetingId: string, columns: HomeGridCol
   });
 }
 
+export async function getHomeGridRounded(meetingId: string): Promise<boolean> {
+  const meeting = await prisma.meeting.findUnique({
+    where: { id: meetingId },
+    select: { homeGridRounded: true },
+  });
+  return meeting?.homeGridRounded ?? true;
+}
+
+export async function setHomeGridRounded(meetingId: string, rounded: boolean) {
+  await prisma.meeting.update({
+    where: { id: meetingId },
+    data: { homeGridRounded: rounded },
+  });
+}
+
 export function defaultHomeGridCreateData() {
   return DEFAULT_HOME_GRID_ITEMS.map((item, sortOrder) => ({
     ...item,

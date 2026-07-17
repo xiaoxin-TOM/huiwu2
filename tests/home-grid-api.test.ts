@@ -1,17 +1,18 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
 vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
-vi.mock("@/lib/home-grid", () => ({ replaceHomeGridItems: vi.fn(), setHomeGridColumns: vi.fn() }));
+vi.mock("@/lib/home-grid", () => ({ replaceHomeGridItems: vi.fn(), setHomeGridColumns: vi.fn(), setHomeGridRounded: vi.fn() }));
 vi.mock("@/lib/meetings", () => ({ requireCurrentMeetingForRequest: vi.fn() }));
 
 import { auth } from "@/lib/auth";
-import { replaceHomeGridItems, setHomeGridColumns } from "@/lib/home-grid";
+import { replaceHomeGridItems, setHomeGridColumns, setHomeGridRounded } from "@/lib/home-grid";
 import { requireCurrentMeetingForRequest } from "@/lib/meetings";
 import { POST } from "@/app/api/admin/home-grid/route";
 
 const mockedAuth = vi.mocked(auth);
 const mockedReplace = vi.mocked(replaceHomeGridItems);
 const mockedSetColumns = vi.mocked(setHomeGridColumns);
+const mockedSetRounded = vi.mocked(setHomeGridRounded);
 const mockedMeeting = vi.mocked(requireCurrentMeetingForRequest);
 
 beforeEach(() => {
@@ -45,5 +46,6 @@ test("管理员可保存当前会议的宫格配置", async () => {
 
   expect(response.status).toBe(200);
   expect(mockedSetColumns).toHaveBeenCalledWith("meeting-1", 3);
+  expect(mockedSetRounded).toHaveBeenCalledWith("meeting-1", true);
   expect(mockedReplace).toHaveBeenCalledWith("meeting-1", items);
 });

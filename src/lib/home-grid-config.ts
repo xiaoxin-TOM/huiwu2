@@ -1,6 +1,6 @@
 export const HOME_GRID_ICON_KEYS = [
   "file", "info", "book", "alert", "mail", "calendar", "users", "camera",
-  "car", "video", "hotel", "phone", "home", "star", "link",
+  "car", "video", "hotel", "phone", "home", "star", "link", "blank",
 ] as const;
 
 export const HOME_GRID_ICON_OPTIONS = [
@@ -19,6 +19,7 @@ export const HOME_GRID_ICON_OPTIONS = [
   { value: "home", label: "首页" },
   { value: "star", label: "推荐" },
   { value: "link", label: "链接" },
+  { value: "blank", label: "空白自定义" },
 ] as const;
 
 export const HOME_GRID_SIZE_KEYS = ["SMALL", "WIDE", "TALL", "LARGE"] as const;

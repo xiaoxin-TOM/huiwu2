@@ -25,9 +25,10 @@ function defaultDrafts(): HomeGridItemView[] {
   return DEFAULT_HOME_GRID_ITEMS.map((item, index) => ({ ...item, id: `default-${index}` }));
 }
 
-export default function HomeGridEditor({ meetingId, initialItems, initialColumns }: { meetingId: string; initialItems: HomeGridItemView[]; initialColumns: HomeGridColumns }) {
+export default function HomeGridEditor({ meetingId, initialItems, initialColumns, initialRounded = true }: { meetingId: string; initialItems: HomeGridItemView[]; initialColumns: HomeGridColumns; initialRounded?: boolean }) {
   const [items, setItems] = useState(initialItems);
   const [columns, setColumns] = useState<HomeGridColumns>(initialColumns);
+  const [rounded, setRounded] = useState(initialRounded);
   const [saving, setSaving] = useState(false);
   const [uploadingItemId, setUploadingItemId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -110,8 +111,9 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
   async function save() {
     setSaving(true);
     setMessage(null);
-    const payload: { columns: HomeGridColumns; items: HomeGridItemInput[] } = {
+    const payload: { columns: HomeGridColumns; rounded: boolean; items: HomeGridItemInput[] } = {
       columns,
+      rounded,
       items: items.map(({ title, href, icon, size, backgroundImage, isVisible }) => ({
         title,
         href,
@@ -160,6 +162,14 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
+            </label>
+            <label className="inline-flex items-center gap-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={rounded}
+                onChange={(event) => setRounded(event.target.checked)}
+              />
+              圆角
             </label>
             <button type="button" onClick={() => setItems(defaultDrafts())} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
               恢复默认
@@ -255,7 +265,7 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
                     <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 5MB</span>
                   </div>
                   {item.backgroundImage && (
-                    <div className="h-24 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                    <div className="h-24 w-24 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={item.backgroundImage} alt={`${item.title} 背景预览`} className="h-full w-full object-cover" />
                     </div>
@@ -276,7 +286,7 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
               <h2 className="font-semibold text-slate-800">实时预览</h2>
-              <p className="text-xs text-slate-500">手机两列、宽屏四列，大卡片会自动补位。</p>
+              <p className="text-xs text-slate-500">按前台比例等比例缩小显示。</p>
             </div>
             <span className={`rounded-full px-2 py-1 text-xs ${hasIncompleteDesktopRow ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>
               {visibleArea} 格
@@ -287,7 +297,7 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
               当前宽屏占用格数不是 {columns} 的倍数，末行可能留空；可调整一个入口为横向或大卡片。
             </p>
           )}
-          <HomeGrid meetingId={meetingId} items={items} columns={columns} preview />
+          <HomeGrid meetingId={meetingId} items={items} columns={columns} rounded={rounded} preview />
         </div>
 
         {message && (
