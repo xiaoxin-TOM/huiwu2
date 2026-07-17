@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
-import { validateImage, saveImage } from "@/lib/upload";
+import { requireCurrentMeetingForRequest } from "@/lib/meetings";
+import { validateImage, validateImageContent } from "@/lib/upload";
+import { uploadAdminImageToOSS } from "@/lib/oss";
 import { addPhoto } from "@/lib/albums";
 
 export async function POST(req: Request, ctx: RouteContext<"/api/admin/albums/[id]/photos">) {
@@ -19,10 +21,25 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/albums/[i
   const err = validateImage({ type: file.type, size: file.size });
   if (err) return NextResponse.json({ ok: false, error: err }, { status: 400 });
   try {
-    const url = await saveImage(file);
+    const meeting = await requireCurrentMeetingForRequest(req);
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const contentError = validateImageContent(buffer, file.type);
+    if (contentError) {
+      return NextResponse.json({ ok: false, error: contentError }, { status: 400 });
+    }
+    const url = await uploadAdminImageToOSS({
+      meetingId: meeting.id,
+      buffer,
+      mime: file.type,
+      req,
+    });
     await addPhoto(id, url, caption);
-  } catch {
-    return NextResponse.json({ ok: false, error: "上传失败" }, { status: 500 });
+  } catch (error) {
+    console.error("[album photo upload]", error);
+    return NextResponse.json(
+      { ok: false, error: error instanceof Error ? error.message : "上传失败" },
+      { status: 500 }
+    );
   }
   return NextResponse.json({ ok: true });
 }
