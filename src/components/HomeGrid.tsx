@@ -1,13 +1,20 @@
 import Link from "next/link";
 import HomeGridIcon from "@/components/HomeGridIcon";
-import { homeGridSizeClass, isExternalHomeGridHref, type HomeGridColumns } from "@/lib/home-grid-config";
+import { homeGridSizeClass, isExternalHomeGridHref, type HomeGridColumns, type HomeGridSize } from "@/lib/home-grid-config";
 import type { HomeGridItemView } from "@/lib/home-grid";
 import { meetingHref } from "@/lib/public";
 
-const CELL_SIZE: Record<HomeGridColumns, string> = {
-  2: "min(30vw, 270px)",
-  3: "min(24vw, 270px)",
-  4: "min(17vw, 270px)",
+const CELL_WIDTH: Record<HomeGridColumns, string> = {
+  2: "min(30vw, calc((100% - 40px) / 2))",
+  3: "min(24vw, calc((100% - 80px) / 3))",
+  4: "min(17vw, calc((100% - 120px) / 4))",
+};
+
+const ASPECT_CLASS: Record<HomeGridSize, string> = {
+  SMALL: "aspect-square",
+  WIDE: "aspect-[2/1]",
+  TALL: "aspect-[1/2]",
+  LARGE: "aspect-square",
 };
 
 export default function HomeGrid({
@@ -22,17 +29,18 @@ export default function HomeGrid({
   preview?: boolean;
 }) {
   const visibleItems = items.filter((item) => item.isVisible);
-  const cellSize = CELL_SIZE[columns] ?? CELL_SIZE[4];
+  const cellWidth = CELL_WIDTH[columns] ?? CELL_WIDTH[4];
 
   return (
     <div
-      className="grid grid-flow-dense justify-center gap-10"
-      style={{ gridTemplateColumns: `repeat(${columns}, ${cellSize})`, gridAutoRows: cellSize }}
+      className="grid grid-flow-dense justify-center gap-10 max-w-full"
+      style={{ gridTemplateColumns: `repeat(${columns}, ${cellWidth})` }}
     >
       {visibleItems.map((item) => {
         const sizeClass = homeGridSizeClass(item.size);
+        const aspectClass = ASPECT_CLASS[item.size];
         const large = item.size === "LARGE" || item.size === "TALL";
-        const className = `${sizeClass} group relative flex h-full w-full min-h-0 overflow-hidden rounded-2xl border border-sky-100/70 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md items-center justify-center`;
+        const className = `${sizeClass} ${aspectClass} group relative flex min-h-0 overflow-hidden rounded-2xl border border-sky-100/70 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md items-center justify-center`;
         const content = (
           <>
             {item.backgroundImage && (
