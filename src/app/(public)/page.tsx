@@ -35,14 +35,14 @@ export default async function HomePage({
       </section>
 
       {/* Feature grid */}
-      <section className="mx-auto max-w-6xl px-4 py-6 md:px-8">
+      <section className="mx-auto max-w-5xl px-[50px] py-6">
         <h2 className="mb-4 text-lg font-bold text-slate-800">会议服务</h2>
         <HomeGrid meetingId={meeting.id} items={homeGridItems} columns={homeGridColumns} />
       </section>
 
       {/* Welcome content */}
       {cfg.welcomeHtml && (
-        <section className="mx-auto max-w-6xl px-4 pb-8 md:px-8">
+        <section className="mx-auto max-w-5xl px-[50px] pb-8">
           <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
             <h2 className="mb-4 text-lg font-bold text-slate-800">会议简介</h2>
             <div className="prose max-w-none text-slate-600">
