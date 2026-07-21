@@ -19,7 +19,10 @@ export default async function VenuePage({
     <div className="space-y-4">
       <PageHeader title={page?.title ?? "会场交通"} />
       <SectionCard>
-        {page ? (
+        {page?.mode === "IMAGE" && page.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={page.imageUrl} alt={page.title} className="w-full rounded-lg" />
+        ) : page ? (
           <div className="prose max-w-none text-slate-600">
             <RichText html={page.contentHtml} />
           </div>

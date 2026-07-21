@@ -11,6 +11,19 @@ export default async function SchedulePage({
 }) {
   const meeting = await requirePublicMeeting((await searchParams).m);
   await guardPublicAccess(meeting.id);
+
+  if (meeting.scheduleMode === "IMAGE" && meeting.scheduleImageUrl) {
+    return (
+      <div className="space-y-5">
+        <PageHeader title="详细日程" />
+        <SectionCard>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={meeting.scheduleImageUrl} alt="详细日程" className="w-full rounded-lg" />
+        </SectionCard>
+      </div>
+    );
+  }
+
   const grouped = groupByDayAndRoom(await getDetailedSessions(meeting.id));
   return (
     <div className="space-y-5">

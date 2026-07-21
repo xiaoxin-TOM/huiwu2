@@ -10,11 +10,9 @@ export function getPageBySlug(slug: string, meetingId: string) {
   });
 }
 
-export function upsertPage(
-  meetingId: string,
-  slug: string,
-  data: { title: string; contentHtml: string },
-) {
+type PageData = { title: string; contentHtml: string; mode?: string; imageUrl?: string };
+
+export function upsertPage(meetingId: string, slug: string, data: PageData) {
   return prisma.page.upsert({
     where: { meetingId_slug: { meetingId, slug } },
     update: data,
@@ -22,11 +20,7 @@ export function upsertPage(
   });
 }
 
-export function updatePage(
-  meetingId: string,
-  slug: string,
-  data: { title: string; contentHtml: string },
-) {
+export function updatePage(meetingId: string, slug: string, data: PageData) {
   return prisma.page.update({
     where: { meetingId_slug: { meetingId, slug } },
     data,

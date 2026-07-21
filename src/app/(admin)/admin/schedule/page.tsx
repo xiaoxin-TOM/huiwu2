@@ -3,6 +3,7 @@ import { getAllSpeakers } from "@/lib/speakers";
 import { getCurrentMeeting } from "@/lib/meetings";
 import { SessionSpeakerFields } from "@/components/SessionSpeakerFields";
 import AdminForm from "@/components/AdminForm";
+import ScheduleImageModeEditor from "@/components/ScheduleImageModeEditor";
 import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminSchedulePage() {
@@ -22,6 +23,8 @@ export default async function AdminSchedulePage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">日程管理</h1>
+
+      <ScheduleImageModeEditor defaultMode={meeting.scheduleMode} defaultImageUrl={meeting.scheduleImageUrl ?? ""} />
 
       <AdminForm action="/api/admin/sessions" redirectTo="/admin/schedule" className="grid grid-cols-2 gap-2 rounded border p-4 sm:grid-cols-3">
         <input name="day" type="date" required className="rounded border px-2 py-1.5 text-sm" />

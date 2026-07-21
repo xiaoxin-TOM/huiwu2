@@ -55,6 +55,26 @@ export default async function MePage({
             </div>
             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">已认证</span>
           </div>
+          {speaker.sessions.length > 0 && (
+            <div className="mt-4 space-y-2 border-t border-slate-100 pt-4">
+              <p className="text-sm font-medium text-slate-600">我的演讲时间</p>
+              {[...speaker.sessions]
+                .sort(
+                  (a, b) =>
+                    a.session.day.localeCompare(b.session.day) ||
+                    a.session.startTime.localeCompare(b.session.startTime),
+                )
+                .map((s) => (
+                  <div key={s.sessionId} className="rounded-xl bg-slate-50 p-3 text-sm">
+                    <p className="font-medium text-slate-800">{s.session.title}</p>
+                    <p className="mt-1 text-slate-500">
+                      {s.session.day} {s.session.startTime}–{s.session.endTime}
+                      {s.session.room && ` · ${s.session.room}`}
+                    </p>
+                  </div>
+                ))}
+            </div>
+          )}
         </SectionCard>
       )}
 

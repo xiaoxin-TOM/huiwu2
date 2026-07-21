@@ -13,6 +13,11 @@ export async function createRegistration(
     where: { userId_meetingId: { userId, meetingId } },
   });
   if (existing) throw new Error("ALREADY_REGISTERED");
+  const meeting = await prisma.meeting.findUnique({ where: { id: meetingId } });
+  if (!meeting) throw new Error("NO_DEFAULT_MEETING");
+  if (meeting.requirePassword && (input.password ?? "") !== meeting.registrationPassword) {
+    throw new Error("INVALID_PASSWORD");
+  }
   const type = await prisma.registrationType.findUnique({ where: { id: input.typeId } });
   if (!type) throw new Error("TYPE_NOT_FOUND");
   try {
@@ -79,6 +84,50 @@ export function listRegistrations(meetingId: string) {
     include: { user: true, type: true },
     orderBy: { createdAt: "desc" },
   });
+}
+
+export const REGISTRATIONS_PAGE_SIZE = 20;
+
+export type RegistrationListQuery = {
+  typeId?: string;
+  organization?: string;
+  page?: number;
+};
+
+export async function listRegistrationsPaged(meetingId: string, query: RegistrationListQuery = {}) {
+  const where: Prisma.RegistrationWhereInput = { meetingId };
+  if (query.typeId) where.typeId = query.typeId;
+  if (query.organization?.trim()) {
+    where.organization = { contains: query.organization.trim(), mode: "insensitive" };
+  }
+  const page = Math.max(1, query.page ?? 1);
+  const take = REGISTRATIONS_PAGE_SIZE;
+  const skip = (page - 1) * take;
+  const [items, total] = await Promise.all([
+    prisma.registration.findMany({
+      where,
+      include: { user: true, type: true },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take,
+    }),
+    prisma.registration.count({ where }),
+  ]);
+  return { items, total, page, pageSize: take };
+}
+
+export async function batchReviewRegistrations(
+  meetingId: string,
+  ids: string[],
+  decision: "APPROVED" | "REJECTED",
+) {
+  const limited = [...new Set(ids)].slice(0, REGISTRATIONS_PAGE_SIZE);
+  if (limited.length === 0) return 0;
+  const result = await prisma.registration.updateMany({
+    where: { id: { in: limited }, meetingId },
+    data: { status: decision },
+  });
+  return result.count;
 }
 
 export type RegistrationFilters = {
@@ -215,22 +264,28 @@ export function listRegistrationTypes() {
   return prisma.registrationType.findMany({ orderBy: { fee: "asc" } });
 }
 
-export function createRegistrationType(data: { name: string; fee: number; description?: string }) {
+export async function createRegistrationType(data: { name: string; fee: number; description?: string }) {
+  const fee = Math.max(0, data.fee);
+  const duplicate = await prisma.registrationType.findFirst({ where: { fee } });
+  if (duplicate) throw new Error("DUPLICATE_IDENTITY_CODE");
   return prisma.registrationType.create({
     data: {
       name: data.name.trim(),
-      fee: Math.max(0, data.fee),
+      fee,
       description: data.description?.trim() ?? "",
     },
   });
 }
 
-export function updateRegistrationType(id: string, data: { name: string; fee: number; description?: string }) {
+export async function updateRegistrationType(id: string, data: { name: string; fee: number; description?: string }) {
+  const fee = Math.max(0, data.fee);
+  const duplicate = await prisma.registrationType.findFirst({ where: { fee, NOT: { id } } });
+  if (duplicate) throw new Error("DUPLICATE_IDENTITY_CODE");
   return prisma.registrationType.update({
     where: { id },
     data: {
       name: data.name.trim(),
-      fee: Math.max(0, data.fee),
+      fee,
       description: data.description?.trim() ?? "",
     },
   });

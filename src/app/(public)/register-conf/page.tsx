@@ -70,7 +70,11 @@ export default async function RegisterConfPage({
     <div className="space-y-4">
       <PageHeader title={`${meeting.title} · 注册报名`} />
       <SectionCard title="填写报名信息">
-        <RegistrationForm meetingId={meeting.id} types={types.map((t) => ({ id: t.id, name: t.name, fee: t.fee }))} />
+        <RegistrationForm
+          meetingId={meeting.id}
+          types={types.map((t) => ({ id: t.id, name: t.name, fee: t.fee }))}
+          requirePassword={meeting.requirePassword}
+        />
       </SectionCard>
     </div>
   );

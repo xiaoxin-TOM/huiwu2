@@ -41,6 +41,8 @@ export async function createMeeting(data: {
   registrationLimit?: number | null;
   opensAt?: string | null;
   closesAt?: string | null;
+  requirePassword?: boolean;
+  registrationPassword?: string;
   ownerId?: string;
 }) {
   const count = await prisma.meeting.count();
@@ -65,7 +67,16 @@ export function updateMeeting(
     registrationLimit?: number | null;
     opensAt?: string | null;
     closesAt?: string | null;
+    requirePassword?: boolean;
+    registrationPassword?: string;
   },
+) {
+  return prisma.meeting.update({ where: { id }, data });
+}
+
+export function updateScheduleImageMode(
+  id: string,
+  data: { scheduleMode: "TEXT" | "IMAGE"; scheduleImageUrl: string },
 ) {
   return prisma.meeting.update({ where: { id }, data });
 }

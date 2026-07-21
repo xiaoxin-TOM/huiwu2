@@ -18,6 +18,7 @@ export const registrationSchema = z.object({
   organization: z.string().optional().default(""),
   title: z.string().optional().default(""),
   phone: z.string().optional().default(""),
+  password: z.string().optional(),
 });
 export type RegistrationInput = z.infer<typeof registrationSchema>;
 
@@ -85,9 +86,24 @@ export const noticeSchema = z.object({
   isPublished: z.boolean(),
 });
 
+export const safeImageUrl = z.string().trim().max(500, "图片地址过长").refine(
+  (value) =>
+    value === "" ||
+    (value.startsWith("/") && !value.startsWith("//")) ||
+    /^https?:\/\/[^\s]+$/i.test(value),
+  "图片请输入站内路径或 http(s) 链接",
+);
+
 export const pageSchema = z.object({
   title: z.string().min(1, "请填写标题"),
   contentHtml: z.string().optional().default(""),
+  mode: z.enum(["TEXT", "IMAGE"]).default("TEXT"),
+  imageUrl: safeImageUrl.default(""),
+});
+
+export const scheduleImageModeSchema = z.object({
+  scheduleMode: z.enum(["TEXT", "IMAGE"]).default("TEXT"),
+  scheduleImageUrl: safeImageUrl.default(""),
 });
 
 export const speakerSchema = z.object({
@@ -150,17 +166,24 @@ export const submissionReviewSchema = z.object({
   decision: z.enum(["APPROVED", "REJECTED"]),
 });
 
-export const meetingSchema = z.object({
-  title: z.string().min(1, "请填写会议名称"),
-  description: z.string().optional().default(""),
-  location: z.string().optional().default(""),
-  startDate: z.string().optional().default(""),
-  endDate: z.string().optional().default(""),
-  requireApproval: z.coerce.boolean().default(false),
-  registrationLimit: z.coerce.number().int().min(0).optional().nullable(),
-  opensAt: z.string().optional().nullable(),
-  closesAt: z.string().optional().nullable(),
-});
+export const meetingSchema = z
+  .object({
+    title: z.string().min(1, "请填写会议名称"),
+    description: z.string().optional().default(""),
+    location: z.string().optional().default(""),
+    startDate: z.string().optional().default(""),
+    endDate: z.string().optional().default(""),
+    requireApproval: z.coerce.boolean().default(false),
+    registrationLimit: z.coerce.number().int().min(0).optional().nullable(),
+    opensAt: z.string().optional().nullable(),
+    closesAt: z.string().optional().nullable(),
+    requirePassword: z.coerce.boolean().default(false),
+    registrationPassword: z.string().optional().default(""),
+  })
+  .refine((d) => !d.requirePassword || d.registrationPassword.trim().length > 0, {
+    message: "请设置报名密码",
+    path: ["registrationPassword"],
+  });
 export type MeetingInput = z.infer<typeof meetingSchema>;
 
 const homeGridUrl = z.string().trim().min(1, "请填写跳转地址").max(500, "地址过长").refine(

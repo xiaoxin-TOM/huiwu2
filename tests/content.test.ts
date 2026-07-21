@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, expect, test } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { getPublishedNotices, getNoticeById, getPage } from "@/lib/content";
+import { upsertPage } from "@/lib/pages-admin";
 
 const ids: string[] = [];
 const pageSlugs: string[] = [];
@@ -53,4 +54,25 @@ test("getPage 命中返回页,缺失返回 null", async () => {
   const page = await getPage("venue-test", meetingId);
   expect(page?.title).toBe("交通测试");
   expect(await getPage("不存在", meetingId)).toBeNull();
+});
+
+test("upsertPage 支持一图流模式(mode/imageUrl)并保留切换后的富文本内容", async () => {
+  pageSlugs.push("image-flow-test");
+  await upsertPage(meetingId, "image-flow-test", {
+    title: "一图流测试",
+    contentHtml: "<p>原始富文本</p>",
+    mode: "TEXT",
+    imageUrl: "",
+  });
+  await upsertPage(meetingId, "image-flow-test", {
+    title: "一图流测试",
+    contentHtml: "<p>原始富文本</p>",
+    mode: "IMAGE",
+    imageUrl: "https://example.com/a.png",
+  });
+  const page = await getPage("image-flow-test", meetingId);
+  expect(page?.mode).toBe("IMAGE");
+  expect(page?.imageUrl).toBe("https://example.com/a.png");
+  // 切回富文本模式时原内容应仍然保留
+  expect(page?.contentHtml).toBe("<p>原始富文本</p>");
 });

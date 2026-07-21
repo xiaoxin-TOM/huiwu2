@@ -25,7 +25,10 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/registrat
   }
   try {
     await updateRegistrationType(id, parsed.data);
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === "DUPLICATE_IDENTITY_CODE") {
+      return NextResponse.json({ ok: false, error: "该身份编号已被使用，请修改" }, { status: 400 });
+    }
     return NextResponse.json({ ok: false, error: "更新失败" }, { status: 500 });
   }
   return NextResponse.json({ ok: true });

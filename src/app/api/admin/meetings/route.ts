@@ -20,6 +20,8 @@ export async function POST(req: Request) {
     registrationLimit: form?.get("registrationLimit") ?? null,
     opensAt: form?.get("opensAt") ?? null,
     closesAt: form?.get("closesAt") ?? null,
+    requirePassword: form?.get("requirePassword") ?? "off",
+    registrationPassword: form?.get("registrationPassword") ?? "",
   });
   if (!parsed.success) {
     return NextResponse.json(

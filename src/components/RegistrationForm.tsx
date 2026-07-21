@@ -9,9 +9,11 @@ type TypeOption = { id: string; name: string; fee: number };
 export default function RegistrationForm({
   meetingId,
   types,
+  requirePassword = false,
 }: {
   meetingId: string;
   types: TypeOption[];
+  requirePassword?: boolean;
 }) {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -33,6 +35,7 @@ export default function RegistrationForm({
           organization: fd.get("organization"),
           title: fd.get("title"),
           phone: fd.get("phone"),
+          password: fd.get("password"),
         }),
       });
       const data = await res.json().catch(() => ({ ok: false, error: "服务器错误" }));
@@ -80,6 +83,18 @@ export default function RegistrationForm({
         <label className={labelClass}>联系电话</label>
         <input name="phone" placeholder="请输入联系电话" className={inputClass} />
       </div>
+      {requirePassword && (
+        <div>
+          <label className={labelClass}>报名密码</label>
+          <input
+            name="password"
+            type="password"
+            required
+            placeholder="请输入报名密码"
+            className={inputClass}
+          />
+        </div>
+      )}
       {error && <p className="text-sm text-red-600">{error}</p>}
       <button type="submit" disabled={submitting} className={buttonClass}>
         {submitting ? "提交中…" : "提交报名"}

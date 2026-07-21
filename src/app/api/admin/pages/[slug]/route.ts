@@ -19,6 +19,8 @@ async function parsePageForm(req: Request) {
   const parsed = pageSchema.safeParse({
     title: form?.get("title") ?? "",
     contentHtml: sanitizeRichHtml(String(form?.get("contentHtml") ?? "")),
+    mode: form?.get("mode") ?? "TEXT",
+    imageUrl: form?.get("imageUrl") ?? "",
   });
   if (!parsed.success) {
     return { error: NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 }) };

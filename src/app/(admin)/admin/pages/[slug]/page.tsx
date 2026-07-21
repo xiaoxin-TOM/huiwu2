@@ -2,7 +2,7 @@ import { getPageBySlug } from "@/lib/pages-admin";
 import { getCurrentMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 import { ButtonLink } from "@/components/ui/Button";
-import RichTextEditor from "@/components/RichTextEditor";
+import PageContentModeEditor from "@/components/PageContentModeEditor";
 
 const KNOWN: Record<string, string> = {
   intro: "活动简介",
@@ -42,7 +42,11 @@ export default async function EditPagePage({ params }: { params: Promise<{ slug:
         <div className="block text-sm text-gray-600">
           正文
           <div className="mt-1">
-            <RichTextEditor defaultValue={page?.contentHtml ?? ""} />
+            <PageContentModeEditor
+              defaultMode={page?.mode ?? "TEXT"}
+              defaultContentHtml={page?.contentHtml ?? ""}
+              defaultImageUrl={page?.imageUrl ?? ""}
+            />
           </div>
         </div>
         <div className="flex flex-wrap gap-3 pt-2">

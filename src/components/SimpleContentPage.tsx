@@ -23,7 +23,10 @@ export default async function SimpleContentPage({
     <div className="space-y-4">
       <PageHeader title={page?.title ?? fallbackTitle} />
       <SectionCard>
-        {page?.contentHtml ? (
+        {page?.mode === "IMAGE" && page.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={page.imageUrl} alt={page.title} className="w-full rounded-lg" />
+        ) : page?.contentHtml ? (
           <div className="prose max-w-none text-slate-600">
             <RichText html={page.contentHtml} />
           </div>

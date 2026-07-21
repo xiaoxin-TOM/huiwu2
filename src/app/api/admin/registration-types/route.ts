@@ -25,7 +25,10 @@ export async function POST(req: Request) {
   try {
     const created = await createRegistrationType(parsed.data);
     return NextResponse.json({ ok: true, type: created });
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === "DUPLICATE_IDENTITY_CODE") {
+      return NextResponse.json({ ok: false, error: "该身份编号已被使用，请修改" }, { status: 400 });
+    }
     return NextResponse.json({ ok: false, error: "创建失败" }, { status: 500 });
   }
 }

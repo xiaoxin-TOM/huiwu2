@@ -8,6 +8,24 @@ function newId() {
   return `draft-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function formatTimeRange(start: string, end: string): string {
+  if (!start && !end) return "";
+  const [sd, st] = start.split("T");
+  const [ed, et] = end.split("T");
+  if (!start) return end;
+  if (!end) return start;
+  if (sd === ed) return `${sd} ${st}-${et}`;
+  return `${sd} ${st} - ${ed} ${et}`;
+}
+
+function parseTimeRange(value: string): { start: string; end: string } {
+  const same = value.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})-(\d{2}:\d{2})$/);
+  if (same) return { start: `${same[1]}T${same[2]}`, end: `${same[1]}T${same[3]}` };
+  const diff = value.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}) - (\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/);
+  if (diff) return { start: `${diff[1]}T${diff[2]}`, end: `${diff[3]}T${diff[4]}` };
+  return { start: "", end: "" };
+}
+
 export default function LiveStreamEditor({ initialItems }: { initialItems: LiveStreamView[] }) {
   const [items, setItems] = useState<LiveStreamView[]>(initialItems);
   const [saving, setSaving] = useState(false);
@@ -163,16 +181,32 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
                     className="mt-1 w-full rounded-lg border px-3 py-2"
                   />
                 </label>
-                <label className="block text-sm text-slate-600">
+                <div className="block text-sm text-slate-600">
                   观看时间
-                  <input
-                    value={item.time}
-                    maxLength={100}
-                    placeholder="例如：2026-09-18 09:00-12:00"
-                    onChange={(event) => patchItem(item.id, { time: event.target.value })}
-                    className="mt-1 w-full rounded-lg border px-3 py-2"
-                  />
-                </label>
+                  {(() => {
+                    const { start, end } = parseTimeRange(item.time);
+                    return (
+                      <div className="mt-1 grid grid-cols-2 gap-2">
+                        <input
+                          type="datetime-local"
+                          value={start}
+                          onChange={(event) =>
+                            patchItem(item.id, { time: formatTimeRange(event.target.value, end) })
+                          }
+                          className="rounded-lg border px-2 py-2 text-sm"
+                        />
+                        <input
+                          type="datetime-local"
+                          value={end}
+                          onChange={(event) =>
+                            patchItem(item.id, { time: formatTimeRange(start, event.target.value) })
+                          }
+                          className="rounded-lg border px-2 py-2 text-sm"
+                        />
+                      </div>
+                    );
+                  })()}
+                </div>
                 <label className="block text-sm text-slate-600">
                   会场描述
                   <input

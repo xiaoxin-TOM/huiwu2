@@ -34,6 +34,9 @@ export async function POST(req: Request) {
     if (e instanceof Error && e.message === "TYPE_NOT_FOUND") {
       return NextResponse.json({ ok: false, error: "参会类型不存在" }, { status: 400 });
     }
+    if (e instanceof Error && e.message === "INVALID_PASSWORD") {
+      return NextResponse.json({ ok: false, error: "报名密码不正确" }, { status: 400 });
+    }
     if (e instanceof Error && e.message === "NO_DEFAULT_MEETING") {
       return NextResponse.json({ ok: false, error: "当前无默认会议，请联系管理员" }, { status: 400 });
     }

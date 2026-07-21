@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getMeetingById } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
+import RegistrationPasswordField from "@/components/RegistrationPasswordField";
 import { ButtonLink } from "@/components/ui/Button";
 
 export default async function EditMeetingPage({ params }: { params: Promise<{ id: string }> }) {
@@ -43,6 +44,7 @@ export default async function EditMeetingPage({ params }: { params: Promise<{ id
           <input type="checkbox" name="requireApproval" value="on" id="requireApproval" defaultChecked={meeting.requireApproval} />
           <label htmlFor="requireApproval" className="text-sm text-gray-600">报名后需要审核</label>
         </div>
+        <RegistrationPasswordField defaultChecked={meeting.requirePassword} defaultPassword={meeting.registrationPassword} />
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm text-gray-600">开放报名</label>

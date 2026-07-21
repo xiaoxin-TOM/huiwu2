@@ -22,7 +22,10 @@ export default async function ContactPage({
     <div className="space-y-4">
       <PageHeader title={page?.title ?? "联系方式"} />
       <SectionCard>
-        {html ? (
+        {page?.mode === "IMAGE" && page.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={page.imageUrl} alt={page.title} className="w-full rounded-lg" />
+        ) : html ? (
           <div className="prose max-w-none text-slate-600">
             <RichText html={html} />
           </div>

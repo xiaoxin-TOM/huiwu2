@@ -26,7 +26,11 @@ export async function GET(req: Request) {
       listRegistrationTypes(),
     ]);
 
-    return jsonOk({ existing, types, meeting: { id: meeting.id, title: meeting.title } });
+    return jsonOk({
+      existing,
+      types,
+      meeting: { id: meeting.id, title: meeting.title, requirePassword: meeting.requirePassword },
+    });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "获取报名信息失败";
     return jsonError(msg, 500);
@@ -53,6 +57,7 @@ export async function POST(req: Request) {
     const msg = e instanceof Error ? e.message : "提交报名失败";
     if (msg === "ALREADY_REGISTERED") return jsonError("您已经报名过该会议", 409);
     if (msg === "TYPE_NOT_FOUND") return jsonError("参会类型不存在", 400);
+    if (msg === "INVALID_PASSWORD") return jsonError("报名密码不正确", 400);
     return jsonError(msg, 500);
   }
 }
