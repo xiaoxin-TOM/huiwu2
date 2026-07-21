@@ -45,10 +45,18 @@ export const bookingSchema = z
   });
 export type BookingInput = z.infer<typeof bookingSchema>;
 
-export const albumSchema = z.object({
-  title: z.string().min(1, "请填写相册标题"),
-  date: z.string().min(1, "请填写日期"),
-});
+export const albumSchema = z
+  .object({
+    title: z.string().min(1, "请填写相册标题"),
+    date: z.string().optional().default(""),
+    note: z.string().optional().default(""),
+    startTime: z.string().min(1, "请选择开始时间"),
+    endTime: z.string().min(1, "请选择结束时间"),
+  })
+  .refine((d) => d.endTime >= d.startTime, {
+    message: "结束时间不能早于开始时间",
+    path: ["endTime"],
+  });
 
 const coordField = (min: number, max: number, msg: string) =>
   z.string().optional().default("").refine((v) => {

@@ -8,15 +8,19 @@ interface AdminFormProps {
   redirectTo: string;
   children: React.ReactNode;
   className?: string;
+  confirmMessage?: string;
 }
 
-export default function AdminForm({ action, redirectTo, children, className }: AdminFormProps) {
+export default function AdminForm({ action, redirectTo, children, className, confirmMessage }: AdminFormProps) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (confirmMessage && !window.confirm(confirmMessage)) {
+      return;
+    }
     setError("");
     setLoading(true);
 

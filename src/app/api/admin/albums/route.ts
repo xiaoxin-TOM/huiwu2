@@ -15,7 +15,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "未选择会议" }, { status: 400 });
   }
   const form = await req.formData().catch(() => null);
-  const parsed = albumSchema.safeParse({ title: form?.get("title"), date: form?.get("date") });
+  const getString = (value: FormDataEntryValue | null | undefined) => (typeof value === "string" ? value : "");
+  const parsed = albumSchema.safeParse({
+    title: getString(form?.get("title")),
+    date: getString(form?.get("date")),
+    note: getString(form?.get("note")),
+    startTime: getString(form?.get("startTime")),
+    endTime: getString(form?.get("endTime")),
+  });
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
   }

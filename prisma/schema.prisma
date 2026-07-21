@@ -321,6 +321,9 @@ model Album {
   meetingId String  @default("default-meeting")
   title     String
   date      String  @default("")
+  note      String  @default("")
+  startTime String  @default("")
+  endTime   String  @default("")
   coverUrl  String?
   photos    Photo[]
   meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
