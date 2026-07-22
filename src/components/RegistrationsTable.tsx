@@ -7,6 +7,7 @@ type RegistrationRow = {
   id: string;
   fullName: string;
   email: string;
+  phone: string;
   typeId: string;
   typeName: string;
   organization: string;
@@ -15,8 +16,15 @@ type RegistrationRow = {
 };
 
 type TypeOption = { id: string; name: string };
+type Bucket = "UNREGISTERED" | "REGISTERED";
+
+const TABS: { key: Bucket; label: string }[] = [
+  { key: "UNREGISTERED", label: "未报名（待审核）" },
+  { key: "REGISTERED", label: "已报名（已通过）" },
+];
 
 export default function RegistrationsTable({ types }: { types: TypeOption[] }) {
+  const [bucket, setBucket] = useState<Bucket>("UNREGISTERED");
   const [items, setItems] = useState<RegistrationRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -32,7 +40,7 @@ export default function RegistrationsTable({ types }: { types: TypeOption[] }) {
     setLoading(true);
     setMessage(null);
     try {
-      const params = new URLSearchParams({ page: String(page) });
+      const params = new URLSearchParams({ page: String(page), bucket });
       if (typeId) params.set("typeId", typeId);
       if (organization) params.set("organization", organization);
       const res = await fetch(`/api/admin/registrations/list?${params.toString()}`);
@@ -53,7 +61,7 @@ export default function RegistrationsTable({ types }: { types: TypeOption[] }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, typeId, organization]);
+  }, [page, typeId, organization, bucket]);
 
   function toggleSelect(id: string) {
     setSelected((current) => {
@@ -89,9 +97,31 @@ export default function RegistrationsTable({ types }: { types: TypeOption[] }) {
   }
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const showReviewActions = bucket === "UNREGISTERED";
 
   return (
     <div className="space-y-3">
+      <div className="flex gap-2 border-b">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => {
+              if (bucket === t.key) return;
+              setBucket(t.key);
+              setPage(1);
+            }}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition ${
+              bucket === t.key
+                ? "border-sky-600 text-sky-700"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-wrap items-end gap-3">
         <label className="block text-sm text-gray-600">
           按类型筛选
@@ -138,14 +168,16 @@ export default function RegistrationsTable({ types }: { types: TypeOption[] }) {
             </button>
           </div>
         </label>
-        <button
-          type="button"
-          disabled={selected.size === 0 || loading}
-          onClick={() => void review([...selected], "APPROVED")}
-          className="rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:opacity-50"
-        >
-          批量通过（已选 {selected.size} 条）
-        </button>
+        {showReviewActions && (
+          <button
+            type="button"
+            disabled={selected.size === 0 || loading}
+            onClick={() => void review([...selected], "APPROVED")}
+            className="rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:opacity-50"
+          >
+            批量通过（已选 {selected.size} 条）
+          </button>
+        )}
       </div>
 
       {message && (
@@ -161,30 +193,36 @@ export default function RegistrationsTable({ types }: { types: TypeOption[] }) {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500">
-                <th className="px-4 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selected.size === items.length && items.length > 0}
-                    onChange={toggleSelectAll}
-                  />
-                </th>
+                {showReviewActions && (
+                  <th className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selected.size === items.length && items.length > 0}
+                      onChange={toggleSelectAll}
+                    />
+                  </th>
+                )}
                 <th className="px-4 py-3">姓名</th>
                 <th className="px-4 py-3">邮箱</th>
+                <th className="px-4 py-3">联系电话</th>
                 <th className="px-4 py-3">类型</th>
                 <th className="px-4 py-3">单位</th>
                 <th className="px-4 py-3">状态</th>
                 <th className="px-4 py-3">签到</th>
-                <th className="px-4 py-3">操作</th>
+                {showReviewActions && <th className="px-4 py-3">操作</th>}
               </tr>
             </thead>
             <tbody>
               {items.map((r) => (
                 <tr key={r.id} className="border-b">
-                  <td className="px-4 py-3">
-                    <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggleSelect(r.id)} />
-                  </td>
+                  {showReviewActions && (
+                    <td className="px-4 py-3">
+                      <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggleSelect(r.id)} />
+                    </td>
+                  )}
                   <td className="px-4 py-3">{r.fullName}</td>
                   <td className="px-4 py-3">{r.email}</td>
+                  <td className="px-4 py-3">{r.phone || "-"}</td>
                   <td className="px-4 py-3">{r.typeName}</td>
                   <td className="px-4 py-3">{r.organization}</td>
                   <td className="px-4 py-3 text-sky-700">{STATUS_LABEL[r.status] ?? r.status}</td>
@@ -195,26 +233,28 @@ export default function RegistrationsTable({ types }: { types: TypeOption[] }) {
                       <span className="rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-700">未签到</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        disabled={loading}
-                        onClick={() => void review([r.id], "APPROVED")}
-                        className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700 disabled:opacity-50"
-                      >
-                        通过
-                      </button>
-                      <button
-                        type="button"
-                        disabled={loading}
-                        onClick={() => void review([r.id], "REJECTED")}
-                        className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
-                      >
-                        拒绝
-                      </button>
-                    </div>
-                  </td>
+                  {showReviewActions && (
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={loading}
+                          onClick={() => void review([r.id], "APPROVED")}
+                          className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700 disabled:opacity-50"
+                        >
+                          通过
+                        </button>
+                        <button
+                          type="button"
+                          disabled={loading}
+                          onClick={() => void review([r.id], "REJECTED")}
+                          className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
+                        >
+                          拒绝
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

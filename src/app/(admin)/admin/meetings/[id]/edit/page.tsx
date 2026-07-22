@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation";
-import { getMeetingById } from "@/lib/meetings";
+import { getMeetingById, canAccessMeeting } from "@/lib/meetings";
+import { requireAdmin } from "@/lib/session";
 import AdminForm from "@/components/AdminForm";
 import RegistrationPasswordField from "@/components/RegistrationPasswordField";
 import { ButtonLink } from "@/components/ui/Button";
 
 export default async function EditMeetingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const user = await requireAdmin();
   const meeting = await getMeetingById(id);
-  if (!meeting) notFound();
+  if (!meeting || !(await canAccessMeeting(user.id, id))) notFound();
 
   return (
     <div className="max-w-xl space-y-4">

@@ -1,95 +1,70 @@
-import { auth } from "@/lib/auth";
-import { searchUsers } from "@/lib/users-admin";
+import { requireCurrentMeeting, getMeetingById } from "@/lib/meetings";
+import { listMeetingStaff } from "@/lib/meeting-staff";
+import MeetingStaffAuthorizeForm from "@/components/MeetingStaffAuthorizeForm";
 import AdminForm from "@/components/AdminForm";
-import { ButtonLink } from "@/components/ui/Button";
-import { ClipboardListIcon } from "@/components/icons";
 
-export default async function AdminUsersPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>;
-}) {
-  const [session, params] = await Promise.all([auth(), searchParams]);
-  const selfId = session?.user?.id;
-  const users = await searchUsers(params.q ?? "");
+export default async function AdminUsersPage() {
+  const meeting = await requireCurrentMeeting();
+  const [full, staff] = await Promise.all([getMeetingById(meeting.id), listMeetingStaff(meeting.id)]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">用户管理</h1>
-        <ButtonLink href="/admin/users/new" variant="primary">
-          + 新建用户
-        </ButtonLink>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">会议授权</h1>
+        <p className="mt-1 text-sm text-gray-500">当前会议：{meeting.title}</p>
       </div>
 
-      <form method="get" className="flex gap-2">
-        <input
-          name="q"
-          defaultValue={params.q ?? ""}
-          placeholder="搜索姓名、邮箱、单位"
-          className="flex-1 rounded-lg border px-3 py-2 text-sm"
-        />
-        <button type="submit" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-          搜索
-        </button>
-      </form>
+      <div className="rounded-xl bg-white p-5 shadow-sm">
+        <h2 className="mb-1 text-lg font-semibold">会议归属</h2>
+        <p className="text-sm text-gray-500">
+          {full?.owner ? `${full.owner.name}（${full.owner.email}）` : "无归属（历史遗留会议，所有管理员可见）"}
+        </p>
+      </div>
 
-      <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b text-left text-gray-500">
-              <th className="px-4 py-3">姓名</th>
-              <th className="px-4 py-3">邮箱</th>
-              <th className="px-4 py-3">角色</th>
-              <th className="px-4 py-3">状态</th>
-              <th className="px-4 py-3">报名记录</th>
-              <th className="px-4 py-3">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id} className="border-b">
-                <td className="px-4 py-3">{u.name}</td>
-                <td className="px-4 py-3">{u.email}</td>
-                <td className="px-4 py-3">{u.role === "ADMIN" ? "管理员" : "用户"}</td>
-                <td className="px-4 py-3">
-                  {u.isActive ? (
-                    <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">启用</span>
-                  ) : (
-                    <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">停用</span>
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  <ButtonLink href={`/admin/users/${u.id}/registrations`} variant="ghost" size="xs">
-                    <ClipboardListIcon className="h-3.5 w-3.5" />
-                    查看
-                  </ButtonLink>
-                </td>
-                <td className="px-4 py-3">
-                  {u.id === selfId ? (
-                    <span className="text-gray-400">当前账号</span>
-                  ) : (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <ButtonLink href={`/admin/users/${u.id}/edit`} variant="secondary" size="xs">
-                        编辑
-                      </ButtonLink>
-                      <AdminForm action={`/api/admin/users/${u.id}/reset-password`} redirectTo="/admin/users" className="inline">
-                        <button type="submit" className="rounded-lg border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-600 transition hover:bg-orange-100">
-                          重置密码
+      <div className="space-y-4 rounded-xl bg-white p-5 shadow-sm">
+        <div>
+          <h2 className="text-lg font-semibold">授权用户管理本会议</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            通过邮箱授权其他已注册用户管理本会议，授权后对方将获得本会议的全部管理权限（若对方当前不是管理员，将自动升级为管理员）。
+          </p>
+        </div>
+        <MeetingStaffAuthorizeForm meetingTitle={meeting.title} />
+
+        {staff.length === 0 ? (
+          <p className="text-sm text-gray-500">尚未授权任何用户。</p>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b text-left text-gray-500">
+                  <th className="px-4 py-3">姓名</th>
+                  <th className="px-4 py-3">邮箱</th>
+                  <th className="px-4 py-3">授权时间</th>
+                  <th className="px-4 py-3">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {staff.map((s) => (
+                  <tr key={s.userId} className="border-b">
+                    <td className="px-4 py-3">{s.user.name}</td>
+                    <td className="px-4 py-3">{s.user.email}</td>
+                    <td className="px-4 py-3 text-gray-500">{s.grantedAt.toLocaleString("zh-CN")}</td>
+                    <td className="px-4 py-3">
+                      <AdminForm action={`/api/admin/meeting-staff/${s.userId}/revoke`} redirectTo="/admin/users">
+                        <button
+                          type="submit"
+                          className="rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100"
+                        >
+                          撤销授权
                         </button>
                       </AdminForm>
-                      <AdminForm action={`/api/admin/users/${u.id}/delete`} redirectTo="/admin/users" className="inline">
-                        <button type="submit" className="rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100">
-                          删除
-                        </button>
-                      </AdminForm>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

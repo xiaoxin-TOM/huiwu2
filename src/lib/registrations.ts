@@ -88,10 +88,13 @@ export function listRegistrations(meetingId: string) {
 
 export const REGISTRATIONS_PAGE_SIZE = 20;
 
+export type RegistrationBucket = "REGISTERED" | "UNREGISTERED";
+
 export type RegistrationListQuery = {
   typeId?: string;
   organization?: string;
   page?: number;
+  bucket?: RegistrationBucket;
 };
 
 export async function listRegistrationsPaged(meetingId: string, query: RegistrationListQuery = {}) {
@@ -99,6 +102,11 @@ export async function listRegistrationsPaged(meetingId: string, query: Registrat
   if (query.typeId) where.typeId = query.typeId;
   if (query.organization?.trim()) {
     where.organization = { contains: query.organization.trim(), mode: "insensitive" };
+  }
+  if (query.bucket === "REGISTERED") {
+    where.status = "APPROVED";
+  } else if (query.bucket === "UNREGISTERED") {
+    where.status = { in: ["PENDING", "REJECTED"] };
   }
   const page = Math.max(1, query.page ?? 1);
   const take = REGISTRATIONS_PAGE_SIZE;

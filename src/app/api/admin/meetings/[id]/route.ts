@@ -2,14 +2,17 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { meetingSchema } from "@/lib/validation";
-import { updateMeeting } from "@/lib/meetings";
+import { updateMeeting, canAccessMeeting } from "@/lib/meetings";
 
 export async function POST(req: Request, ctx: RouteContext<"/api/admin/meetings/[id]">) {
   const session = await auth();
-  if (!isAdmin(session?.user?.role)) {
+  if (!isAdmin(session?.user?.role) || !session?.user?.id) {
     return NextResponse.json({ ok: false, error: "无权限" }, { status: 403 });
   }
   const { id } = await ctx.params;
+  if (!(await canAccessMeeting(session.user.id, id))) {
+    return NextResponse.json({ ok: false, error: "无权访问该会议" }, { status: 403 });
+  }
   const form = await req.formData().catch(() => null);
   const parsed = meetingSchema.safeParse({
     title: form?.get("title") ?? "",

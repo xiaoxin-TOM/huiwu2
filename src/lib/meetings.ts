@@ -1,9 +1,43 @@
 import { cookies, headers } from "next/headers";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import { defaultHomeGridCreateData } from "@/lib/home-grid";
 
-export function listMeetings() {
+async function currentAdminUserId(): Promise<string | null> {
+  const session = await auth();
+  return session?.user?.id ?? null;
+}
+
+/**
+ * 会议隔离:每个管理员只能访问自己创建的会议、其他管理员通过 MeetingStaff 授权的会议，
+ * 以及历史上未设置 ownerId 的遗留会议(视为公共可见，避免升级后被锁在门外)。
+ */
+export async function canAccessMeeting(userId: string, meetingId: string): Promise<boolean> {
+  const meeting = await prisma.meeting.findUnique({ where: { id: meetingId }, select: { ownerId: true } });
+  if (!meeting) return false;
+  if (meeting.ownerId === null || meeting.ownerId === userId) return true;
+  const staff = await prisma.meetingStaff.findUnique({
+    where: { meetingId_userId: { meetingId, userId } },
+  });
+  return !!staff;
+}
+
+function accessibleMeetingWhere(userId: string): Prisma.MeetingWhereInput {
+  return { OR: [{ ownerId: userId }, { ownerId: null }, { staff: { some: { userId } } }] };
+}
+
+async function firstAccessibleMeetingId(userId: string): Promise<string | null> {
+  const where = accessibleMeetingWhere(userId);
+  const preferred = await prisma.meeting.findFirst({ where: { ...where, isDefault: true } });
+  if (preferred) return preferred.id;
+  const fallback = await prisma.meeting.findFirst({ where, orderBy: { createdAt: "desc" } });
+  return fallback?.id ?? null;
+}
+
+export function listMeetingsForUser(userId: string) {
   return prisma.meeting.findMany({
+    where: accessibleMeetingWhere(userId),
     orderBy: { createdAt: "desc" },
     include: { owner: { select: { id: true, name: true, email: true } } },
   });
@@ -113,14 +147,12 @@ export async function setDefaultMeeting(id: string) {
 }
 
 export async function getCurrentMeetingId(): Promise<string | null> {
+  const userId = await currentAdminUserId();
+  if (!userId) return null;
   const c = await cookies();
-  const id = c.get("admin_meeting_id")?.value;
-  if (id) {
-    const exists = await prisma.meeting.findUnique({ where: { id } });
-    if (exists) return id;
-  }
-  const def = await getDefaultMeeting();
-  return def?.id ?? null;
+  const cookieId = c.get("admin_meeting_id")?.value;
+  if (cookieId && (await canAccessMeeting(userId, cookieId))) return cookieId;
+  return firstAccessibleMeetingId(userId);
 }
 
 export async function getCurrentMeeting() {
@@ -142,10 +174,12 @@ export function getCurrentMeetingIdFromRequest(req: Request): string | undefined
 }
 
 export async function requireCurrentMeetingForRequest(req: Request) {
-  const id = getCurrentMeetingIdFromRequest(req);
-  const meeting = id
-    ? await prisma.meeting.findUnique({ where: { id } })
-    : await getDefaultMeeting();
+  const userId = await currentAdminUserId();
+  if (!userId) throw new Error("NO_CURRENT_MEETING");
+  const cookieId = getCurrentMeetingIdFromRequest(req);
+  const id =
+    cookieId && (await canAccessMeeting(userId, cookieId)) ? cookieId : await firstAccessibleMeetingId(userId);
+  const meeting = id ? await prisma.meeting.findUnique({ where: { id } }) : null;
   if (!meeting) throw new Error("NO_CURRENT_MEETING");
   return meeting;
 }
@@ -197,11 +231,12 @@ export async function requireMeetingFromSearchParams(searchParams: { m?: string 
 }
 
 export async function getSelectedMeetingId(): Promise<string | null> {
+  const userId = await currentAdminUserId();
+  if (!userId) return null;
   const c = await cookies();
   const id = c.get("admin_meeting_id")?.value;
   if (!id) return null;
-  const exists = await prisma.meeting.findUnique({ where: { id } });
-  return exists ? id : null;
+  return (await canAccessMeeting(userId, id)) ? id : null;
 }
 
 export async function getSelectedMeeting() {

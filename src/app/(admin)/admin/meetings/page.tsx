@@ -1,10 +1,15 @@
-import { listMeetings, getSelectedMeeting } from "@/lib/meetings";
+import { requireAdmin } from "@/lib/session";
+import { listMeetingsForUser, getSelectedMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 import { CopyRegistrationLink } from "@/components/CopyRegistrationLink";
 import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminMeetingsPage() {
-  const [meetings, current] = await Promise.all([listMeetings(), getSelectedMeeting()]);
+  const user = await requireAdmin();
+  const [meetings, current] = await Promise.all([
+    listMeetingsForUser(user.id),
+    getSelectedMeeting(),
+  ]);
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -28,6 +33,7 @@ export default async function AdminMeetingsPage() {
                 <th className="px-4 py-3">名称</th>
                 <th className="px-4 py-3">地点</th>
                 <th className="px-4 py-3">时间</th>
+                <th className="px-4 py-3">会议归属</th>
                 <th className="px-4 py-3">默认</th>
                 <th className="px-4 py-3">报名链接</th>
                 <th className="px-4 py-3">操作</th>
@@ -41,6 +47,7 @@ export default async function AdminMeetingsPage() {
                   <td className="px-4 py-3 text-gray-500">
                     {m.startDate} {m.endDate && `~ ${m.endDate}`}
                   </td>
+                  <td className="px-4 py-3 text-gray-500">{m.owner?.name ?? "-"}</td>
                   <td className="px-4 py-3">
                     {m.isDefault ? (
                       <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">默认</span>

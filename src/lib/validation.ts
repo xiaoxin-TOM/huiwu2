@@ -140,26 +140,8 @@ export const roleSchema = z.object({
   role: z.enum(["USER", "ADMIN"]),
 });
 
-export const adminUserCreateSchema = z.object({
-  name: z.string().min(1, "请填写姓名"),
-  email: z.string().email("邮箱格式不正确"),
-  password: z.string().min(6, "密码至少 6 位"),
-  role: z.enum(["USER", "ADMIN"]),
-  isActive: z.boolean(),
-});
-export type AdminUserCreateInput = z.infer<typeof adminUserCreateSchema>;
-
-export const adminUserUpdateSchema = z.object({
-  name: z.string().min(1, "请填写姓名"),
-  email: z.string().email("邮箱格式不正确"),
-  password: z.string().optional(),
-  role: z.enum(["USER", "ADMIN"]),
-  isActive: z.boolean(),
-});
-export type AdminUserUpdateInput = z.infer<typeof adminUserUpdateSchema>;
-
-export const userSearchParamsSchema = z.object({
-  q: z.string().optional().default(""),
+export const authorizeMeetingStaffSchema = z.object({
+  email: z.string().trim().email("邮箱格式不正确"),
 });
 
 export const submissionReviewSchema = z.object({

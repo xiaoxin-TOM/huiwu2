@@ -45,7 +45,7 @@ const MENU = [
   { href: "/admin/receptions", label: "接待管理", icon: UsersIcon },
   { href: "/admin/channels", label: "渠道推广", icon: LinkIcon },
   { href: "/admin/badge-template", label: "胸卡模板", icon: FileTextIcon },
-  { href: "/admin/users", label: "用户管理", icon: UserCogIcon },
+  { href: "/admin/users", label: "会议授权", icon: UserCogIcon },
   { href: "/admin/checkin", label: "签到管理", icon: ScanIcon },
 ];
 

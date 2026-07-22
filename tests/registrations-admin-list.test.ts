@@ -94,3 +94,37 @@ test("batchReviewRegistrations 单次最多处理 20 条，且仅影响指定会
   const count2 = await batchReviewRegistrations(meetingId, moreThan20, "REJECTED");
   expect(count2).toBeLessThanOrEqual(20);
 });
+
+test("listRegistrationsPaged 按 bucket 区分已报名(APPROVED)/未报名(PENDING+REJECTED)", async () => {
+  const t = await prisma.registrationType.create({ data: { name: "报审bucket类型", fee: 9201 } });
+  const m = await prisma.meeting.create({ data: { title: "报审bucket测试会议" } });
+  const localUserIds: string[] = [];
+  try {
+    const statuses = ["PENDING", "APPROVED", "REJECTED"] as const;
+    for (const status of statuses) {
+      const u = await prisma.user.create({
+        data: { name: `bucket用户-${status}`, email: `bucket-${status}@example.com`, passwordHash: "x", isActive: true },
+      });
+      localUserIds.push(u.id);
+      const reg = await createRegistration(u.id, m.id, {
+        typeId: t.id, fullName: `bucket用户-${status}`, organization: "", title: "", phone: "",
+      });
+      if (status !== "PENDING") {
+        await prisma.registration.update({ where: { id: reg.id }, data: { status } });
+      }
+    }
+
+    const registered = await listRegistrationsPaged(m.id, { bucket: "REGISTERED" });
+    expect(registered.total).toBe(1);
+    expect(registered.items.every((r) => r.status === "APPROVED")).toBe(true);
+
+    const unregistered = await listRegistrationsPaged(m.id, { bucket: "UNREGISTERED" });
+    expect(unregistered.total).toBe(2);
+    expect(unregistered.items.every((r) => r.status === "PENDING" || r.status === "REJECTED")).toBe(true);
+  } finally {
+    await prisma.registration.deleteMany({ where: { userId: { in: localUserIds } } });
+    await prisma.user.deleteMany({ where: { id: { in: localUserIds } } });
+    await prisma.meeting.delete({ where: { id: m.id } }).catch(() => {});
+    await prisma.registrationType.delete({ where: { id: t.id } }).catch(() => {});
+  }
+});
