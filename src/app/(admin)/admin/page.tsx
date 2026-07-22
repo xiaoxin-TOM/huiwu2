@@ -87,6 +87,8 @@ export default async function AdminDashboard() {
             venueAddress: meeting.venueAddress,
             venueLng: meeting.venueLng,
             venueLat: meeting.venueLat,
+            requirePassword: meeting.requirePassword,
+            registrationPassword: meeting.registrationPassword,
           }} />
         </div>
 

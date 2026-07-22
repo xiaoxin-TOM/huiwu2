@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploadField from "@/components/ImageUploadField";
+import RegistrationPasswordField from "@/components/RegistrationPasswordField";
 
 interface SiteConfigValues {
   confName?: string | null;
@@ -16,6 +17,8 @@ interface SiteConfigValues {
   venueLat?: string | null;
   welcomeHtml?: string | null;
   footerHtml?: string | null;
+  requirePassword?: boolean | null;
+  registrationPassword?: string | null;
 }
 
 export default function AdminSiteForm({ defaultValues }: { defaultValues: SiteConfigValues }) {
@@ -176,6 +179,13 @@ export default function AdminSiteForm({ defaultValues }: { defaultValues: SiteCo
             className="mt-1 w-full rounded border px-3 py-2 text-sm"
           />
         </label>
+      </div>
+
+      <div className="rounded-lg border border-slate-200 p-3">
+        <RegistrationPasswordField
+          defaultChecked={defaultValues.requirePassword ?? false}
+          defaultPassword={defaultValues.registrationPassword ?? ""}
+        />
       </div>
 
       <button

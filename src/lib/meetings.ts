@@ -130,6 +130,8 @@ export function updateMeetingConfig(
     venueAddress?: string;
     venueLng?: string;
     venueLat?: string;
+    requirePassword?: boolean;
+    registrationPassword?: string;
   },
 ) {
   return prisma.meeting.update({ where: { id }, data });

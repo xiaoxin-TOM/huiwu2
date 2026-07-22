@@ -18,7 +18,7 @@ export const registrationSchema = z.object({
   organization: z.string().optional().default(""),
   title: z.string().optional().default(""),
   phone: z.string().optional().default(""),
-  password: z.string().optional(),
+  password: z.string().nullish(),
 });
 export type RegistrationInput = z.infer<typeof registrationSchema>;
 
@@ -78,6 +78,12 @@ export const siteConfigSchema = z.object({
   venueAddress: z.string().optional().default(""),
   venueLng: coordField(-180, 180, "经度无效(-180~180)"),
   venueLat: coordField(-90, 90, "纬度无效(-90~90)"),
+  requirePassword: z.boolean().default(false),
+  registrationPassword: z.string().optional().default(""),
+})
+.refine((d) => !d.requirePassword || d.registrationPassword.trim().length > 0, {
+  message: "请设置报名密码",
+  path: ["registrationPassword"],
 });
 
 export const noticeSchema = z.object({

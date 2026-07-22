@@ -30,6 +30,8 @@ export async function POST(req: Request) {
     venueAddress: g("venueAddress"),
     venueLng: g("venueLng"),
     venueLat: g("venueLat"),
+    requirePassword: form?.get("requirePassword") === "on",
+    registrationPassword: g("registrationPassword"),
   });
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
@@ -47,6 +49,8 @@ export async function POST(req: Request) {
       venueAddress: parsed.data.venueAddress,
       venueLng: parsed.data.venueLng,
       venueLat: parsed.data.venueLat,
+      requirePassword: parsed.data.requirePassword,
+      registrationPassword: parsed.data.registrationPassword,
     });
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });

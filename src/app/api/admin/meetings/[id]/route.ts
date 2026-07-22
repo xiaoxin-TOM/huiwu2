@@ -20,11 +20,11 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/meetings/
     location: form?.get("location") ?? "",
     startDate: form?.get("startDate") ?? "",
     endDate: form?.get("endDate") ?? "",
-    requireApproval: form?.get("requireApproval") ?? "off",
+    requireApproval: form?.get("requireApproval") === "on",
     registrationLimit: form?.get("registrationLimit") ?? null,
     opensAt: form?.get("opensAt") ?? null,
     closesAt: form?.get("closesAt") ?? null,
-    requirePassword: form?.get("requirePassword") ?? "off",
+    requirePassword: form?.get("requirePassword") === "on",
     registrationPassword: form?.get("registrationPassword") ?? "",
   });
   if (!parsed.success) {
