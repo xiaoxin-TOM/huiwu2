@@ -15,7 +15,7 @@ export default async function PhotosPage({
   const albums = await listAlbums(meeting.id);
   return (
     <div className="space-y-4">
-      <PageHeader title="图片直播" />
+      <PageHeader title="图片直播" backHref={meetingHref(meeting.id, "/")} />
       {albums.length === 0 ? (
         <p className="text-slate-500">暂无相册。</p>
       ) : (

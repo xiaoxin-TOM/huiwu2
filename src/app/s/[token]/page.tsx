@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { meetingHref } from "@/lib/public";
 import { getSpeakerByToken } from "@/lib/speakers-admin";
 import { currentUser } from "@/lib/session";
 import SpeakerAcceptButton from "@/components/SpeakerAcceptButton";
@@ -75,7 +76,7 @@ export default async function SpeakerInvitationPage({
         </div>
 
         <div className="text-center text-xs text-slate-400">
-          <Link href="/" className="hover:underline">
+          <Link href={meetingHref(meeting.id, "/")} className="hover:underline">
             返回首页
           </Link>
         </div>

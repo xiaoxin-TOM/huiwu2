@@ -27,7 +27,7 @@ export default async function LivePage({
 
   return (
     <div className="space-y-4">
-      <PageHeader title="现场直播" />
+      <PageHeader title="现场直播" backHref={meetingHref(meeting.id, "/")} />
       {items.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (

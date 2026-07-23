@@ -1,5 +1,6 @@
 import { listHotels } from "@/lib/hotels";
 import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
+import { meetingHref } from "@/lib/public";
 import BookingForm from "@/components/BookingForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard, DataCard } from "@/components/ui/Card";
@@ -15,7 +16,7 @@ export default async function HotelsPage({
   const hotels = await listHotels(meeting.id);
   return (
     <div className="space-y-5">
-      <PageHeader title="酒店预订" />
+      <PageHeader title="酒店预订" backHref={meetingHref(meeting.id, "/")} />
 
       {hotels.length === 0 ? (
         <p className="text-slate-500">暂无酒店信息。</p>

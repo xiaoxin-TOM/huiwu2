@@ -1,6 +1,7 @@
 import { getPage } from "@/lib/content";
 import { parseVenueLocation } from "@/lib/venue";
 import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
+import { meetingHref } from "@/lib/public";
 import RichText from "@/components/RichText";
 import VenueMap from "@/components/VenueMap";
 import VenueNavButton from "@/components/VenueNavButton";
@@ -18,7 +19,7 @@ export default async function VenuePage({
   const venue = parseVenueLocation(meeting);
   return (
     <div className="space-y-4">
-      <PageHeader title={page?.title ?? "会场交通"} />
+      <PageHeader title={page?.title ?? "会场交通"} backHref={meetingHref(meeting.id, "/")} />
       <SectionCard>
         {page?.mode === "IMAGE" && page.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element

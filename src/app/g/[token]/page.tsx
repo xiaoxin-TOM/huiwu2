@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { meetingHref } from "@/lib/public";
 import { getGuestByToken } from "@/lib/guests-admin";
 import ConfirmButton from "@/components/ConfirmButton";
 
@@ -75,7 +76,7 @@ export default async function GuestInvitationPage({ params }: { params: Promise<
         </div>
 
         <div className="text-center text-xs text-slate-400">
-          <Link href="/" className="hover:underline">返回首页</Link>
+          <Link href={meetingHref(meeting.id, "/")} className="hover:underline">返回首页</Link>
         </div>
       </div>
     </div>

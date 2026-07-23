@@ -20,7 +20,7 @@ export default async function SubmissionsPage({
 
   return (
     <div className="space-y-4">
-      <PageHeader title={`${meeting.title} · 论文提交`} />
+      <PageHeader title={`${meeting.title} · 论文提交`} backHref={meetingHref(meeting.id, "/")} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <IconCard href={meetingHref(meeting.id, "/schedule")} title="会议日程" icon={<CalendarIcon className="h-6 w-6" />} />

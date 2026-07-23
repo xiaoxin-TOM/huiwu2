@@ -1,5 +1,6 @@
 import { getPage } from "@/lib/content";
 import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
+import { meetingHref } from "@/lib/public";
 import RichText from "@/components/RichText";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
@@ -21,7 +22,7 @@ export default async function SimpleContentPage({
   const page = await getPage(slug, meeting.id);
   return (
     <div className="space-y-4">
-      <PageHeader title={page?.title ?? fallbackTitle} />
+      <PageHeader title={page?.title ?? fallbackTitle} backHref={meetingHref(meeting.id, "/")} />
       <SectionCard>
         {page?.mode === "IMAGE" && page.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element

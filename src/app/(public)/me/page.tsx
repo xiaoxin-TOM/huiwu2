@@ -30,7 +30,7 @@ export default async function MePage({
 
   return (
     <div className="space-y-4">
-      <PageHeader title="个人中心" action={<LogoutButton variant="dark" />} />
+      <PageHeader title="个人中心" backHref={meetingHref(meeting.id, "/")} action={<LogoutButton variant="dark" />} />
 
       <SectionCard>
         <div className="flex items-center gap-4">

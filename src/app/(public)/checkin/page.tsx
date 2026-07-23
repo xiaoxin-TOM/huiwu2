@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { meetingHref } from "@/lib/public";
 import { ShieldCheckIcon, AlertCircleIcon } from "@/components/icons";
 
 interface CheckinState {
@@ -14,6 +15,7 @@ interface CheckinState {
 function CheckinContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const meetingId = searchParams.get("m") ?? undefined;
   const [state, setState] = useState<CheckinState>(() =>
     token
       ? { status: "loading", message: "正在签到..." }
@@ -71,7 +73,7 @@ function CheckinContent() {
             <p className="text-gray-600">{state.message}</p>
           </>
         )}
-        <Link href="/" className="mt-6 inline-block text-sm text-sky-600 hover:underline">
+        <Link href={meetingHref(meetingId, "/")} className="mt-6 inline-block text-sm text-sky-600 hover:underline">
           返回首页
         </Link>
       </div>

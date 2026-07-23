@@ -21,7 +21,7 @@ export default async function SpeakerMaterialsPage({
   if (!speaker) {
     return (
       <div className="space-y-4">
-        <PageHeader title="上传报告资料" />
+        <PageHeader title="上传报告资料" backHref={meetingHref(meeting.id, "/")} />
         <p className="text-slate-500">您当前不是认证讲者，无法接受邀约后上传资料。</p>
         <Link href={meetingHref(meeting.id, "/me")} className="inline-flex items-center text-sky-700 hover:underline">
           <ArrowLeftIcon className="mr-1 h-4 w-4" /> 返回个人中心
@@ -39,6 +39,7 @@ export default async function SpeakerMaterialsPage({
     <div className="space-y-4">
       <PageHeader
         title="上传报告资料"
+        backHref={meetingHref(meeting.id, "/")}
         action={
           <Link
             href={meetingHref(meeting.id, "/me")}

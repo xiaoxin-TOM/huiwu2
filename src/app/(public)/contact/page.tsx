@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getPage } from "@/lib/content";
 import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
-import { getPublicConfig } from "@/lib/public";
+import { getPublicConfig, meetingHref } from "@/lib/public";
 import RichText from "@/components/RichText";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
@@ -20,7 +20,7 @@ export default async function ContactPage({
 
   return (
     <div className="space-y-4">
-      <PageHeader title={page?.title ?? "联系方式"} />
+      <PageHeader title={page?.title ?? "联系方式"} backHref={meetingHref(meeting.id, "/")} />
       <SectionCard>
         {page?.mode === "IMAGE" && page.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element

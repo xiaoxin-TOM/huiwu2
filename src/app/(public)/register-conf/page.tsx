@@ -38,7 +38,7 @@ export default async function RegisterConfPage({
   if (existing) {
     return (
       <div className="space-y-4">
-        <PageHeader title="注册报名" />
+        <PageHeader title="注册报名" backHref={meetingHref(meeting.id, "/")} />
         <SectionCard>
           <div className="flex flex-col items-center py-6 text-center">
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
@@ -68,7 +68,7 @@ export default async function RegisterConfPage({
   const types = await prisma.registrationType.findMany({ orderBy: { fee: "asc" } });
   return (
     <div className="space-y-4">
-      <PageHeader title={`${meeting.title} · 注册报名`} />
+      <PageHeader title={`${meeting.title} · 注册报名`} backHref={meetingHref(meeting.id, "/")} />
       <SectionCard title="填写报名信息">
         <RegistrationForm
           meetingId={meeting.id}

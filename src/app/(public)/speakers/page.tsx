@@ -18,7 +18,7 @@ export default async function SpeakersPage({
 
   return (
     <div className="space-y-4">
-      <PageHeader title="讲者查询" />
+      <PageHeader title="讲者查询" backHref={meetingHref(meeting.id, "/")} />
 
       <FormCard>
         <form action={meetingHref(meeting.id, "/speakers")} method="get" className="flex gap-2">

@@ -1,5 +1,6 @@
 import { getDetailedSessions, groupByDayAndRoom } from "@/lib/schedule";
 import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
+import { meetingHref } from "@/lib/public";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
 import { ClockIcon, UsersIcon, CalendarIcon } from "@/components/icons";
@@ -15,7 +16,7 @@ export default async function SchedulePage({
   if (meeting.scheduleMode === "IMAGE" && meeting.scheduleImageUrl) {
     return (
       <div className="space-y-5">
-        <PageHeader title="详细日程" />
+        <PageHeader title="详细日程" backHref={meetingHref(meeting.id, "/")} />
         <SectionCard>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={meeting.scheduleImageUrl} alt="详细日程" className="w-full rounded-lg" />
@@ -27,7 +28,7 @@ export default async function SchedulePage({
   const grouped = groupByDayAndRoom(await getDetailedSessions(meeting.id));
   return (
     <div className="space-y-5">
-      <PageHeader title="详细日程" />
+      <PageHeader title="详细日程" backHref={meetingHref(meeting.id, "/")} />
       {grouped.length === 0 ? (
         <p className="text-slate-500">日程待发布。</p>
       ) : (

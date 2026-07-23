@@ -15,7 +15,7 @@ export default async function NoticesPage({
   const notices = await getPublishedNotices(meeting.id);
   return (
     <div className="space-y-4">
-      <PageHeader title="会议通知" />
+      <PageHeader title="会议通知" backHref={meetingHref(meeting.id, "/")} />
       {notices.length === 0 ? (
         <p className="text-slate-500">暂无通知。</p>
       ) : (
