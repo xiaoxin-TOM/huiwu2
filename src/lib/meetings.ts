@@ -77,6 +77,7 @@ export async function createMeeting(data: {
   closesAt?: string | null;
   requirePassword?: boolean;
   registrationPassword?: string;
+  requireRealName?: boolean;
   ownerId?: string;
 }) {
   const count = await prisma.meeting.count();
@@ -103,6 +104,7 @@ export function updateMeeting(
     closesAt?: string | null;
     requirePassword?: boolean;
     registrationPassword?: string;
+    requireRealName?: boolean;
   },
 ) {
   return prisma.meeting.update({ where: { id }, data });
@@ -132,6 +134,7 @@ export function updateMeetingConfig(
     venueLat?: string;
     requirePassword?: boolean;
     registrationPassword?: string;
+    requireRealName?: boolean;
   },
 ) {
   return prisma.meeting.update({ where: { id }, data });

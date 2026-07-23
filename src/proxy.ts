@@ -53,9 +53,7 @@ export const proxy = auth((req) => {
 
   const mRootMatch = pathname.match(/^\/m\/([^/]+)$/);
   if (mRootMatch) {
-    if (!role) {
-      return redirectToLogin(req);
-    }
+    // 是否要求登录/实名由 guardPublicAccess 在页面内按会议的 requireRealName 配置判断
     return rewriteWithMeeting(req, mRootMatch[1], "/");
   }
 

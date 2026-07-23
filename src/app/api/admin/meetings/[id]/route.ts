@@ -26,6 +26,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/meetings/
     closesAt: form?.get("closesAt") ?? null,
     requirePassword: form?.get("requirePassword") === "on",
     registrationPassword: form?.get("registrationPassword") ?? "",
+    requireRealName: form?.get("requireRealName") === "on",
   });
   if (!parsed.success) {
     return NextResponse.json(

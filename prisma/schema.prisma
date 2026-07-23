@@ -97,6 +97,7 @@ model Meeting {
   closesAt             String?
   requirePassword      Boolean  @default(false)
   registrationPassword String   @default("")
+  requireRealName      Boolean  @default(true) // 关闭后未登录游客也可直接浏览会议首页及相关展示页面
   scheduleMode         String   @default("TEXT") // TEXT | IMAGE (一图流)
   scheduleImageUrl     String?
   // 会议级站点配置

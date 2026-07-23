@@ -32,6 +32,7 @@ export async function POST(req: Request) {
     venueLat: g("venueLat"),
     requirePassword: form?.get("requirePassword") === "on",
     registrationPassword: g("registrationPassword"),
+    requireRealName: form?.get("requireRealName") === "on",
   });
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
@@ -51,6 +52,7 @@ export async function POST(req: Request) {
       venueLat: parsed.data.venueLat,
       requirePassword: parsed.data.requirePassword,
       registrationPassword: parsed.data.registrationPassword,
+      requireRealName: parsed.data.requireRealName,
     });
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });

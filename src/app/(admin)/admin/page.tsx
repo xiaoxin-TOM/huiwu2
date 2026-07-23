@@ -89,6 +89,7 @@ export default async function AdminDashboard() {
             venueLat: meeting.venueLat,
             requirePassword: meeting.requirePassword,
             registrationPassword: meeting.registrationPassword,
+            requireRealName: meeting.requireRealName,
           }} />
         </div>
 

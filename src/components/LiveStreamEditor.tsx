@@ -86,8 +86,8 @@ export default function LiveStreamEditor({ initialItems, initialMultiButton = fa
   }
 
   async function uploadCover(itemId: string, file: File) {
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage({ type: "error", text: "图片不能超过 5MB" });
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage({ type: "error", text: "图片不能超过 10MB" });
       return;
     }
     setUploadingCoverId(itemId);
@@ -111,8 +111,8 @@ export default function LiveStreamEditor({ initialItems, initialMultiButton = fa
   }
 
   async function uploadIntro(itemId: string, file: File) {
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage({ type: "error", text: "图片不能超过 5MB" });
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage({ type: "error", text: "图片不能超过 10MB" });
       return;
     }
     setUploadingIntroId(itemId);
@@ -341,7 +341,7 @@ export default function LiveStreamEditor({ initialItems, initialMultiButton = fa
                       移除封面
                     </button>
                   )}
-                  <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 5MB，推荐使用 16:9 比例图片</span>
+                  <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 10MB，推荐使用 16:9 比例图片</span>
                 </div>
                 {item.coverImage && (
                   <div className="aspect-video overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
@@ -382,7 +382,7 @@ export default function LiveStreamEditor({ initialItems, initialMultiButton = fa
                         移除介绍图片
                       </button>
                     )}
-                    <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 5MB，详情页使用</span>
+                    <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 10MB，详情页使用</span>
                   </div>
                   {item.introImage && (
                     <div className="aspect-video overflow-hidden rounded-lg border border-slate-200 bg-slate-100">

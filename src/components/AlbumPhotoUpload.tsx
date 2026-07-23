@@ -191,7 +191,7 @@ export default function AlbumPhotoUpload({ albumId }: AlbumPhotoUploadProps) {
               >
                 <UploadIcon className="mx-auto h-10 w-10 text-slate-400" />
                 <p className="mt-2 text-sm font-medium text-slate-600">点击或拖拽图片到此处</p>
-                <p className="text-xs text-slate-400">支持 JPG / PNG / WebP，单张不超过 5MB</p>
+                <p className="text-xs text-slate-400">支持 JPG / PNG / WebP，单张不超过 10MB</p>
                 <input
                   ref={inputRef}
                   name="files"

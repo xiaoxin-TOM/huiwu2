@@ -20,7 +20,7 @@ export async function savePdf(file: File): Promise<string> {
   return `/uploads/${name}`;
 }
 
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const IMAGE_EXT: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
@@ -29,7 +29,7 @@ const IMAGE_EXT: Record<string, string> = {
 
 export function validateImage(file: { type: string; size: number }): string | null {
   if (!(file.type in IMAGE_EXT)) return "仅支持 JPG/PNG/WebP 图片";
-  if (file.size > MAX_IMAGE_BYTES) return "图片不能超过 5MB";
+  if (file.size > MAX_IMAGE_BYTES) return "图片不能超过 10MB";
   return null;
 }
 

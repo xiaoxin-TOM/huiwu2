@@ -22,6 +22,7 @@ export async function POST(req: Request) {
     closesAt: form?.get("closesAt") ?? null,
     requirePassword: form?.get("requirePassword") === "on",
     registrationPassword: form?.get("registrationPassword") ?? "",
+    requireRealName: form?.get("requireRealName") === "on",
   });
   if (!parsed.success) {
     return NextResponse.json(

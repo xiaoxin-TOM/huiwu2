@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploadField from "@/components/ImageUploadField";
 import RegistrationPasswordField from "@/components/RegistrationPasswordField";
+import RealNameField from "@/components/RealNameField";
 
 interface SiteConfigValues {
   confName?: string | null;
@@ -19,6 +20,7 @@ interface SiteConfigValues {
   footerHtml?: string | null;
   requirePassword?: boolean | null;
   registrationPassword?: string | null;
+  requireRealName?: boolean | null;
 }
 
 export default function AdminSiteForm({ defaultValues }: { defaultValues: SiteConfigValues }) {
@@ -186,6 +188,10 @@ export default function AdminSiteForm({ defaultValues }: { defaultValues: SiteCo
           defaultChecked={defaultValues.requirePassword ?? false}
           defaultPassword={defaultValues.registrationPassword ?? ""}
         />
+      </div>
+
+      <div className="rounded-lg border border-slate-200 p-3">
+        <RealNameField defaultChecked={defaultValues.requireRealName ?? true} />
       </div>
 
       <button

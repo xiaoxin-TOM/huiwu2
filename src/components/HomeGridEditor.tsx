@@ -84,8 +84,8 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
   }
 
   async function uploadImage(itemId: string, file: File) {
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage({ type: "error", text: "图片不能超过 5MB" });
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage({ type: "error", text: "图片不能超过 10MB" });
       return;
     }
     setUploadingItemId(itemId);
@@ -278,7 +278,7 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
                         移除图片
                       </button>
                     )}
-                    <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 5MB</span>
+                    <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 10MB</span>
                   </div>
                   {item.backgroundImage && (
                     <div className="h-24 w-24 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">

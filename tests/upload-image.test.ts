@@ -11,12 +11,12 @@ test("拒绝非图片类型", () => {
   expect(validateImage({ type: "application/pdf", size: 1000 })).toBe("仅支持 JPG/PNG/WebP 图片");
 });
 
-test("拒绝超过 5MB", () => {
-  expect(validateImage({ type: "image/jpeg", size: 6 * 1024 * 1024 })).toBe("图片不能超过 5MB");
+test("拒绝超过 10MB", () => {
+  expect(validateImage({ type: "image/jpeg", size: 11 * 1024 * 1024 })).toBe("图片不能超过 10MB");
 });
 
-test("正好 5MB 通过", () => {
-  expect(validateImage({ type: "image/jpeg", size: 5 * 1024 * 1024 })).toBeNull();
+test("正好 10MB 通过", () => {
+  expect(validateImage({ type: "image/jpeg", size: 10 * 1024 * 1024 })).toBeNull();
 });
 
 test("校验图片真实文件头", () => {

@@ -57,8 +57,8 @@ export default function ImageUploadField({
   const [message, setMessage] = useState<string | null>(null);
 
   async function upload(file: File) {
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage("图片不能超过 5MB");
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage("图片不能超过 10MB");
       return;
     }
     setUploading(true);
@@ -121,7 +121,7 @@ export default function ImageUploadField({
             移除图片
           </button>
         )}
-        <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 5MB</span>
+        <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 10MB</span>
       </div>
       {message && <p className="text-xs text-slate-500">{message}</p>}
       {value && (

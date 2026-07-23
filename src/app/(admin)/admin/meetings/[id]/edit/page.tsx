@@ -3,6 +3,7 @@ import { getMeetingById, canAccessMeeting } from "@/lib/meetings";
 import { requireAdmin } from "@/lib/session";
 import AdminForm from "@/components/AdminForm";
 import RegistrationPasswordField from "@/components/RegistrationPasswordField";
+import RealNameField from "@/components/RealNameField";
 import { ButtonLink } from "@/components/ui/Button";
 
 export default async function EditMeetingPage({ params }: { params: Promise<{ id: string }> }) {
@@ -47,6 +48,7 @@ export default async function EditMeetingPage({ params }: { params: Promise<{ id
           <label htmlFor="requireApproval" className="text-sm text-gray-600">报名后需要审核</label>
         </div>
         <RegistrationPasswordField defaultChecked={meeting.requirePassword} defaultPassword={meeting.registrationPassword} />
+        <RealNameField defaultChecked={meeting.requireRealName} />
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm text-gray-600">开放报名</label>

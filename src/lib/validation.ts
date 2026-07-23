@@ -80,6 +80,7 @@ export const siteConfigSchema = z.object({
   venueLat: coordField(-90, 90, "纬度无效(-90~90)"),
   requirePassword: z.boolean().default(false),
   registrationPassword: z.string().optional().default(""),
+  requireRealName: z.boolean().default(true),
 })
 .refine((d) => !d.requirePassword || d.registrationPassword.trim().length > 0, {
   message: "请设置报名密码",
@@ -169,6 +170,7 @@ export const meetingSchema = z
     closesAt: z.string().optional().nullable(),
     requirePassword: z.coerce.boolean().default(false),
     registrationPassword: z.string().optional().default(""),
+    requireRealName: z.coerce.boolean().default(true),
   })
   .refine((d) => !d.requirePassword || d.registrationPassword.trim().length > 0, {
     message: "请设置报名密码",
