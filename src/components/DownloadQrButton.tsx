@@ -20,17 +20,14 @@ export function DownloadQrButton({
     setLoading(true);
     try {
       const fullUrl = `${window.location.origin}${relativeUrl}`;
-      const res = await fetch(`/api/qr?text=${encodeURIComponent(fullUrl)}`);
-      if (!res.ok) throw new Error("二维码生成失败");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
+      const QRCode = await import("qrcode");
+      const dataUrl = await QRCode.toDataURL(fullUrl, { width: 256, margin: 2 });
       const a = document.createElement("a");
-      a.href = url;
+      a.href = dataUrl;
       a.download = `${fileName}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
     } catch {
       // 静默失败，避免阻断用户操作
     } finally {

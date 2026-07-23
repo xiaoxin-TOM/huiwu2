@@ -2,6 +2,45 @@
 
 import { useState } from "react";
 
+function compressImage(file: File, maxWidth = 1920, quality = 0.8): Promise<File> {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith("image/")) return resolve(file);
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return resolve(file);
+      // 填充白色背景，避免透明 PNG 转 JPEG 后出现黑底
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return resolve(file);
+          const name = file.name.replace(/\.[^.]+$/, ".jpg") || "compressed.jpg";
+          resolve(new File([blob], name, { type: "image/jpeg" }));
+        },
+        "image/jpeg",
+        quality,
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(file);
+    };
+    img.src = objectUrl;
+  });
+}
+
 export default function ImageUploadField({
   name,
   defaultValue = "",
@@ -25,8 +64,10 @@ export default function ImageUploadField({
     setUploading(true);
     setMessage(null);
     const form = new FormData();
-    form.set("file", file);
     try {
+      // 大图在客户端先压缩，避免请求体超过网关/平台限制（如 Vercel 4.5MB / Nginx client_max_body_size）
+      const uploadFile = file.size > 1024 * 1024 ? await compressImage(file) : file;
+      form.set("file", uploadFile);
       const response = await fetch("/api/admin/upload/image", {
         method: "POST",
         body: form,
