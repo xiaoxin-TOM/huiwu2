@@ -1,31 +1,34 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/ui/AuthCard";
 import { inputClass, buttonClass, labelClass } from "@/components/ui/Card";
 import { LockIcon, MailIcon } from "@/components/icons";
+import { getSafeCallbackUrl } from "@/lib/urls";
 
-function getSafeCallbackUrl(raw: string | null): string | undefined {
-  if (!raw) return undefined;
-  try {
-    const url = new URL(raw, "http://localhost");
-    if (url.protocol !== "http:" && url.protocol !== "https:") return undefined;
-    const path = url.pathname + url.search;
-    if (!path.startsWith("/")) return undefined;
-    return path;
-  } catch {
-    return undefined;
-  }
+function getPublicMeetingHomeFromCookie(): string {
+  if (typeof document === "undefined") return "/";
+  const match = document.cookie.match(/(?:^|; )public_meeting_id=([^;]+)/);
+  return match ? `/m/${match[1]}` : "/";
 }
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"));
+  const fallback = getPublicMeetingHomeFromCookie();
+  const { status } = useSession();
   const [error, setError] = useState("");
+
+  // 已登录时（如手机返回回到登录页）自动回到对应会议首页
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace(callbackUrl || fallback);
+    }
+  }, [status, callbackUrl, fallback, router]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,7 +44,7 @@ export function LoginForm() {
       setError("邮箱或密码错误");
       return;
     }
-    router.push(callbackUrl ?? "/");
+    router.push(callbackUrl || fallback);
   }
 
   return (
