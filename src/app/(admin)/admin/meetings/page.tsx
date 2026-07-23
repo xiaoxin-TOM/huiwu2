@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/session";
 import { listMeetingsForUser, getSelectedMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
 import { CopyMeetingLink } from "@/components/CopyMeetingLink";
+import { DownloadQrButton } from "@/components/DownloadQrButton";
 import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminMeetingsPage() {
@@ -61,10 +62,26 @@ export default async function AdminMeetingsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <CopyMeetingLink meetingId={m.id} prefix="/r" label="复制报名链接" />
+                    <div className="flex flex-col gap-1">
+                      <CopyMeetingLink meetingId={m.id} prefix="/r" label="复制报名链接" />
+                      <DownloadQrButton
+                        meetingId={m.id}
+                        prefix="/r"
+                        label="下载报名二维码"
+                        fileName={`报名二维码-${m.title}`}
+                      />
+                    </div>
                   </td>
                   <td className="px-4 py-3">
-                    <CopyMeetingLink meetingId={m.id} prefix="/m" label="复制主页链接" />
+                    <div className="flex flex-col gap-1">
+                      <CopyMeetingLink meetingId={m.id} prefix="/m" label="复制主页链接" />
+                      <DownloadQrButton
+                        meetingId={m.id}
+                        prefix="/m"
+                        label="下载主页二维码"
+                        fileName={`主页二维码-${m.title}`}
+                      />
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap items-center gap-2">
