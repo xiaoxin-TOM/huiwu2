@@ -12,7 +12,7 @@ export default async function HomePage({
   searchParams: Promise<{ m?: string }>;
 }) {
   const meeting = await requirePublicMeeting((await searchParams).m);
-  await guardPublicAccess(meeting.id);
+  await guardPublicAccess(meeting.id, { allowPending: true });
   const [siteConfig, homeGridItems, homeGridColumns, homeGridRounded] = await Promise.all([
     prisma.siteConfig.findUnique({ where: { id: 1 } }),
     listHomeGridItems(meeting.id),

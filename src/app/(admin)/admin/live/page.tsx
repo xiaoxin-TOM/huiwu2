@@ -14,7 +14,7 @@ export default async function AdminLivePage() {
           当前会议：{meeting.title}。配置多个直播会场的外部链接。
         </p>
       </div>
-      <LiveStreamEditor initialItems={items} />
+      <LiveStreamEditor initialItems={items} initialMultiButton={meeting.liveMultiButton} />
     </div>
   );
 }

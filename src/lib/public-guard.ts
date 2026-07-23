@@ -16,7 +16,7 @@ export async function requirePublicMeeting(meetingId?: string | null): Promise<M
   redirect("/register-conf");
 }
 
-export async function guardPublicAccess(meetingId: string) {
+export async function guardPublicAccess(meetingId: string, options?: { allowPending?: boolean }) {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return;
@@ -26,7 +26,7 @@ export async function guardPublicAccess(meetingId: string) {
   if (!registration) {
     redirect(`/r/${meetingId}`);
   }
-  if (registration.status !== "APPROVED") {
+  if (!options?.allowPending && registration.status !== "APPROVED") {
     redirect(`/m/${meetingId}/me`);
   }
 }

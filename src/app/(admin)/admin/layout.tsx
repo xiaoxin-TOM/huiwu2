@@ -5,7 +5,6 @@ import { isAdmin } from "@/lib/access";
 import { getSelectedMeeting } from "@/lib/meetings";
 import {
   HomeIcon,
-  BellIcon,
   FileTextIcon,
   CalendarIcon,
   UsersIcon,
@@ -32,7 +31,6 @@ const MENU = [
   { href: "/admin", label: "基础信息", icon: HomeIcon },
   { href: "/admin/home-grid", label: "首页宫格", icon: StarIcon },
   { href: "/admin/live", label: "直播管理", icon: VideoIcon },
-  { href: "/admin/notices", label: "通知管理", icon: BellIcon },
   { href: "/admin/pages", label: "内容页", icon: FileTextIcon },
   { href: "/admin/schedule", label: "日程管理", icon: CalendarIcon },
   { href: "/admin/speakers", label: "讲者管理", icon: UsersIcon },

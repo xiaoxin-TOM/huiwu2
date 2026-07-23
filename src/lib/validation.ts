@@ -86,12 +86,6 @@ export const siteConfigSchema = z.object({
   path: ["registrationPassword"],
 });
 
-export const noticeSchema = z.object({
-  title: z.string().min(1, "请填写标题"),
-  contentHtml: z.string().optional().default(""),
-  isPublished: z.boolean(),
-});
-
 export const safeImageUrl = z.string().trim().max(500, "图片地址过长").refine(
   (value) =>
     value === "" ||
@@ -99,6 +93,14 @@ export const safeImageUrl = z.string().trim().max(500, "图片地址过长").ref
     /^https?:\/\/[^\s]+$/i.test(value),
   "图片请输入站内路径或 http(s) 链接",
 );
+
+export const noticeSchema = z.object({
+  title: z.string().min(1, "请填写标题"),
+  contentHtml: z.string().optional().default(""),
+  mode: z.enum(["TEXT", "IMAGE"]).default("TEXT"),
+  imageUrl: safeImageUrl.default(""),
+  isPublished: z.boolean(),
+});
 
 export const pageSchema = z.object({
   title: z.string().min(1, "请填写标题"),
@@ -256,6 +258,7 @@ const liveStreamUrl = z.string().trim().min(1, "请填写直播地址").max(500,
 );
 
 export const liveStreamSchema = z.object({
+  id: z.string().optional(),
   name: z.string().trim().min(1, "请填写会场名称").max(50, "会场名称不能超过 50 个字"),
   url: liveStreamUrl,
   coverImage: z.string().trim().max(500, "封面图地址过长").refine(
@@ -265,12 +268,20 @@ export const liveStreamSchema = z.object({
       /^https?:\/\/[^\s]+$/i.test(value),
     "封面图请输入站内路径或 http(s) 链接",
   ).default(""),
+  introImage: z.string().trim().max(500, "介绍图片地址过长").refine(
+    (value) =>
+      value === "" ||
+      (value.startsWith("/") && !value.startsWith("//")) ||
+      /^https?:\/\/[^\s]+$/i.test(value),
+    "介绍图片请输入站内路径或 http(s) 链接",
+  ).default(""),
   description: z.string().trim().max(200, "会场描述不能超过 200 个字").default(""),
   time: z.string().trim().max(100, "观看时间不能超过 100 个字").default(""),
   isVisible: z.boolean(),
 });
 
 export const liveStreamsSchema = z.object({
+  multiButton: z.boolean().default(false),
   items: z.array(liveStreamSchema).max(20, "直播会场最多 20 个"),
 });
 

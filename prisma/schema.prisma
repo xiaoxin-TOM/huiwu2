@@ -74,6 +74,8 @@ model Notice {
   meetingId   String   @default("default-meeting")
   title       String
   contentHtml String   @default("")
+  mode        String   @default("TEXT") // TEXT | IMAGE (一图流)
+  imageUrl    String?
   isPublished Boolean  @default(true)
   publishedAt DateTime @default(now())
   meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
@@ -105,6 +107,7 @@ model Meeting {
   logoUrl              String?
   heroImageUrl         String?
   liveUrl              String?
+  liveMultiButton      Boolean  @default(false)
   venueAddress         String   @default("")
   venueLng             String   @default("")
   venueLat             String   @default("")
@@ -140,6 +143,7 @@ model LiveStream {
   name        String
   url         String
   coverImage  String?
+  introImage  String?
   description String   @default("")
   time        String   @default("")
   sortOrder   Int      @default(0)

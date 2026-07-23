@@ -24,7 +24,7 @@ function getRemotePatterns(): { protocol: "http" | "https"; hostname: string }[]
 }
 
 const nextConfig: NextConfig = {
-	 allowedDevOrigins: ['huiwutong.wealzeal.com','39.96.221.13'],
+	 allowedDevOrigins: ['huiwutong.wealzeal.com','39.96.221.13','192.168.31.182'],
   serverExternalPackages: ["ali-oss"],
   images: {
     remotePatterns: getRemotePatterns(),

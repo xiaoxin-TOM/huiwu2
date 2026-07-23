@@ -2,9 +2,17 @@
 
 import { useState } from "react";
 
-export function CopyRegistrationLink({ meetingId }: { meetingId: string }) {
+export function CopyMeetingLink({
+  meetingId,
+  prefix,
+  label,
+}: {
+  meetingId: string;
+  prefix: "/r" | "/m";
+  label: string;
+}) {
   const [copied, setCopied] = useState(false);
-  const relativeUrl = `/r/${meetingId}`;
+  const relativeUrl = `${prefix}/${meetingId}`;
 
   async function handleClick() {
     const fullUrl = `${window.location.origin}${relativeUrl}`;
@@ -24,7 +32,7 @@ export function CopyRegistrationLink({ meetingId }: { meetingId: string }) {
       className="text-xs text-sky-700 hover:underline"
       title={relativeUrl}
     >
-      {copied ? "已复制" : "复制报名链接"}
+      {copied ? "已复制" : label}
     </button>
   );
 }

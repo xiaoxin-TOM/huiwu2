@@ -17,6 +17,9 @@ export function parseVenueLocation(
 }
 
 // 高德 URI API:手机端 callnative=1 拉起高德 App 导航,电脑端打开网页版路线规划,无需 key
-export function amapNavUrl(loc: VenueLocation): string {
-  return `https://uri.amap.com/navigation?to=${loc.lng},${loc.lat},${encodeURIComponent(loc.name)}&mode=car&callnative=1`;
+export function amapNavUrl(loc: VenueLocation, from?: { lng: number; lat: number; name?: string }): string {
+  const fromPart = from
+    ? `from=${from.lng},${from.lat},${encodeURIComponent(from.name ?? "我的位置")}&`
+    : "";
+  return `https://uri.amap.com/navigation?${fromPart}to=${loc.lng},${loc.lat},${encodeURIComponent(loc.name)}&mode=car&callnative=1`;
 }

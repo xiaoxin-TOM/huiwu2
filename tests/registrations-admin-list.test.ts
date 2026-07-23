@@ -97,7 +97,7 @@ test("batchReviewRegistrations 单次最多处理 20 条，且仅影响指定会
 
 test("listRegistrationsPaged 按 bucket 区分已报名(APPROVED)/未报名(PENDING+REJECTED)", async () => {
   const t = await prisma.registrationType.create({ data: { name: "报审bucket类型", fee: 9201 } });
-  const m = await prisma.meeting.create({ data: { title: "报审bucket测试会议" } });
+  const m = await prisma.meeting.create({ data: { title: "报审bucket测试会议", requireApproval: true } });
   const localUserIds: string[] = [];
   try {
     const statuses = ["PENDING", "APPROVED", "REJECTED"] as const;

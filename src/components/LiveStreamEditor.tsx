@@ -1,24 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { VideoIcon } from "@/components/icons";
+import { useRouter } from "next/navigation";
+import { VideoIcon, LinkIcon } from "@/components/icons";
 import type { LiveStreamInput, LiveStreamView } from "@/lib/live";
 
 function newId() {
   return `draft-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function toDateTimeLocal(value: string): string {
+  return value.replace(" ", "T");
+}
+
 function formatTimeRange(start: string, end: string): string {
   if (!start && !end) return "";
-  const [sd, st] = start.split("T");
-  const [ed, et] = end.split("T");
-  if (!start) return end;
-  if (!end) return start;
+  const startNormalized = start.replace("T", " ");
+  const endNormalized = end.replace("T", " ");
+  if (!start) return endNormalized;
+  if (!end) return startNormalized;
+  const [sd, st] = startNormalized.split(" ");
+  const [ed, et] = endNormalized.split(" ");
   if (sd === ed) return `${sd} ${st}-${et}`;
   return `${sd} ${st} - ${ed} ${et}`;
 }
 
 function parseTimeRange(value: string): { start: string; end: string } {
+  if (!value) return { start: "", end: "" };
+  // 兼容可能包含 T 的单时间格式
+  const single = value.match(/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}$/);
+  if (single) return { start: toDateTimeLocal(value), end: "" };
   const same = value.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})-(\d{2}:\d{2})$/);
   if (same) return { start: `${same[1]}T${same[2]}`, end: `${same[1]}T${same[3]}` };
   const diff = value.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}) - (\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/);
@@ -26,11 +37,15 @@ function parseTimeRange(value: string): { start: string; end: string } {
   return { start: "", end: "" };
 }
 
-export default function LiveStreamEditor({ initialItems }: { initialItems: LiveStreamView[] }) {
+export default function LiveStreamEditor({ initialItems, initialMultiButton = false }: { initialItems: LiveStreamView[]; initialMultiButton?: boolean }) {
+  const router = useRouter();
   const [items, setItems] = useState<LiveStreamView[]>(initialItems);
+  const [multiButton, setMultiButton] = useState(initialMultiButton);
   const [saving, setSaving] = useState(false);
-  const [uploadingItemId, setUploadingItemId] = useState<string | null>(null);
+  const [uploadingCoverId, setUploadingCoverId] = useState<string | null>(null);
+  const [uploadingIntroId, setUploadingIntroId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   function patchItem(id: string, patch: Partial<LiveStreamInput>) {
     setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)));
@@ -56,6 +71,7 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
         name: "主会场直播",
         url: "",
         coverImage: "",
+        introImage: "",
         description: "",
         time: "",
         isVisible: true,
@@ -74,7 +90,7 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
       setMessage({ type: "error", text: "图片不能超过 5MB" });
       return;
     }
-    setUploadingItemId(itemId);
+    setUploadingCoverId(itemId);
     setMessage(null);
     const form = new FormData();
     form.set("file", file);
@@ -90,14 +106,51 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
     } catch (error) {
       setMessage({ type: "error", text: error instanceof Error ? error.message : "上传失败" });
     } finally {
-      setUploadingItemId(null);
+      setUploadingCoverId(null);
+    }
+  }
+
+  async function uploadIntro(itemId: string, file: File) {
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage({ type: "error", text: "图片不能超过 5MB" });
+      return;
+    }
+    setUploadingIntroId(itemId);
+    setMessage(null);
+    const form = new FormData();
+    form.set("file", file);
+    try {
+      const response = await fetch("/api/admin/live/upload", {
+        method: "POST",
+        body: form,
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.url) throw new Error(result.error || "上传失败");
+      patchItem(itemId, { introImage: result.url });
+      setMessage({ type: "success", text: "直播介绍图片已上传并应用，请保存直播会场" });
+    } catch (error) {
+      setMessage({ type: "error", text: error instanceof Error ? error.message : "上传失败" });
+    } finally {
+      setUploadingIntroId(null);
     }
   }
 
   async function save() {
     setSaving(true);
     setMessage(null);
-    const payload = { items: items.map(({ name, url, coverImage, description, time, isVisible }) => ({ name, url, coverImage, description, time, isVisible })) };
+    const payload = {
+      multiButton,
+      items: items.map(({ id, name, url, coverImage, introImage, description, time, isVisible }) => ({
+        id,
+        name,
+        url,
+        coverImage,
+        introImage,
+        description,
+        time,
+        isVisible,
+      })),
+    };
     try {
       const response = await fetch("/api/admin/live", {
         method: "POST",
@@ -107,6 +160,7 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "保存失败");
       setMessage({ type: "success", text: "直播会场已保存" });
+      router.refresh();
     } catch (error) {
       setMessage({ type: "error", text: error instanceof Error ? error.message : "保存失败" });
     } finally {
@@ -114,8 +168,35 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
     }
   }
 
+  async function copyRoute(id: string) {
+    const path = `/live/${id}`;
+    try {
+      await navigator.clipboard.writeText(path);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId((current) => (current === id ? null : current)), 1500);
+    } catch {
+      // ignore
+    }
+  }
+
   return (
     <div className="space-y-4">
+      <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <label className="flex cursor-pointer items-center gap-3">
+          <input
+            type="checkbox"
+            checked={multiButton}
+            onChange={(event) => setMultiButton(event.target.checked)}
+          />
+          <div>
+            <p className="font-medium text-slate-700">多按钮模式</p>
+            <p className="text-sm text-slate-500">
+              开启后，前台直播页每个会场显示为独立入口；进入后只展示单个会场。适合宫格分发。
+            </p>
+          </div>
+        </label>
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate-500">配置一个或多个直播会场，前台按此顺序展示。</p>
         <button
@@ -150,11 +231,22 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
                 <div className="flex items-center gap-1">
                   <button type="button" onClick={() => moveItem(index, -1)} disabled={index === 0} aria-label="上移" className="rounded border px-2 py-1 text-sm disabled:opacity-30">↑</button>
                   <button type="button" onClick={() => moveItem(index, 1)} disabled={index === items.length - 1} aria-label="下移" className="rounded border px-2 py-1 text-sm disabled:opacity-30">↓</button>
+                  {multiButton && (
+                    <button
+                      type="button"
+                      onClick={() => copyRoute(item.id)}
+                      disabled={item.id.startsWith("draft-")}
+                      title={item.id.startsWith("draft-") ? "保存后生成可用链接" : "复制该会场页面路径，用于首页宫格跳转"}
+                      className="inline-flex items-center gap-1 rounded border border-sky-200 bg-sky-50 px-2 py-1 text-xs text-sky-700 transition hover:bg-sky-100 disabled:opacity-40"
+                    >
+                      <LinkIcon className="h-3 w-3" />
+                      {copiedId === item.id ? "已复制" : "复制页面路径"}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => removeItem(item.id)}
-                    disabled={items.length === 1}
-                    className="ml-1 rounded border border-red-100 bg-red-50 px-2 py-1 text-xs text-red-600 disabled:opacity-30"
+                    className="ml-1 rounded border border-red-100 bg-red-50 px-2 py-1 text-xs text-red-600 hover:bg-red-100"
                   >
                     删除
                   </button>
@@ -221,7 +313,7 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
 
               <div className="mt-3 space-y-2">
                 <label className="block text-sm text-slate-600">
-                  封面图地址（可选）
+                  封面图地址（列表页展示，可选）
                   <input
                     value={item.coverImage}
                     onChange={(event) => patchItem(item.id, { coverImage: event.target.value })}
@@ -230,12 +322,12 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
                   />
                 </label>
                 <div className="flex flex-wrap items-center gap-2">
-                  <label className={`cursor-pointer rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-100 ${uploadingItemId === item.id ? "pointer-events-none opacity-50" : ""}`}>
-                    {uploadingItemId === item.id ? "上传中..." : "上传图片并记录"}
+                  <label className={`cursor-pointer rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-100 ${uploadingCoverId === item.id ? "pointer-events-none opacity-50" : ""}`}>
+                    {uploadingCoverId === item.id ? "上传中..." : "上传封面图片"}
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
-                      disabled={uploadingItemId != null}
+                      disabled={uploadingCoverId != null}
                       className="hidden"
                       onChange={(event) => {
                         const input = event.currentTarget;
@@ -258,6 +350,48 @@ export default function LiveStreamEditor({ initialItems }: { initialItems: LiveS
                   </div>
                 )}
               </div>
+
+              {multiButton && (
+                <div className="mt-3 space-y-2">
+                  <label className="block text-sm text-slate-600">
+                    直播介绍图片地址（详情页展示，可选）
+                    <input
+                      value={item.introImage}
+                      onChange={(event) => patchItem(item.id, { introImage: event.target.value })}
+                      placeholder="上传图片后自动填写，也可粘贴图片地址"
+                      className="mt-1 w-full rounded-lg border px-3 py-2"
+                    />
+                  </label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className={`cursor-pointer rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-100 ${uploadingIntroId === item.id ? "pointer-events-none opacity-50" : ""}`}>
+                      {uploadingIntroId === item.id ? "上传中..." : "上传介绍图片"}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        disabled={uploadingIntroId != null}
+                        className="hidden"
+                        onChange={(event) => {
+                          const input = event.currentTarget;
+                          const file = input.files?.[0];
+                          if (file) void uploadIntro(item.id, file).finally(() => { input.value = ""; });
+                        }}
+                      />
+                    </label>
+                    {item.introImage && (
+                      <button type="button" onClick={() => patchItem(item.id, { introImage: "" })} className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600 hover:bg-red-100">
+                        移除介绍图片
+                      </button>
+                    )}
+                    <span className="text-xs text-slate-400">JPG、PNG、WebP，最大 5MB，详情页使用</span>
+                  </div>
+                  {item.introImage && (
+                    <div className="aspect-video overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={item.introImage} alt={`${item.name} 介绍图片预览`} className="h-full w-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              )}
 
               <label className="mt-3 inline-flex items-center gap-2 text-sm text-slate-600">
                 <input

@@ -43,7 +43,7 @@ export default function RegistrationForm({
         setError(data.error ?? "报名失败");
         return;
       }
-      router.push(`/m/${meetingId}/me`);
+      router.push(`/m/${meetingId}`);
       router.refresh();
     } catch {
       setError("网络错误，请重试");

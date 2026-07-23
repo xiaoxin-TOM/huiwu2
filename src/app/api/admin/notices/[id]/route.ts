@@ -14,6 +14,8 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/notices/[
   const parsed = noticeSchema.safeParse({
     title: form?.get("title") ?? "",
     contentHtml: form?.get("contentHtml") ?? "",
+    mode: form?.get("mode") ?? "TEXT",
+    imageUrl: form?.get("imageUrl") ?? "",
     isPublished: form?.get("isPublished") === "on",
   });
   if (!parsed.success) {

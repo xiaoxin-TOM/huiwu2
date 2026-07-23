@@ -18,6 +18,8 @@ export async function POST(req: Request) {
   const parsed = noticeSchema.safeParse({
     title: form?.get("title") ?? "",
     contentHtml: form?.get("contentHtml") ?? "",
+    mode: form?.get("mode") ?? "TEXT",
+    imageUrl: form?.get("imageUrl") ?? "",
     isPublished: form?.get("isPublished") === "on",
   });
   if (!parsed.success) {

@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/session";
 import { listMeetingsForUser, getSelectedMeeting } from "@/lib/meetings";
 import AdminForm from "@/components/AdminForm";
-import { CopyRegistrationLink } from "@/components/CopyRegistrationLink";
+import { CopyMeetingLink } from "@/components/CopyMeetingLink";
 import { ButtonLink } from "@/components/ui/Button";
 
 export default async function AdminMeetingsPage() {
@@ -36,6 +36,7 @@ export default async function AdminMeetingsPage() {
                 <th className="px-4 py-3">会议归属</th>
                 <th className="px-4 py-3">默认</th>
                 <th className="px-4 py-3">报名链接</th>
+                <th className="px-4 py-3">主页链接</th>
                 <th className="px-4 py-3">操作</th>
               </tr>
             </thead>
@@ -60,7 +61,10 @@ export default async function AdminMeetingsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <CopyRegistrationLink meetingId={m.id} />
+                    <CopyMeetingLink meetingId={m.id} prefix="/r" label="复制报名链接" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <CopyMeetingLink meetingId={m.id} prefix="/m" label="复制主页链接" />
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap items-center gap-2">

@@ -53,6 +53,9 @@ export const proxy = auth((req) => {
 
   const mRootMatch = pathname.match(/^\/m\/([^/]+)$/);
   if (mRootMatch) {
+    if (!role) {
+      return redirectToLogin(req);
+    }
     return rewriteWithMeeting(req, mRootMatch[1], "/");
   }
 

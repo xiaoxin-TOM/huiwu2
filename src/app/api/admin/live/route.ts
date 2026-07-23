@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
   try {
     const meeting = await requireCurrentMeetingForRequest(req);
-    await replaceLiveStreams(meeting.id, parsed.data.items);
+    await replaceLiveStreams(meeting.id, parsed.data.items, parsed.data.multiButton);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });

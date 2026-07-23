@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { liveStreamSchema, liveStreamsSchema } from "@/lib/validation";
 
-const baseItem = { name: "主会场", url: "https://live.example.com", coverImage: "", description: "", time: "", isVisible: true };
+const baseItem = { name: "主会场", url: "https://live.example.com", coverImage: "", introImage: "", description: "", time: "", isVisible: true };
 
 describe("直播会场", () => {
   test("会场名称与外部链接必填", () => {
@@ -21,6 +21,12 @@ describe("直播会场", () => {
     expect(liveStreamSchema.safeParse({ ...baseItem, coverImage: "" }).success).toBe(true);
     expect(liveStreamSchema.safeParse({ ...baseItem, coverImage: "https://cdn.example.com/cover.jpg" }).success).toBe(true);
     expect(liveStreamSchema.safeParse({ ...baseItem, coverImage: "//invalid" }).success).toBe(false);
+  });
+
+  test("直播介绍图片允许为空或有效图片地址", () => {
+    expect(liveStreamSchema.safeParse({ ...baseItem, introImage: "" }).success).toBe(true);
+    expect(liveStreamSchema.safeParse({ ...baseItem, introImage: "https://cdn.example.com/intro.jpg" }).success).toBe(true);
+    expect(liveStreamSchema.safeParse({ ...baseItem, introImage: "//invalid" }).success).toBe(false);
   });
 
   test("会场描述不超过 200 字", () => {

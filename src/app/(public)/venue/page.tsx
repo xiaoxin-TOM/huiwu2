@@ -1,8 +1,9 @@
 import { getPage } from "@/lib/content";
-import { parseVenueLocation, amapNavUrl } from "@/lib/venue";
+import { parseVenueLocation } from "@/lib/venue";
 import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import RichText from "@/components/RichText";
 import VenueMap from "@/components/VenueMap";
+import VenueNavButton from "@/components/VenueNavButton";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
 
@@ -38,14 +39,7 @@ export default async function VenuePage({
                 <h2 className="font-semibold text-slate-800">{venue.name}</h2>
                 {venue.address && <p className="text-sm text-slate-500">{venue.address}</p>}
               </div>
-              <a
-                href={amapNavUrl(venue)}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded bg-sky-700 px-4 py-2 text-sm text-white hover:bg-sky-800"
-              >
-                🧭 导航到会场
-              </a>
+              <VenueNavButton venue={venue} />
             </div>
             <VenueMap lng={venue.lng} lat={venue.lat} name={venue.name} address={venue.address} />
           </div>

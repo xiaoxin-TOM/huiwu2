@@ -25,3 +25,13 @@ test("会场位置:导航链接指向高德 URI API 且名称已编码", () => {
     `https://uri.amap.com/navigation?to=116.397,39.909,${encodeURIComponent("北京国际会议中心")}&mode=car&callnative=1`
   );
 });
+
+test("会场位置:提供起点时导航链接包含 from", () => {
+  const url = amapNavUrl(
+    { lng: 116.397, lat: 39.909, name: "北京国际会议中心", address: "" },
+    { lng: 116.407, lat: 39.904, name: "我的位置" }
+  );
+  expect(url).toBe(
+    `https://uri.amap.com/navigation?from=116.407,39.904,${encodeURIComponent("我的位置")}&to=116.397,39.909,${encodeURIComponent("北京国际会议中心")}&mode=car&callnative=1`
+  );
+});

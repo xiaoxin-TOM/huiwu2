@@ -180,12 +180,10 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
           </div>
         </div>
 
-        <datalist id="home-grid-route-options">
-          {HOME_GRID_ROUTE_OPTIONS.map((route) => <option key={route.value} value={route.value}>{route.label}</option>)}
-        </datalist>
-
         <div className="space-y-3">
-          {items.map((item, index) => (
+          {items.map((item, index) => {
+            const isCustomHref = !HOME_GRID_ROUTE_OPTIONS.some((route) => route.value === item.href);
+            return (
             <article
               key={item.id}
               onDragOver={(event) => event.preventDefault()}
@@ -223,7 +221,25 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
                 </label>
                 <label className="text-sm text-slate-600">
                   跳转地址
-                  <input list="home-grid-route-options" value={item.href} onChange={(event) => patchItem(item.id, { href: event.target.value })} placeholder="/schedule 或 https://..." className="mt-1 w-full rounded-lg border px-3 py-2" />
+                  <select
+                    value={isCustomHref ? "__custom__" : item.href}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      if (value === "__custom__") {
+                        // 进入自定义模式:清空地址,下方出现链接输入框
+                        if (!isCustomHref) patchItem(item.id, { href: "" });
+                      } else {
+                        patchItem(item.id, { href: value });
+                      }
+                    }}
+                    className="mt-1 w-full rounded-lg border bg-white px-3 py-2"
+                  >
+                    {HOME_GRID_ROUTE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    <option value="__custom__">自定义链接</option>
+                  </select>
+                  {isCustomHref && (
+                    <input value={item.href} onChange={(event) => patchItem(item.id, { href: event.target.value })} placeholder="/schedule 或 https://..." className="mt-2 w-full rounded-lg border px-3 py-2" />
+                  )}
                 </label>
                 <label className="text-sm text-slate-600">
                   图标
@@ -277,7 +293,8 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
                 在前台显示
               </label>
             </article>
-          ))}
+            );
+          })}
         </div>
       </section>
 

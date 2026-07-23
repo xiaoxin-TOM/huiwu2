@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePublicMeeting, guardPublicAccess } from "@/lib/public-guard";
 import { getPublicConfig } from "@/lib/public";
 import { listVisibleLiveStreams } from "@/lib/live";
+import { meetingHref } from "@/lib/public";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
 import { VideoIcon, ExternalLinkIcon } from "@/components/icons";
@@ -45,15 +46,25 @@ export default async function LivePage({
                 <h2 className="mb-2 text-lg font-bold text-slate-800">{item.name}</h2>
                 {item.time && <p className="mb-1 text-sm font-medium text-sky-700">{item.time}</p>}
                 {item.description && <p className="mb-4 text-sm text-slate-500">{item.description}</p>}
-                <a
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-5 py-2.5 font-medium text-white transition hover:bg-sky-700"
-                >
-                  <ExternalLinkIcon className="h-4 w-4" />
-                  进入直播
-                </a>
+                {meeting.liveMultiButton ? (
+                  <a
+                    href={meetingHref(meeting.id, `/live/${item.id}`)}
+                    className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-5 py-2.5 font-medium text-white transition hover:bg-sky-700"
+                  >
+                    <ExternalLinkIcon className="h-4 w-4" />
+                    进入会场
+                  </a>
+                ) : (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-5 py-2.5 font-medium text-white transition hover:bg-sky-700"
+                  >
+                    <ExternalLinkIcon className="h-4 w-4" />
+                    进入直播
+                  </a>
+                )}
               </div>
             </SectionCard>
           ))}

@@ -13,17 +13,13 @@ export function getNotice(id: string, meetingId?: string) {
   return prisma.notice.findFirst({ where });
 }
 
-export function createNotice(
-  meetingId: string,
-  data: { title: string; contentHtml: string; isPublished: boolean },
-) {
+type NoticeData = { title: string; contentHtml: string; isPublished: boolean; mode?: string; imageUrl?: string };
+
+export function createNotice(meetingId: string, data: NoticeData) {
   return prisma.notice.create({ data: { ...data, meetingId } });
 }
 
-export function updateNotice(
-  id: string,
-  data: { title: string; contentHtml: string; isPublished: boolean },
-) {
+export function updateNotice(id: string, data: NoticeData) {
   return prisma.notice.update({ where: { id }, data });
 }
 

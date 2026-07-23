@@ -31,6 +31,7 @@ export async function createRegistration(
         organization: input.organization ?? "",
         title: input.title ?? "",
         phone: input.phone ?? "",
+        status: meeting.requireApproval ? "PENDING" : "APPROVED",
         token: randomUUID().replace(/-/g, ""),
       },
     });
