@@ -36,7 +36,6 @@ export default async function AdminMeetingsPage() {
                 <th className="px-4 py-3">时间</th>
                 <th className="px-4 py-3">会议归属</th>
                 <th className="px-4 py-3">默认</th>
-                <th className="px-4 py-3">报名链接</th>
                 <th className="px-4 py-3">主页链接</th>
                 <th className="px-4 py-3">操作</th>
               </tr>
@@ -60,17 +59,6 @@ export default async function AdminMeetingsPage() {
                         </button>
                       </AdminForm>
                     )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-col gap-1">
-                      <CopyMeetingLink meetingId={m.id} prefix="/r" label="复制报名链接" />
-                      <DownloadQrButton
-                        meetingId={m.id}
-                        prefix="/r"
-                        label="下载报名二维码"
-                        fileName={`报名二维码-${m.title}`}
-                      />
-                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
