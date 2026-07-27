@@ -62,6 +62,15 @@ export const FileTextIcon = (props?: IconProps) =>
     props,
   );
 
+export const FolderIcon = (props?: IconProps) =>
+  baseIcon(
+    <>
+      <path d="M4 20a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2z" />
+      <line x1="8" y1="13" x2="16" y2="13" />
+    </>,
+    props,
+  );
+
 export const CalendarIcon = (props?: IconProps) =>
   baseIcon(
     <>

@@ -32,7 +32,7 @@ export default function SpeakerMaterialUploadForm({ sessions, meetingId }: Speak
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setSuccess("上传成功");
+        setSuccess("上传成功，等待管理员审核通过后方可公开访问");
         (e.target as HTMLFormElement).reset();
         setFileName("");
         router.refresh();
@@ -71,6 +71,18 @@ export default function SpeakerMaterialUploadForm({ sessions, meetingId }: Speak
       </div>
 
       <div>
+        <label className="flex items-start gap-2 rounded-lg bg-amber-50 p-3">
+          <input name="isConfidential" type="checkbox" className="mt-0.5" />
+          <span className="text-sm">
+            <span className="font-medium text-amber-900">设为保密材料</span>
+            <span className="mt-0.5 block text-xs text-amber-800">
+              勾选后仅您本人与会议管理员可查看，不会出现在参会文件列表中。
+            </span>
+          </span>
+        </label>
+      </div>
+
+      <div>
         <label className="block text-sm font-medium text-slate-700">演讲稿件</label>
         <input
           ref={fileInputRef}
@@ -93,7 +105,7 @@ export default function SpeakerMaterialUploadForm({ sessions, meetingId }: Speak
           <span className="text-sm text-slate-600">{fileName || "未选择文件"}</span>
         </div>
         <p className="mt-1 text-xs text-slate-500">
-          支持 PDF、PPT、PPTX、Word、Excel，单个文件不超过 50MB
+          支持 PDF、PPT、PPTX、Word、Excel，单个文件不超过 50MB。上传后需管理员审核通过才会公开。
         </p>
       </div>
 

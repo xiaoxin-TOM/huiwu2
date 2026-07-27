@@ -8,6 +8,7 @@ import { meetingHref } from "@/lib/public";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
 import SpeakerMaterialUploadForm from "@/components/SpeakerMaterialUploadForm";
+import SpeakerMaterialList from "@/components/SpeakerMaterialList";
 import { ArrowLeftIcon } from "@/components/icons";
 
 export default async function SpeakerMaterialsPage({
@@ -62,27 +63,17 @@ export default async function SpeakerMaterialsPage({
         {materials.length === 0 ? (
           <p className="text-sm text-slate-500">尚未上传任何资料。</p>
         ) : (
-          <div className="divide-y">
-            {materials.map((m) => (
-              <div key={m.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-medium text-slate-800">{m.fileName}</p>
-                  <p className="text-xs text-slate-500">
-                    {m.session.day} {m.session.startTime}-{m.session.endTime} · {m.session.title} ·{" "}
-                    {(m.fileSize / 1024 / 1024).toFixed(2)} MB
-                  </p>
-                </div>
-                <a
-                  href={m.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  查看
-                </a>
-              </div>
-            ))}
-          </div>
+          <SpeakerMaterialList
+            materials={materials.map((m) => ({
+              id: m.id,
+              fileName: m.fileName,
+              fileSize: m.fileSize,
+              status: m.status,
+              reviewNote: m.reviewNote,
+              isConfidential: m.isConfidential,
+              sessionLabel: `${m.session.day} ${m.session.startTime}-${m.session.endTime} · ${m.session.title}`,
+            }))}
+          />
         )}
       </SectionCard>
     </div>

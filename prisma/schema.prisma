@@ -134,6 +134,7 @@ model Meeting {
   albums        Album[]
   homeGridItems HomeGridItem[]
   liveStreams   LiveStream[]
+  reportLinks   ReportLink[]
 
   @@index([isDefault])
 }
@@ -282,18 +283,44 @@ model SessionSpeaker {
 }
 
 model SpeakerMaterial {
-  id         String   @id @default(cuid())
-  speakerId  String
-  sessionId  String
-  fileUrl    String
-  fileName   String
-  fileSize   Int
-  uploadedAt DateTime @default(now())
-  speaker    Speaker  @relation(fields: [speakerId], references: [id], onDelete: Cascade)
-  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id             String    @id @default(cuid())
+  speakerId      String
+  sessionId      String
+  // OSS object key。文件为私有读，一律通过 /api/materials/[id]/file 鉴权后代理访问，
+  // 不再对外暴露 fileUrl。fileUrl 仅保留作历史记录与回填来源。
+  fileKey        String    @default("")
+  fileUrl        String
+  fileName       String
+  fileSize       Int
+  mimeType       String    @default("")
+  isConfidential Boolean   @default(false) // 保密：仅上传讲者、管理员、汇报链接可见
+  status         String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  reviewNote     String    @default("")
+  reviewedAt     DateTime?
+  reviewedById   String?
+  uploadedAt     DateTime  @default(now())
+  speaker        Speaker   @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+  session        Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([speakerId])
   @@index([sessionId])
+  @@index([status])
+}
+
+/// 现场汇报链接：凭 token + 密码进入会议章程页，可查看该会议全部已审核通过的材料（含保密）。
+model ReportLink {
+  id           String    @id @default(cuid())
+  meetingId    String
+  token        String    @unique @default(uuid())
+  name         String    @default("")
+  passwordHash String
+  expiresAt    DateTime?
+  isActive     Boolean   @default(true)
+  createdById  String?
+  createdAt    DateTime  @default(now())
+  meeting      Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
 }
 
 model Hotel {

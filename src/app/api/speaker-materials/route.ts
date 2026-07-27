@@ -36,6 +36,7 @@ export async function POST(req: Request) {
   }
 
   const sessionId = form?.get("sessionId")?.toString() ?? "";
+  const isConfidential = form?.get("isConfidential")?.toString() === "on";
   const file = form?.get("file");
   if (!sessionId || !(file instanceof File)) {
     return NextResponse.json({ ok: false, error: "请选择日程和文件" }, { status: 400 });
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileUrl = await uploadToOSS({
+    const { key, url } = await uploadToOSS({
       speakerId: speaker.id,
       fileName: file.name,
       buffer,
@@ -64,11 +65,18 @@ export async function POST(req: Request) {
     const material = await createSpeakerMaterial({
       speakerId: speaker.id,
       sessionId,
-      fileUrl,
+      fileKey: key,
+      fileUrl: url,
       fileName: file.name,
       fileSize: file.size,
+      mimeType: file.type,
+      isConfidential,
     });
-    return NextResponse.json({ ok: true, material: { id: material.id, fileUrl, fileName: material.fileName } });
+    // 一律回到待审状态，审核通过前不对外可见
+    return NextResponse.json({
+      ok: true,
+      material: { id: material.id, fileName: material.fileName, status: material.status },
+    });
   } catch (error) {
     console.error("[upload material] speaker:", speaker.id, "error:", error);
     const message = error instanceof Error ? error.message : "上传失败";

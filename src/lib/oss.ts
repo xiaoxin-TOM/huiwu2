@@ -1,4 +1,5 @@
 import OSS from "ali-oss";
+import type { Readable } from "node:stream";
 import { randomUUID } from "node:crypto";
 
 const MAX_BYTES = 50 * 1024 * 1024;
@@ -75,29 +76,64 @@ function uploaderMetadata(req?: Request): Record<string, string> {
   return headers;
 }
 
+/**
+ * 上传讲者材料。对象一律写成私有读——材料可能是保密稿，公网直链等于没有保密可言。
+ * 返回 object key，读取统一走 /api/materials/[id]/file 鉴权代理。
+ */
 export async function uploadToOSS(params: {
   speakerId: string;
   fileName: string;
   buffer: Buffer;
   mime: string;
   req?: Request;
-}): Promise<string> {
+}): Promise<{ key: string; url: string }> {
   const client = getClient();
   const safeName = params.fileName.replace(/[^a-zA-Z0-9_.\-\u4e00-\u9fa5]/g, "_");
   const key = `${getBasePath()}/speakers/${params.speakerId}/${randomUUID()}-${safeName}`;
-  const headers: Record<string, string> = {
-    "Content-Disposition": `attachment; filename="${encodeURIComponent(safeName)}"`,
-    ...uploaderMetadata(params.req),
-  };
   const result = await client.put(key, params.buffer, {
     mime: params.mime,
-    headers,
+    headers: {
+      "x-oss-object-acl": "private",
+      ...uploaderMetadata(params.req),
+    },
   });
   if (!result.url) {
     throw new Error("OSS 上传失败，未返回文件 URL");
   }
-  // 使用配置的公网访问地址（IMAGE_BASE_URL / ALIYUN_OSS_PUBLIC_BASE_URL / OSS 默认域名）
-  return `${getPublicBaseUrl()}/${key}`;
+  // url 仅留档备查，不对外暴露
+  return { key, url: `${getPublicBaseUrl()}/${key}` };
+}
+
+/** 取私有对象的可读流，供鉴权代理路由透传给浏览器。 */
+export async function getSpeakerMaterialStream(key: string): Promise<Readable> {
+  const result = await getClient().getStream(key);
+  if (!result?.stream) throw new Error("OSS 读取失败");
+  return result.stream as Readable;
+}
+
+export async function deleteSpeakerMaterialFromOSS(key: string): Promise<void> {
+  if (!key) return;
+  await getClient().delete(key);
+}
+
+/** 把历史遗留的公网 URL 还原成 object key，供回填脚本使用。 */
+export function keyFromPublicUrl(url: string): string {
+  if (!url) return "";
+  for (const base of [process.env.IMAGE_BASE_URL, process.env.ALIYUN_OSS_PUBLIC_BASE_URL]) {
+    const trimmed = base?.replace(/\/$/, "");
+    if (trimmed && url.startsWith(`${trimmed}/`)) return url.slice(trimmed.length + 1);
+  }
+  try {
+    return new URL(url).pathname.replace(/^\//, "");
+  } catch {
+    return "";
+  }
+}
+
+/** 把历史对象的 ACL 收回为私有，供回填脚本使用。 */
+export async function makeObjectPrivate(key: string): Promise<void> {
+  if (!key) return;
+  await getClient().putACL(key, "private");
 }
 
 export async function uploadHomeGridImageToOSS(params: {

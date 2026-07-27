@@ -48,3 +48,6 @@ next-env.d.ts
 prisma/*.db
 
 /public/uploads/
+
+# 由 copy:pdf-worker 生成
+/public/vendor/

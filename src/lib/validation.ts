@@ -158,6 +158,24 @@ export const submissionReviewSchema = z.object({
   decision: z.enum(["APPROVED", "REJECTED"]),
 });
 
+export const materialReviewSchema = z.object({
+  decision: z.enum(["APPROVED", "REJECTED"]),
+  reviewNote: z.string().max(500, "审核备注过长").optional().default(""),
+});
+
+export const reportLinkSchema = z
+  .object({
+    name: z.string().trim().max(60, "名称过长").optional().default(""),
+    // 汇报链接可查看含保密在内的全部已过审材料，等同管理员级凭证，密码不可省
+    password: z.string().min(6, "汇报链接密码至少 6 位").max(100, "密码过长"),
+    expiresAt: z.string().trim().optional().default(""),
+  })
+  .refine((d) => d.expiresAt === "" || !Number.isNaN(Date.parse(d.expiresAt)), {
+    message: "失效时间格式不正确",
+    path: ["expiresAt"],
+  });
+export type ReportLinkInput = z.infer<typeof reportLinkSchema>;
+
 export const meetingSchema = z
   .object({
     title: z.string().min(1, "请填写会议名称"),

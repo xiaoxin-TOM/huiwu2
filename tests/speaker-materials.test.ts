@@ -20,7 +20,10 @@ vi.mock("@/lib/oss", () => ({
     if (file.size > 50 * 1024 * 1024) return "文件不能超过 50MB";
     return null;
   },
-  uploadToOSS: vi.fn(async () => "https://mock-oss.example.com/speakers/test/file.pdf"),
+  uploadToOSS: vi.fn(async () => ({
+    key: "uploads/speakers/test/file.pdf",
+    url: "https://mock-oss.example.com/uploads/speakers/test/file.pdf",
+  })),
 }));
 
 let meetingId: string;
@@ -58,13 +61,17 @@ test("创建并列出讲者资料", async () => {
   const material = await createSpeakerMaterial({
     speakerId,
     sessionId,
-    fileUrl: "https://mock-oss.example.com/speakers/test/file.pdf",
+    fileKey: "uploads/speakers/test/file.pdf",
+    fileUrl: "https://mock-oss.example.com/uploads/speakers/test/file.pdf",
     fileName: "演讲稿.pdf",
     fileSize: 1024,
+    mimeType: "application/pdf",
+    isConfidential: false,
   });
-  // material.id captured for potential future assertions
   expect(material.fileName).toBe("演讲稿.pdf");
   expect(material.speakerId).toBe(speakerId);
+  // 新上传一律待审，审核通过前不对外可见
+  expect(material.status).toBe("PENDING");
 
   const list = await listSpeakerMaterials(speakerId);
   expect(list).toHaveLength(1);
