@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { HOME_GRID_ICON_KEYS, HOME_GRID_SIZE_KEYS } from "@/lib/home-grid-config";
+import { RECEPTION_BULK_FIELDS, RECEPTION_BULK_MODES, type ReceptionBulkField } from "@/lib/reception-bulk";
 
 export const registerSchema = z.object({
   name: z.string().min(1, "请填写姓名"),
@@ -238,6 +239,42 @@ export const receptionSchema = z.object({
   remark: z.string().optional().default(""),
 });
 export type ReceptionInput = z.infer<typeof receptionSchema>;
+
+export const RECEPTION_FIELDS = Object.keys(receptionSchema.shape) as (keyof ReceptionInput)[];
+
+/**
+ * 局部更新用：只校验调用方实际提交的字段。
+ * 不能用 receptionSchema，也不能用它的 .partial()——两者都会给缺失字段补 ""，
+ * 把未提交的接待信息一起清空（房间号内联编辑就踩过这个坑）。
+ */
+export const receptionPatchSchema = z.object(
+  Object.fromEntries(
+    RECEPTION_FIELDS.map((key) => [key, z.string().max(500, "内容过长").optional()]),
+  ) as Record<keyof ReceptionInput, z.ZodOptional<z.ZodString>>,
+);
+export type ReceptionPatch = z.infer<typeof receptionPatchSchema>;
+
+// 批量设置只接受勾选过的字段，因此每个字段都是可选的；缺省即"未勾选、不写入"。
+const receptionBulkFieldsShape = Object.fromEntries(
+  RECEPTION_BULK_FIELDS.map((key) => [key, z.string().max(500, "内容过长").optional()]),
+) as Record<ReceptionBulkField, z.ZodOptional<z.ZodString>>;
+
+export const receptionBulkSchema = z.object({
+  mode: z.enum(RECEPTION_BULK_MODES),
+  targets: z
+    .array(
+      z.object({
+        kind: z.enum(["guest", "registration"]),
+        id: z.string().min(1),
+      }),
+    )
+    .min(1, "请先勾选要设置的人员")
+    .max(500, "单次最多批量设置 500 人"),
+  fields: z
+    .object(receptionBulkFieldsShape)
+    .refine((f) => Object.keys(f).length > 0, "请至少勾选一个要设置的字段"),
+});
+export type ReceptionBulkInput = z.infer<typeof receptionBulkSchema>;
 
 export const channelSchema = z.object({
   code: z.string().min(2, "短码至少 2 位").max(40, "短码过长"),

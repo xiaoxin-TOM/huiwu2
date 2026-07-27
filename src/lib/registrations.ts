@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { RegistrationInput, ReceptionInput } from "@/lib/validation";
+import type { RegistrationInput, ReceptionInput, ReceptionPatch } from "@/lib/validation";
 
 export async function createRegistration(
   userId: string,
@@ -182,7 +182,7 @@ export function getRegistrationReceptionById(id: string) {
   return prisma.registrationReception.findUnique({ where: { id }, include: { registration: true } });
 }
 
-export function updateRegistrationReception(id: string, input: ReceptionInput) {
+export function updateRegistrationReception(id: string, input: ReceptionPatch) {
   return prisma.registrationReception.update({ where: { id }, data: { ...input } });
 }
 

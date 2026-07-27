@@ -4,7 +4,7 @@ import { listRegistrationsWithReception } from "@/lib/registrations";
 import { prisma } from "@/lib/prisma";
 import ReceptionExportButton from "@/components/ReceptionExportButton";
 import ReceptionFilterBar from "@/components/ReceptionFilterBar";
-import QuickRoomEdit from "@/components/QuickRoomEdit";
+import ReceptionTable from "@/components/ReceptionTable";
 import { ButtonLink } from "@/components/ui/Button";
 import type { ReceptionRow } from "@/types/reception";
 
@@ -12,11 +12,6 @@ const LEVEL_LABEL: Record<string, string> = {
   VIP: "VIP",
   NORMAL: "嘉宾",
   MEDIA: "媒体",
-};
-
-const KIND_LABEL: Record<string, string> = {
-  guest: "嘉宾",
-  registration: "报名",
 };
 
 function buildRows(
@@ -161,66 +156,7 @@ export default async function AdminReceptionsPage({
           中维护人员。
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="border-b text-left text-gray-500">
-                <th className="px-4 py-3">来源</th>
-                <th className="px-4 py-3">姓名</th>
-                <th className="px-4 py-3">单位</th>
-                <th className="px-4 py-3">分类</th>
-                <th className="px-4 py-3">联系方式</th>
-                <th className="px-4 py-3">抵达</th>
-                <th className="px-4 py-3">返程</th>
-                <th className="px-4 py-3">酒店</th>
-                <th className="px-4 py-3">房间号</th>
-                <th className="px-4 py-3">司机/车牌</th>
-                <th className="px-4 py-3">操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={`${r.kind}-${r.id}`} className="border-b">
-                  <td className="px-4 py-3">
-                    <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                      {KIND_LABEL[r.kind]}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium">{r.name}</td>
-                  <td className="px-4 py-3 text-gray-500">{r.company || "-"}</td>
-                  <td className="px-4 py-3">{r.category}</td>
-                  <td className="px-4 py-3 text-gray-500">{r.contact}</td>
-                  <td className="px-4 py-3 text-gray-500">
-                    {[r.reception?.arriveMode, r.reception?.arriveNo, r.reception?.arriveTime].filter(Boolean).join(" ") || "-"}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">
-                    {[r.reception?.departMode, r.reception?.departNo, r.reception?.departTime].filter(Boolean).join(" ") || "-"}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">{r.reception?.hotelName || "-"}</td>
-                  <td className="px-4 py-3">
-                    {r.reception ? (
-                      <QuickRoomEdit receptionId={r.reception.id} defaultValue={r.reception.hotelRoom} />
-                    ) : (
-                      "-"
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">
-                    {[r.reception?.carDriver, r.reception?.carPlate].filter(Boolean).join(" / ") || "-"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <ButtonLink
-                      href={r.kind === "guest" ? `/admin/guests/${r.id}/edit` : `/admin/registrations/${r.id}/reception`}
-                      variant="secondary"
-                      size="xs"
-                    >
-                      编辑
-                    </ButtonLink>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ReceptionTable rows={rows} />
       )}
     </div>
   );

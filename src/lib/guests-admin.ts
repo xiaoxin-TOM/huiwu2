@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { GuestInput, ReceptionInput } from "@/lib/validation";
+import type { GuestInput, ReceptionInput, ReceptionPatch } from "@/lib/validation";
 
 export type GuestFilters = {
   level?: "ALL" | "VIP" | "NORMAL" | "MEDIA";
@@ -97,7 +97,7 @@ export function getReceptionById(id: string) {
   return prisma.guestReception.findUnique({ where: { id }, include: { guest: true } });
 }
 
-export function updateReception(id: string, input: ReceptionInput) {
+export function updateReception(id: string, input: ReceptionPatch) {
   return prisma.guestReception.update({
     where: { id },
     data: { ...input },

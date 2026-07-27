@@ -18,6 +18,12 @@ export type ReceptionInfo = {
   remark: string;
 };
 
+/** 批量操作的目标行；嘉宾与报名人员分属两张表，靠 kind 区分。 */
+export type ReceptionTarget = {
+  kind: "guest" | "registration";
+  id: string;
+};
+
 export type ReceptionRow = {
   id: string;
   kind: "guest" | "registration";
