@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { speakerSchema } from "@/lib/validation";
-import { createSpeaker } from "@/lib/speakers-admin";
-import { createGuest } from "@/lib/guests-admin";
+import { createSpeakerWithGuest } from "@/lib/speakers-admin";
 import { getCurrentMeetingId } from "@/lib/meetings";
 
 function parse(form: FormData | null) {
@@ -31,19 +30,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message ?? "参数错误" }, { status: 400 });
   }
   try {
-    const speaker = await createSpeaker(meetingId, parsed.data);
-    await createGuest(meetingId, {
-      name: speaker.name,
-      phone: "",
-      email: "",
-      company: speaker.organization,
-      title: speaker.title,
-      level: "NORMAL",
-      bio: speaker.bio,
-      note: "由讲者自动生成",
-      seatInfo: "",
-    });
-  } catch {
+    // 讲者与其嘉宾记录同一事务写入，避免留下没有嘉宾记录的孤儿讲者
+    await createSpeakerWithGuest(meetingId, parsed.data);
+  } catch (error) {
+    console.error("[create speaker] meeting:", meetingId, "error:", error);
     return NextResponse.json({ ok: false, error: "创建失败" }, { status: 500 });
   }
   return NextResponse.json({ ok: true });

@@ -10,8 +10,46 @@ type SpeakerData = {
   photoUrl: string;
 };
 
+/** 由讲者自动生成的嘉宾记录的备注标记，认领时靠它找回对应记录 */
+export const SPEAKER_GUEST_NOTE = "由讲者自动生成";
+
+/**
+ * 历史版本兜底分支写过别的备注，认领时必须一并匹配，
+ * 否则老数据会被当成不存在而重复生成一条嘉宾。
+ */
+export const LEGACY_SPEAKER_GUEST_NOTES = ["由讲者接受邀约后生成"];
+
+const SPEAKER_GUEST_NOTES = [SPEAKER_GUEST_NOTE, ...LEGACY_SPEAKER_GUEST_NOTES];
+
 export function createSpeaker(meetingId: string, data: SpeakerData) {
   return prisma.speaker.create({ data: { ...data, meetingId } });
+}
+
+/**
+ * 创建讲者并同步生成其嘉宾记录。
+ *
+ * 必须在同一事务里：两者分开写时，嘉宾写入失败会留下一个没有嘉宾记录的讲者，
+ * 而接口又返回失败，管理员重试就变成重复讲者 + 嘉宾管理里查无此人。
+ */
+export function createSpeakerWithGuest(meetingId: string, data: SpeakerData) {
+  return prisma.$transaction(async (tx) => {
+    const speaker = await tx.speaker.create({ data: { ...data, meetingId } });
+    await tx.guest.create({
+      data: {
+        meetingId,
+        name: speaker.name,
+        phone: null,
+        email: null,
+        company: speaker.organization,
+        title: speaker.title,
+        level: "NORMAL",
+        bio: speaker.bio,
+        note: SPEAKER_GUEST_NOTE,
+        seatInfo: "",
+      },
+    });
+    return speaker;
+  });
 }
 
 export function updateSpeaker(id: string, data: SpeakerData) {
@@ -84,7 +122,7 @@ export async function acceptSpeakerInvitation(token: string, userId: string): Pr
         where: {
           meetingId: speaker.meetingId,
           name: speaker.name,
-          note: "由讲者自动生成",
+          note: { in: SPEAKER_GUEST_NOTES },
         },
         orderBy: { createdAt: "desc" },
       });
@@ -104,7 +142,7 @@ export async function acceptSpeakerInvitation(token: string, userId: string): Pr
             title: speaker.title,
             level: "NORMAL",
             bio: speaker.bio,
-            note: "由讲者接受邀约后生成",
+            note: SPEAKER_GUEST_NOTE,
             seatInfo: "",
             confirmed: true,
             confirmedAt: new Date(),

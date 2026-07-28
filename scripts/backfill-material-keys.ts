@@ -11,11 +11,9 @@
  *
  * 可重复执行：已有 fileKey 的记录跳过第 1、2 步，ACL 收敛是幂等操作。
  */
-import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../src/lib/prisma";
 import { keyFromPublicUrl, makeObjectPrivate } from "../src/lib/oss";
 
-const prisma = new PrismaClient();
 const dryRun = process.argv.includes("--dry-run");
 
 async function main() {
