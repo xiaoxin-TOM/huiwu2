@@ -72,12 +72,10 @@ export default function SpeakerMaterialList({ materials }: { materials: SpeakerM
 
             <div className="flex items-center gap-2">
               <a
-                href={`/api/materials/${m.id}/file`}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={`/api/materials/${m.id}/file?download=1`}
                 className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
               >
-                查看
+                下载查看原文
               </a>
               {m.status === "APPROVED" ? (
                 <span className="text-xs text-slate-400">已通过，如需撤回请联系管理员</span>

@@ -4,7 +4,6 @@ import { meetingHref } from "@/lib/public";
 import { listApprovedMaterials } from "@/lib/speaker-materials";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionCard } from "@/components/ui/Card";
-import MaterialPreview from "@/components/MaterialPreview";
 
 export default async function SessionMaterialsPage({
   params,
@@ -33,20 +32,32 @@ export default async function SessionMaterialsPage({
         {session.room && ` · ${session.room}`}
       </p>
 
-      {materials.map((m) => (
-        <SectionCard key={m.id} title={m.speaker.name}>
-          <MaterialPreview
-            material={{
-              id: m.id,
-              fileName: m.fileName,
-              fileSize: m.fileSize,
-              mimeType: m.mimeType,
-              isConfidential: m.isConfidential,
-              speakerName: m.speaker.name,
-            }}
-          />
-        </SectionCard>
-      ))}
+      {/* 只列文件清单，不做浏览器内联预览：Office 文件的端上渲染对复杂排版支持有限，统一下载原文查看 */}
+      <SectionCard title="会议资料">
+        <div className="divide-y">
+          {materials.map((m) => (
+            <div key={m.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+              <div className="min-w-0">
+                <p className="flex flex-wrap items-center gap-2 font-medium text-slate-800">
+                  <span className="truncate">{m.fileName}</span>
+                  {m.isConfidential && (
+                    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">保密</span>
+                  )}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {m.speaker.name} · {(m.fileSize / 1024 / 1024).toFixed(2)} MB
+                </p>
+              </div>
+              <a
+                href={`/api/materials/${m.id}/file?download=1`}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                下载查看原文
+              </a>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
     </div>
   );
 }
