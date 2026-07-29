@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notifyAdminsOfSubmission, notifyUserOfReview } from "@/lib/notifications";
+import { FEEDBACK_CATEGORY_LABEL } from "@/lib/validation";
 
 /**
  * 各业务实体到通知的适配层。
@@ -161,5 +162,42 @@ export async function notifyMaterialReviewed(
     });
   } catch (error) {
     console.error("[notify hook] material reviewed", materialId, error);
+  }
+}
+
+export async function notifyFeedbackSubmitted(feedbackId: string): Promise<void> {
+  try {
+    const fb = await prisma.feedback.findUnique({
+      where: { id: feedbackId },
+      select: { meetingId: true, category: true, user: { select: { name: true } } },
+    });
+    if (!fb) return;
+    await notifyAdminsOfSubmission("FEEDBACK_SUBMITTED", {
+      meetingId: fb.meetingId,
+      // 游客反馈没有账号，统一显示为访客
+      actorName: fb.user?.name ?? "访客",
+      subjectTitle: FEEDBACK_CATEGORY_LABEL[fb.category] ?? fb.category,
+    });
+  } catch (error) {
+    console.error("[notify hook] feedback submitted", feedbackId, error);
+  }
+}
+
+export async function notifyFeedbackReplied(feedbackId: string): Promise<void> {
+  try {
+    const fb = await prisma.feedback.findUnique({
+      where: { id: feedbackId },
+      select: { meetingId: true, userId: true, category: true },
+    });
+    // 游客反馈没有账号可送达，运营需按 contact 字段自行回访
+    if (!fb?.userId) return;
+    await notifyUserOfReview("FEEDBACK_REPLIED", {
+      meetingId: fb.meetingId,
+      userId: fb.userId,
+      decision: "APPROVED",
+      subjectTitle: FEEDBACK_CATEGORY_LABEL[fb.category] ?? fb.category,
+    });
+  } catch (error) {
+    console.error("[notify hook] feedback replied", feedbackId, error);
   }
 }

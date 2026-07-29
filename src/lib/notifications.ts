@@ -13,8 +13,13 @@ import { resolveAdminRecipients, resolveUserRecipient } from "@/lib/notification
  * 调用方（审核接口）不必也不应该 try/catch，更不该因为通知失败而回滚。
  */
 
+/** 发给管理员的事件 */
 type SubmittedType = Extract<NotificationType, `${string}_SUBMITTED`>;
-type ReviewedType = Extract<NotificationType, `${string}_REVIEWED`>;
+
+/** 发给申请人本人的事件。显式列举而非按后缀匹配——FEEDBACK_REPLIED 不叫 _REVIEWED */
+type ReviewedType =
+  | Extract<NotificationType, `${string}_REVIEWED`>
+  | "FEEDBACK_REPLIED";
 
 async function writeInApp(
   recipients: { userId: string }[],

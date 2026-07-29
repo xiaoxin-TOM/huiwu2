@@ -294,6 +294,45 @@ export const receptionBulkSchema = z.object({
 });
 export type ReceptionBulkInput = z.infer<typeof receptionBulkSchema>;
 
+export const FEEDBACK_CATEGORIES = ["BUG", "SUGGESTION", "CONSULT", "COMPLAINT", "OTHER"] as const;
+
+export const FEEDBACK_CATEGORY_LABEL: Record<string, string> = {
+  BUG: "功能异常",
+  SUGGESTION: "建议",
+  CONSULT: "咨询",
+  COMPLAINT: "投诉",
+  OTHER: "其他",
+};
+
+export const feedbackSchema = z.object({
+  category: z.enum(FEEDBACK_CATEGORIES).default("OTHER"),
+  content: z.string().trim().min(1, "请填写反馈内容").max(2000, "反馈内容过长"),
+  contact: z.string().trim().max(100, "联系方式过长").optional().default(""),
+  imageUrl: safeImageUrl.optional().default(""),
+});
+export type FeedbackInput = z.infer<typeof feedbackSchema>;
+
+export const feedbackReplySchema = z.object({
+  reply: z.string().trim().min(1, "请填写回复内容").max(2000, "回复内容过长"),
+});
+
+export const meetingContactSchema = z.object({
+  orgName: z.string().trim().max(100, "名称过长").optional().default(""),
+  phone: z.string().trim().max(50, "电话过长").optional().default(""),
+  phone2: z.string().trim().max(50, "电话过长").optional().default(""),
+  email: z.string().trim().max(100, "邮箱过长").optional().default(""),
+  wechatId: z.string().trim().max(50, "微信号过长").optional().default(""),
+  address: z.string().trim().max(200, "地址过长").optional().default(""),
+  // 二维码走与其他图片一致的白名单，挡掉 javascript: 与协议相对地址
+  wecomQrUrl: safeImageUrl.optional().default(""),
+  groupQrUrl: safeImageUrl.optional().default(""),
+  mpQrUrl: safeImageUrl.optional().default(""),
+  wecomNote: z.string().trim().max(100, "说明过长").optional().default(""),
+  groupNote: z.string().trim().max(100, "说明过长").optional().default(""),
+  mpNote: z.string().trim().max(100, "说明过长").optional().default(""),
+});
+export type MeetingContactInput = z.infer<typeof meetingContactSchema>;
+
 export const channelSchema = z.object({
   code: z.string().min(2, "短码至少 2 位").max(40, "短码过长"),
   name: z.string().min(1, "请填写渠道名称"),

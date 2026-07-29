@@ -12,6 +12,8 @@ export const NOTIFICATION_TYPES = [
   "BOOKING_REVIEWED",
   "MATERIAL_SUBMITTED",
   "MATERIAL_REVIEWED",
+  "FEEDBACK_SUBMITTED",
+  "FEEDBACK_REPLIED",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
@@ -43,6 +45,7 @@ const SUBMITTED_META: Record<string, { label: string; href: string }> = {
   SUBMISSION_SUBMITTED: { label: "论文投稿", href: "/admin/submissions" },
   BOOKING_SUBMITTED: { label: "酒店预订", href: "/admin/bookings" },
   MATERIAL_SUBMITTED: { label: "讲者资料", href: "/admin/submissions?tab=materials" },
+  FEEDBACK_SUBMITTED: { label: "用户反馈", href: "/admin/feedback" },
 };
 
 const REVIEWED_META: Record<string, { label: string; path: string }> = {
@@ -50,6 +53,7 @@ const REVIEWED_META: Record<string, { label: string; path: string }> = {
   SUBMISSION_REVIEWED: { label: "论文投稿", path: "/submissions" },
   BOOKING_REVIEWED: { label: "酒店预订", path: "/me" },
   MATERIAL_REVIEWED: { label: "报告资料", path: "/me/speaker-materials" },
+  FEEDBACK_REPLIED: { label: "反馈", path: "/feedback" },
 };
 
 function decisionWord(decision: NotificationDecision | undefined): string {
