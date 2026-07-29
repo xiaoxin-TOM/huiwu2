@@ -23,6 +23,8 @@ model User {
   ownedMeetings Meeting[]      @relation("MeetingOwner")
   staffMeetings MeetingStaff[]
   speakers      Speaker[]
+  notifications Notification[]
+  feedbacks     Feedback[]
 }
 
 model VerificationCode {
@@ -135,6 +137,9 @@ model Meeting {
   homeGridItems HomeGridItem[]
   liveStreams   LiveStream[]
   reportLinks   ReportLink[]
+  notifications Notification[]
+  contact       MeetingContact?
+  feedbacks     Feedback[]
 
   @@index([isDefault])
 }
@@ -502,6 +507,83 @@ model ChannelVisit {
 
   @@index([channelId])
   @@index([sessionId])
+}
+
+/// 会议的结构化联系方式与客服二维码。原有 contactHtml 富文本保留，展示在结构化信息下方
+model MeetingContact {
+  id         String   @id @default(cuid())
+  meetingId  String   @unique
+  meeting    Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  orgName    String   @default("")
+  phone      String   @default("")
+  phone2     String   @default("")
+  email      String   @default("")
+  wechatId   String   @default("")
+  address    String   @default("")
+  wecomQrUrl String?
+  groupQrUrl String?
+  mpQrUrl    String?
+  wecomNote  String   @default("")
+  groupNote  String   @default("")
+  mpNote     String   @default("")
+  updatedAt  DateTime @updatedAt
+}
+
+/// 用户反馈。userId 可空：会议关闭实名要求时游客也能提交，此时只能靠 contact 字段回访
+model Feedback {
+  id          String    @id @default(cuid())
+  meetingId   String
+  meeting     Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  category    String    @default("OTHER") // BUG | SUGGESTION | CONSULT | COMPLAINT | OTHER
+  content     String
+  contact     String    @default("")
+  imageUrl    String?
+  status      String    @default("PENDING") // PENDING | RESOLVED
+  reply       String    @default("")
+  repliedAt   DateTime?
+  repliedById String?
+  createdAt   DateTime  @default(now())
+
+  @@index([meetingId, status])
+  @@index([userId])
+}
+
+/// 站内信：每个收件人一条，不依赖任何外部服务，必达且可回溯
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meetingId String?
+  meeting   Meeting?  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String    @default("")
+  linkHref  String    @default("")
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([meetingId])
+}
+
+/// 邮件外发队列。审核接口只负责入队，实际发送由 cron 驱动并按退避策略重试
+model NotificationDelivery {
+  id             String    @id @default(cuid())
+  notificationId String?
+  toAddress      String
+  subject        String
+  bodyText       String
+  bodyHtml       String    @default("")
+  status         String    @default("PENDING") // PENDING | SENT | FAILED
+  attempts       Int       @default(0)
+  lastError      String    @default("")
+  nextAttemptAt  DateTime  @default(now())
+  sentAt         DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([status, nextAttemptAt])
 }
 
 model MeetingStaff {

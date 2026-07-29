@@ -3,6 +3,7 @@ import { bookingSchema } from "@/lib/validation";
 import { currentUser } from "@/lib/session";
 import { createBooking } from "@/lib/bookings";
 import { resolveMeetingId } from "@/lib/meetings";
+import { notifyBookingSubmitted } from "@/lib/notification-hooks";
 
 export async function POST(req: Request) {
   const user = await currentUser();
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
   try {
     const meetingId = await resolveMeetingId(body.meetingId);
     const b = await createBooking(user.id, meetingId, parsed.data);
+    await notifyBookingSubmitted(b.id);
     return NextResponse.json({ ok: true, id: b.id });
   } catch (e) {
     if (e instanceof Error && e.message === "HOTEL_NOT_FOUND") {

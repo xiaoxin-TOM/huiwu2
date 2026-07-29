@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { submissionReviewSchema } from "@/lib/validation";
 import { reviewSubmission } from "@/lib/submissions";
+import { notifySubmissionReviewed } from "@/lib/notification-hooks";
 
 export async function POST(req: Request, ctx: RouteContext<"/api/admin/submissions/[id]">) {
   const session = await auth();
@@ -17,6 +18,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/submissio
   }
   try {
     await reviewSubmission(id, parsed.data.decision);
+    await notifySubmissionReviewed(id, parsed.data.decision);
   } catch {
     return NextResponse.json({ ok: false, error: "操作失败" }, { status: 400 });
   }

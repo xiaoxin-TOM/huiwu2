@@ -1,6 +1,7 @@
 import { decode } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { getUserRegistration, createRegistration, listRegistrationTypes } from "@/lib/registrations";
+import { notifyRegistrationSubmitted } from "@/lib/notification-hooks";
 import { requirePublicMeeting, jsonOk, jsonError } from "@/lib/public-api";
 import { registrationSchema } from "@/lib/validation";
 
@@ -52,6 +53,7 @@ export async function POST(req: Request) {
 
     const meeting = await requirePublicMeeting();
     const registration = await createRegistration(user.id, meeting.id, parsed.data);
+    await notifyRegistrationSubmitted(registration.id);
     return jsonOk({ registration });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "提交报名失败";

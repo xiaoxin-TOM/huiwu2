@@ -4,6 +4,7 @@ import { isAdmin } from "@/lib/access";
 import { canAccessMeeting } from "@/lib/meetings";
 import { materialReviewSchema } from "@/lib/validation";
 import { getMaterialWithContext, reviewMaterial } from "@/lib/speaker-materials";
+import { notifyMaterialReviewed } from "@/lib/notification-hooks";
 
 export async function POST(req: Request, ctx: RouteContext<"/api/admin/speaker-materials/[id]">) {
   const session = await auth();
@@ -34,5 +35,6 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/speaker-m
   }
 
   await reviewMaterial(id, parsed.data.decision, userId, parsed.data.reviewNote);
+  await notifyMaterialReviewed(id, parsed.data.decision, parsed.data.reviewNote);
   return NextResponse.json({ ok: true });
 }

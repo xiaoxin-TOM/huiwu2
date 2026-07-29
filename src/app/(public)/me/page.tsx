@@ -4,6 +4,7 @@ import { listUserRegistrationsAcrossMeetings } from "@/lib/registrations";
 import { listUserBookings } from "@/lib/bookings";
 import { resolveMeeting } from "@/lib/meetings";
 import { meetingHref } from "@/lib/public";
+import { countUnreadNotifications } from "@/lib/notifications";
 import { getSpeakerByUserId, listSpeakersByUserId } from "@/lib/speakers-admin";
 import { STATUS_LABEL } from "@/lib/labels";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -11,7 +12,7 @@ import { SectionCard, DataCard, IconCard } from "@/components/ui/Card";
 import LogoutButton from "@/components/LogoutButton";
 import CheckinQrCode from "@/components/CheckinQrCode";
 import MeetingSwitchLink from "@/components/MeetingSwitchLink";
-import { UserIcon, ClipboardListIcon, HotelIcon, FileTextIcon, UploadIcon } from "@/components/icons";
+import { UserIcon, ClipboardListIcon, HotelIcon, FileTextIcon, UploadIcon, BellIcon } from "@/components/icons";
 
 export default async function MePage({
   searchParams,
@@ -20,11 +21,12 @@ export default async function MePage({
 }) {
   const user = await requireUser();
   const meeting = await resolveMeeting((await searchParams).m);
-  const [allRegistrations, bookings, speaker, allSpeakers] = await Promise.all([
+  const [allRegistrations, bookings, speaker, allSpeakers, unreadCount] = await Promise.all([
     listUserRegistrationsAcrossMeetings(user.id),
     listUserBookings(user.id, meeting.id),
     getSpeakerByUserId(user.id, meeting.id),
     listSpeakersByUserId(user.id),
+    countUnreadNotifications(user.id, meeting.id),
   ]);
   const speakerByMeeting = new Map(allSpeakers.map((s) => [s.meetingId, s]));
 
@@ -80,6 +82,11 @@ export default async function MePage({
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <IconCard href={meetingHref(meeting.id, "/register-conf")} title="我的报名" icon={<ClipboardListIcon className="h-6 w-6" />} />
+        <IconCard
+          href={meetingHref(meeting.id, "/notifications")}
+          title={unreadCount > 0 ? `我的通知 (${unreadCount})` : "我的通知"}
+          icon={<BellIcon className="h-6 w-6" />}
+        />
         <IconCard href={meetingHref(meeting.id, "/hotels")} title="我的预订" icon={<HotelIcon className="h-6 w-6" />} />
         {speaker && (
           <IconCard

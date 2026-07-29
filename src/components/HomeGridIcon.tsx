@@ -8,6 +8,7 @@ import {
   CarIcon,
   FileTextIcon,
   FolderIcon,
+  MessageIcon,
   HomeIcon,
   HotelIcon,
   InfoIcon,
@@ -36,6 +37,7 @@ const ICONS = {
   home: HomeIcon,
   star: StarIcon,
   folder: FolderIcon,
+  message: MessageIcon,
   link: LinkIcon,
   blank: FileTextIcon,
 } satisfies Record<HomeGridIconKey, typeof FileTextIcon>;

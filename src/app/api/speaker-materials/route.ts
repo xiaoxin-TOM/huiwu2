@@ -6,6 +6,7 @@ import { getSpeakerSessions } from "@/lib/speakers";
 import { createSpeakerMaterial } from "@/lib/speaker-materials";
 import { uploadToOSS, validateSpeakerMaterial } from "@/lib/oss";
 import { resolveMeetingId } from "@/lib/meetings";
+import { notifyMaterialSubmitted } from "@/lib/notification-hooks";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -72,6 +73,7 @@ export async function POST(req: Request) {
       mimeType: file.type,
       isConfidential,
     });
+    await notifyMaterialSubmitted(material.id);
     // 一律回到待审状态，审核通过前不对外可见
     return NextResponse.json({
       ok: true,

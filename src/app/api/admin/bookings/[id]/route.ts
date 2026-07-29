@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
 import { reviewSchema } from "@/lib/validation";
 import { reviewBooking } from "@/lib/bookings";
+import { notifyBookingReviewed } from "@/lib/notification-hooks";
 
 export async function POST(req: Request, ctx: RouteContext<"/api/admin/bookings/[id]">) {
   const session = await auth();
@@ -17,6 +18,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/admin/bookings/
   }
   try {
     await reviewBooking(id, parsed.data.decision);
+    await notifyBookingReviewed(id, parsed.data.decision);
   } catch {
     return NextResponse.json({ ok: false, error: "操作失败" }, { status: 400 });
   }
