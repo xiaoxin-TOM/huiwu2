@@ -20,6 +20,7 @@ import {
   LinkIcon,
   FileEditIcon,
   VideoIcon,
+  BellIcon,
 } from "@/components/icons";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import AdminShell from "@/components/AdminShell";
@@ -45,6 +46,7 @@ const MENU = [
   { href: "/admin/badge-template", label: "胸卡模板", icon: FileTextIcon },
   { href: "/admin/users", label: "会议授权", icon: UserCogIcon },
   { href: "/admin/checkin", label: "签到管理", icon: ScanIcon },
+  { href: "/admin/notifications", label: "通知中心", icon: BellIcon },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

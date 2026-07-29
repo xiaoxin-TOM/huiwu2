@@ -23,6 +23,7 @@ model User {
   ownedMeetings Meeting[]      @relation("MeetingOwner")
   staffMeetings MeetingStaff[]
   speakers      Speaker[]
+  notifications Notification[]
 }
 
 model VerificationCode {
@@ -135,6 +136,7 @@ model Meeting {
   homeGridItems HomeGridItem[]
   liveStreams   LiveStream[]
   reportLinks   ReportLink[]
+  notifications Notification[]
 
   @@index([isDefault])
 }
@@ -502,6 +504,42 @@ model ChannelVisit {
 
   @@index([channelId])
   @@index([sessionId])
+}
+
+/// 站内信：每个收件人一条，不依赖任何外部服务，必达且可回溯
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meetingId String?
+  meeting   Meeting?  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String    @default("")
+  linkHref  String    @default("")
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([meetingId])
+}
+
+/// 邮件外发队列。审核接口只负责入队，实际发送由 cron 驱动并按退避策略重试
+model NotificationDelivery {
+  id             String    @id @default(cuid())
+  notificationId String?
+  toAddress      String
+  subject        String
+  bodyText       String
+  bodyHtml       String    @default("")
+  status         String    @default("PENDING") // PENDING | SENT | FAILED
+  attempts       Int       @default(0)
+  lastError      String    @default("")
+  nextAttemptAt  DateTime  @default(now())
+  sentAt         DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([status, nextAttemptAt])
 }
 
 model MeetingStaff {

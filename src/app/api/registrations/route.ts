@@ -4,6 +4,7 @@ import { currentUser } from "@/lib/session";
 import { createRegistration } from "@/lib/registrations";
 import { resolveMeetingId } from "@/lib/meetings";
 import { getChannelIdFromCode } from "@/lib/channels-admin";
+import { notifyRegistrationSubmitted } from "@/lib/notification-hooks";
 
 export async function POST(req: Request) {
   const user = await currentUser();
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
     const channelCode = body.channelCode ?? channelMatch?.[1];
     const channelId = channelCode ? (await getChannelIdFromCode(meetingId, channelCode)) ?? undefined : undefined;
     const reg = await createRegistration(user.id, meetingId, parsed.data, { channelId });
+    await notifyRegistrationSubmitted(reg.id);
     return NextResponse.json({ ok: true, id: reg.id });
   } catch (e) {
     if (e instanceof Error && e.message === "ALREADY_REGISTERED") {

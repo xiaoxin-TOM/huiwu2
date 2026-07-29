@@ -4,6 +4,7 @@ import { currentUser } from "@/lib/session";
 import { validatePdf, savePdf } from "@/lib/upload";
 import { createSubmission } from "@/lib/submissions";
 import { resolveMeetingId } from "@/lib/meetings";
+import { notifySubmissionSubmitted } from "@/lib/notification-hooks";
 
 export async function POST(req: Request) {
   const user = await currentUser();
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
     const meetingId = await resolveMeetingId(String(form.get("meetingId") ?? ""));
     const fileUrl = await savePdf(file);
     const sub = await createSubmission(user.id, meetingId, { ...parsed.data, fileUrl });
+    await notifySubmissionSubmitted(sub.id);
     return NextResponse.json({ ok: true, id: sub.id });
   } catch (e) {
     if (e instanceof Error && e.message === "NO_DEFAULT_MEETING") {
