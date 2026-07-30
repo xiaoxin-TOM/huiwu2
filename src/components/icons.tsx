@@ -90,6 +90,18 @@ export const UtensilsIcon = (props?: IconProps) =>
     props,
   );
 
+export const SeatIcon = (props?: IconProps) =>
+  baseIcon(
+    <>
+      <path d="M5 18v-6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6" />
+      <path d="M3 18h18" />
+      <path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4" />
+      <path d="M6 21v-3" />
+      <path d="M18 21v-3" />
+    </>,
+    props,
+  );
+
 export const CalendarIcon = (props?: IconProps) =>
   baseIcon(
     <>

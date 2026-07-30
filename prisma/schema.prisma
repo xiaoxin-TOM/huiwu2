@@ -115,6 +115,8 @@ model Meeting {
   venueAddress         String   @default("")
   venueLng             String   @default("")
   venueLat             String   @default("")
+  seatMapUrl           String?  // 会场平面图，供前台查座时定位
+  seatMapNote          String   @default("")
   homeGridColumns      Int      @default(4)
   homeGridRounded      Boolean  @default(true)
   // 整体外观：留空时前台仍用默认底色，不配置即与改造前一致
@@ -146,6 +148,7 @@ model Meeting {
   contact       MeetingContact?
   feedbacks     Feedback[]
   mealSessions  MealSession[]
+  seatTables    SeatTable[]
 
   @@index([isDefault])
 }
@@ -213,6 +216,7 @@ model Registration {
   createdAt    DateTime               @default(now())
   reception    RegistrationReception?
   mealRedemptions MealRedemption[]
+  seatAssignments SeatAssignment[]
 
   @@unique([userId, meetingId])
   @@index([meetingId])
@@ -411,6 +415,7 @@ model Guest {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   reception   GuestReception?
+  seatAssignments SeatAssignment[]
 
   @@index([meetingId])
   @@index([level])
@@ -514,6 +519,40 @@ model ChannelVisit {
 
   @@index([channelId])
   @@index([sessionId])
+}
+
+/// 宴会/会场的桌位
+model SeatTable {
+  id        String @id @default(cuid())
+  meetingId String
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  name      String
+  capacity  Int    @default(10)
+  area      String @default("")
+  sortOrder Int    @default(0)
+
+  assignments SeatAssignment[]
+
+  @@unique([meetingId, name])
+  @@index([meetingId])
+}
+
+/// 排座。嘉宾与报名人员二者之一，两个唯一约束各自防止同一人在一桌重复出现
+model SeatAssignment {
+  id             String        @id @default(cuid())
+  seatTableId    String
+  seatTable      SeatTable     @relation(fields: [seatTableId], references: [id], onDelete: Cascade)
+  registrationId String?
+  registration   Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  guestId        String?
+  guest          Guest?        @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  seatNo         Int?
+  createdAt      DateTime      @default(now())
+
+  @@unique([seatTableId, registrationId])
+  @@unique([seatTableId, guestId])
+  @@index([registrationId])
+  @@index([guestId])
 }
 
 /// 餐次。typeIds 为空数组表示所有参会类型可用，避免新增类型就要回头补配置

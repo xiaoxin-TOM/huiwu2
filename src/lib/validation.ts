@@ -257,6 +257,31 @@ export const saveTemplateSchema = z.object({
   description: z.string().trim().max(200, "说明过长").optional().default(""),
 });
 
+export const seatTableSchema = z.object({
+  name: z.string().trim().min(1, "请填写桌号").max(40, "桌号过长"),
+  capacity: z.coerce.number().int().min(1, "容量至少 1").max(100, "容量过大").optional().default(10),
+  area: z.string().trim().max(40, "分区名过长").optional().default(""),
+  sortOrder: z.coerce.number().int().min(0).max(9999).optional().default(0),
+});
+export type SeatTableInput = z.infer<typeof seatTableSchema>;
+
+export const seatAssignSchema = z
+  .object({
+    seatTableId: z.string().trim().min(1, "请选择桌位"),
+    registrationId: z.string().trim().optional().nullable(),
+    guestId: z.string().trim().optional().nullable(),
+    seatNo: z.coerce.number().int().min(1).max(100).optional().nullable(),
+  })
+  .refine((d) => Boolean(d.registrationId) !== Boolean(d.guestId), {
+    message: "请指定一位嘉宾或报名人员",
+    path: ["registrationId"],
+  });
+
+export const seatMapSchema = z.object({
+  seatMapUrl: safeImageUrl.optional().default(""),
+  seatMapNote: z.string().trim().max(200, "说明过长").optional().default(""),
+});
+
 export const mealSessionSchema = z.object({
   day: z.string().trim().min(1, "请选择日期").max(20, "日期格式不正确"),
   slot: z.enum(MEAL_SLOTS),

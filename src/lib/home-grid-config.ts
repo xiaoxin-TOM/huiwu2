@@ -1,6 +1,6 @@
 export const HOME_GRID_ICON_KEYS = [
   "file", "info", "book", "alert", "mail", "calendar", "users", "camera",
-  "car", "video", "hotel", "phone", "home", "star", "folder", "message", "meal", "link", "blank",
+  "car", "video", "hotel", "phone", "home", "star", "folder", "message", "meal", "seat", "link", "blank",
 ] as const;
 
 export const HOME_GRID_ICON_OPTIONS = [
@@ -21,6 +21,7 @@ export const HOME_GRID_ICON_OPTIONS = [
   { value: "folder", label: "参会文件" },
   { value: "message", label: "意见反馈" },
   { value: "meal", label: "用餐安排" },
+  { value: "seat", label: "我的座位" },
   { value: "link", label: "链接" },
   { value: "blank", label: "空白自定义" },
 ] as const;
@@ -60,6 +61,7 @@ export const HOME_GRID_ROUTE_OPTIONS = [
   { value: "/materials", label: "参会文件" },
   { value: "/feedback", label: "意见反馈" },
   { value: "/meals", label: "用餐安排" },
+  { value: "/seat", label: "我的座位" },
   { value: "/me", label: "个人中心" },
 ] as const;
 
