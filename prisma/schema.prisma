@@ -25,6 +25,7 @@ model User {
   speakers      Speaker[]
   notifications Notification[]
   feedbacks     Feedback[]
+  templates     MeetingTemplate[]
 }
 
 model VerificationCode {
@@ -116,6 +117,10 @@ model Meeting {
   venueLat             String   @default("")
   homeGridColumns      Int      @default(4)
   homeGridRounded      Boolean  @default(true)
+  // 整体外观：留空时前台仍用默认底色，不配置即与改造前一致
+  bgColor              String   @default("")
+  bgImageUrl           String?
+  bgOverlay            Int      @default(0) // 0-80，背景图上的白色蒙版透明度，保证文字可读
   ownerId              String?
   owner                User?    @relation("MeetingOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   createdAt            DateTime @default(now())
@@ -507,6 +512,25 @@ model ChannelVisit {
 
   @@index([channelId])
   @@index([sessionId])
+}
+
+/// 管理员另存的场景模板。内置六套写在 src/lib/meeting-templates.ts 常量里，不入库
+model MeetingTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  ownerId     String?
+  owner       User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  bgColor     String   @default("")
+  bgImageUrl  String?
+  bgOverlay   Int      @default(0)
+  gridColumns Int      @default(4)
+  gridRounded Boolean  @default(true)
+  /// 宫格入口数组。套用时逐条过 homeGridItemSchema，与手工编辑器同一套白名单
+  items       Json
+  createdAt   DateTime @default(now())
+
+  @@index([ownerId])
 }
 
 /// 会议的结构化联系方式与客服二维码。原有 contactHtml 富文本保留，展示在结构化信息下方

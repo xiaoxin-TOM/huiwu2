@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/access";
-import { replaceHomeGridItems, setHomeGridColumns, setHomeGridRounded } from "@/lib/home-grid";
+import { replaceHomeGridItems, setHomeGridLayoutAndAppearance } from "@/lib/home-grid";
 import { requireCurrentMeetingForRequest } from "@/lib/meetings";
 import { homeGridSchema } from "@/lib/validation";
 
@@ -22,11 +22,14 @@ export async function POST(req: Request) {
 
   try {
     const meeting = await requireCurrentMeetingForRequest(req);
-    await Promise.all([
-      setHomeGridColumns(meeting.id, parsed.data.columns as 2 | 3 | 4),
-      setHomeGridRounded(meeting.id, parsed.data.rounded),
-      replaceHomeGridItems(meeting.id, parsed.data.items),
-    ]);
+    await setHomeGridLayoutAndAppearance(meeting.id, {
+      columns: parsed.data.columns as 2 | 3 | 4,
+      rounded: parsed.data.rounded,
+      bgColor: parsed.data.bgColor,
+      bgImageUrl: parsed.data.bgImageUrl,
+      bgOverlay: parsed.data.bgOverlay,
+    });
+    await replaceHomeGridItems(meeting.id, parsed.data.items);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: false, error: "保存失败" }, { status: 500 });

@@ -222,7 +222,38 @@ export const homeGridItemSchema = z.object({
 export const homeGridSchema = z.object({
   columns: z.coerce.number().int().min(2).max(4).default(4),
   rounded: z.boolean().default(true),
+  // 外观与宫格同页编辑、同次保存，便于右侧预览直接反映背景
+  bgColor: z
+    .string()
+    .trim()
+    .max(20, "颜色值过长")
+    .refine((v) => v === "" || /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v), "请填写 #RRGGBB 形式的颜色")
+    .optional()
+    .default(""),
+  bgImageUrl: safeImageUrl.optional().default(""),
+  bgOverlay: z.coerce.number().int().min(0).max(80).optional().default(0),
   items: z.array(homeGridItemSchema).min(1, "至少保留一个功能入口").max(24, "功能入口最多 24 个"),
+});
+
+export const meetingAppearanceSchema = z.object({
+  bgColor: z
+    .string()
+    .trim()
+    .max(20, "颜色值过长")
+    .refine((v) => v === "" || /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v), "请填写 #RRGGBB 形式的颜色")
+    .optional()
+    .default(""),
+  bgImageUrl: safeImageUrl.optional().default(""),
+  bgOverlay: z.coerce.number().int().min(0, "蒙版不能为负").max(80, "蒙版最多 80").optional().default(0),
+});
+
+export const applyTemplateSchema = z.object({
+  templateKey: z.string().trim().min(1, "请选择模板").max(100, "模板标识过长"),
+});
+
+export const saveTemplateSchema = z.object({
+  name: z.string().trim().min(1, "请填写模板名称").max(40, "模板名称过长"),
+  description: z.string().trim().max(200, "说明过长").optional().default(""),
 });
 
 export const guestSchema = z.object({

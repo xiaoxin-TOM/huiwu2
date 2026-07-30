@@ -1,18 +1,17 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
 vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
-vi.mock("@/lib/home-grid", () => ({ replaceHomeGridItems: vi.fn(), setHomeGridColumns: vi.fn(), setHomeGridRounded: vi.fn() }));
+vi.mock("@/lib/home-grid", () => ({ replaceHomeGridItems: vi.fn(), setHomeGridLayoutAndAppearance: vi.fn() }));
 vi.mock("@/lib/meetings", () => ({ requireCurrentMeetingForRequest: vi.fn() }));
 
 import { auth } from "@/lib/auth";
-import { replaceHomeGridItems, setHomeGridColumns, setHomeGridRounded } from "@/lib/home-grid";
+import { replaceHomeGridItems, setHomeGridLayoutAndAppearance } from "@/lib/home-grid";
 import { requireCurrentMeetingForRequest } from "@/lib/meetings";
 import { POST } from "@/app/api/admin/home-grid/route";
 
 const mockedAuth = vi.mocked(auth);
 const mockedReplace = vi.mocked(replaceHomeGridItems);
-const mockedSetColumns = vi.mocked(setHomeGridColumns);
-const mockedSetRounded = vi.mocked(setHomeGridRounded);
+const mockedSetLayout = vi.mocked(setHomeGridLayoutAndAppearance);
 const mockedMeeting = vi.mocked(requireCurrentMeetingForRequest);
 
 beforeEach(() => {
@@ -24,7 +23,7 @@ test("首页宫格保存接口拒绝普通用户", async () => {
   const response = await POST(new Request("http://localhost/api/admin/home-grid", { method: "POST" }));
   expect(response.status).toBe(403);
   expect(mockedReplace).not.toHaveBeenCalled();
-  expect(mockedSetColumns).not.toHaveBeenCalled();
+  expect(mockedSetLayout).not.toHaveBeenCalled();
 });
 
 test("管理员可保存当前会议的宫格配置", async () => {
@@ -45,7 +44,13 @@ test("管理员可保存当前会议的宫格配置", async () => {
   }));
 
   expect(response.status).toBe(200);
-  expect(mockedSetColumns).toHaveBeenCalledWith("meeting-1", 3);
-  expect(mockedSetRounded).toHaveBeenCalledWith("meeting-1", true);
+  // 布局与外观合并为一次写入；未传的外观字段落到默认值，前台仍走默认底色
+  expect(mockedSetLayout).toHaveBeenCalledWith("meeting-1", {
+    columns: 3,
+    rounded: true,
+    bgColor: "",
+    bgImageUrl: "",
+    bgOverlay: 0,
+  });
   expect(mockedReplace).toHaveBeenCalledWith("meeting-1", items);
 });

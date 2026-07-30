@@ -69,6 +69,37 @@ export async function setHomeGridColumns(meetingId: string, columns: HomeGridCol
   });
 }
 
+/** 宫格布局与外观一次写入，避免同一个会议连续发三条 update */
+export async function setHomeGridLayoutAndAppearance(
+  meetingId: string,
+  data: {
+    columns: HomeGridColumns;
+    rounded: boolean;
+    bgColor: string;
+    bgImageUrl: string;
+    bgOverlay: number;
+  },
+) {
+  await prisma.meeting.update({
+    where: { id: meetingId },
+    data: {
+      homeGridColumns: data.columns,
+      homeGridRounded: data.rounded,
+      bgColor: data.bgColor,
+      bgImageUrl: data.bgImageUrl || null,
+      bgOverlay: data.bgOverlay,
+    },
+  });
+}
+
+export async function getMeetingAppearanceFields(meetingId: string) {
+  const meeting = await prisma.meeting.findUnique({
+    where: { id: meetingId },
+    select: { bgColor: true, bgImageUrl: true, bgOverlay: true },
+  });
+  return meeting ?? { bgColor: "", bgImageUrl: null, bgOverlay: 0 };
+}
+
 export async function getHomeGridRounded(meetingId: string): Promise<boolean> {
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },

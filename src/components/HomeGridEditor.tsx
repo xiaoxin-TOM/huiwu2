@@ -12,10 +12,11 @@ import {
   homeGridArea,
   type HomeGridColumns,
   type HomeGridIconKey,
-  type HomeGridItemInput,
   type HomeGridSize,
 } from "@/lib/home-grid-config";
 import type { HomeGridItemView } from "@/lib/home-grid";
+import { meetingBackgroundStyle } from "@/lib/meeting-templates";
+import MeetingTemplatePicker, { type TemplateChoiceView } from "@/components/MeetingTemplatePicker";
 
 function newId() {
   return `draft-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -25,10 +26,27 @@ function defaultDrafts(): HomeGridItemView[] {
   return DEFAULT_HOME_GRID_ITEMS.map((item, index) => ({ ...item, id: `default-${index}` }));
 }
 
-export default function HomeGridEditor({ meetingId, initialItems, initialColumns, initialRounded = true }: { meetingId: string; initialItems: HomeGridItemView[]; initialColumns: HomeGridColumns; initialRounded?: boolean }) {
+export default function HomeGridEditor({
+  meetingId,
+  initialItems,
+  initialColumns,
+  initialRounded = true,
+  initialAppearance = { bgColor: "", bgImageUrl: "", bgOverlay: 0 },
+  templates = [],
+}: {
+  meetingId: string;
+  initialItems: HomeGridItemView[];
+  initialColumns: HomeGridColumns;
+  initialRounded?: boolean;
+  initialAppearance?: { bgColor: string; bgImageUrl: string; bgOverlay: number };
+  templates?: TemplateChoiceView[];
+}) {
   const [items, setItems] = useState(initialItems);
   const [columns, setColumns] = useState<HomeGridColumns>(initialColumns);
   const [rounded, setRounded] = useState(initialRounded);
+  const [bgColor, setBgColor] = useState(initialAppearance.bgColor);
+  const [bgImageUrl, setBgImageUrl] = useState(initialAppearance.bgImageUrl);
+  const [bgOverlay, setBgOverlay] = useState(initialAppearance.bgOverlay);
   const [saving, setSaving] = useState(false);
   const [uploadingItemId, setUploadingItemId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -111,9 +129,12 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
   async function save() {
     setSaving(true);
     setMessage(null);
-    const payload: { columns: HomeGridColumns; rounded: boolean; items: HomeGridItemInput[] } = {
+    const payload = {
       columns,
       rounded,
+      bgColor,
+      bgImageUrl,
+      bgOverlay,
       items: items.map(({ title, href, icon, size, backgroundImage, isVisible }) => ({
         title,
         href,
@@ -131,7 +152,7 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "保存失败");
-      setMessage({ type: "success", text: "首页宫格已保存" });
+      setMessage({ type: "success", text: "首页宫格与外观已保存" });
     } catch (error) {
       setMessage({ type: "error", text: error instanceof Error ? error.message : "保存失败" });
     } finally {
@@ -314,7 +335,72 @@ export default function HomeGridEditor({ meetingId, initialItems, initialColumns
               当前宽屏占用格数不是 {columns} 的倍数，末行可能留空；可调整一个入口为横向或大卡片。
             </p>
           )}
-          <HomeGrid meetingId={meetingId} items={items} columns={columns} rounded={rounded} preview />
+          <div
+            className="rounded-lg p-2"
+            style={{ backgroundColor: bgColor || "#f8fafc", ...meetingBackgroundStyle({ bgColor, bgImageUrl, bgOverlay }) }}
+          >
+            <HomeGrid meetingId={meetingId} items={items} columns={columns} rounded={rounded} preview />
+          </div>
+        </div>
+
+        <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+          <h2 className="font-semibold text-slate-800">场景模板</h2>
+          <p className="text-xs text-slate-500">一键套用整套入口与外观，或把当前配置存下来复用。</p>
+          <MeetingTemplatePicker
+            meetingId={meetingId}
+            templates={templates}
+            currentItemCount={items.filter((i) => i.isVisible).length}
+          />
+        </div>
+
+        <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+          <h2 className="font-semibold text-slate-800">整体背景</h2>
+          <p className="text-xs text-slate-500">留空则沿用系统默认底色，前台表现与现在一致。</p>
+          <div>
+            <label className="block text-xs text-slate-600">背景色</label>
+            <div className="mt-1 flex items-center gap-2">
+              <input
+                type="color"
+                value={/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(bgColor) ? bgColor : "#f8fafc"}
+                onChange={(e) => setBgColor(e.target.value)}
+                className="h-9 w-12 rounded border"
+              />
+              <input
+                value={bgColor}
+                onChange={(e) => setBgColor(e.target.value.trim())}
+                placeholder="#f8fafc"
+                className="flex-1 rounded-lg border px-3 py-2 text-sm"
+              />
+              {bgColor && (
+                <button type="button" onClick={() => setBgColor("")} className="text-xs text-slate-500 hover:underline">
+                  清除
+                </button>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-slate-600">背景图地址（可选）</label>
+            <input
+              value={bgImageUrl}
+              onChange={(e) => setBgImageUrl(e.target.value.trim())}
+              placeholder="/imgs/bg.jpg 或 https://..."
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            />
+          </div>
+          {bgImageUrl && (
+            <div>
+              <label className="block text-xs text-slate-600">白色蒙版 {bgOverlay}%（提高文字可读性）</label>
+              <input
+                type="range"
+                min={0}
+                max={80}
+                step={5}
+                value={bgOverlay}
+                onChange={(e) => setBgOverlay(Number(e.target.value))}
+                className="mt-1 w-full"
+              />
+            </div>
+          )}
         </div>
 
         {message && (
