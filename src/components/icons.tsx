@@ -79,6 +79,17 @@ export const MessageIcon = (props?: IconProps) =>
     props,
   );
 
+export const UtensilsIcon = (props?: IconProps) =>
+  baseIcon(
+    <>
+      <path d="M3 2v7a3 3 0 0 0 3 3v10" />
+      <path d="M9 2v7a3 3 0 0 1-3 3" />
+      <path d="M6 2v6" />
+      <path d="M17 2c-1.7 1.2-2.5 3-2.5 5.5 0 2 .8 3.2 2.5 3.5V22" />
+    </>,
+    props,
+  );
+
 export const CalendarIcon = (props?: IconProps) =>
   baseIcon(
     <>

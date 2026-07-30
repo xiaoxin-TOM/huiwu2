@@ -145,6 +145,7 @@ model Meeting {
   notifications Notification[]
   contact       MeetingContact?
   feedbacks     Feedback[]
+  mealSessions  MealSession[]
 
   @@index([isDefault])
 }
@@ -211,6 +212,7 @@ model Registration {
   checkinLogs  CheckinLog[]
   createdAt    DateTime               @default(now())
   reception    RegistrationReception?
+  mealRedemptions MealRedemption[]
 
   @@unique([userId, meetingId])
   @@index([meetingId])
@@ -512,6 +514,43 @@ model ChannelVisit {
 
   @@index([channelId])
   @@index([sessionId])
+}
+
+/// 餐次。typeIds 为空数组表示所有参会类型可用，避免新增类型就要回头补配置
+model MealSession {
+  id        String   @id @default(cuid())
+  meetingId String
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  day       String
+  slot      String // BREAKFAST | LUNCH | DINNER
+  name      String   @default("")
+  venue     String   @default("")
+  startTime String   @default("")
+  endTime   String   @default("")
+  /// 限定可用的参会类型 id 数组；空数组 = 不限
+  typeIds   Json
+  sortOrder Int      @default(0)
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  redemptions MealRedemption[]
+
+  @@unique([meetingId, day, slot])
+  @@index([meetingId])
+}
+
+/// 用餐核销记录。唯一约束是防重领的根本保障——并发扫码时应用层"先查再写"挡不住
+model MealRedemption {
+  id             String       @id @default(cuid())
+  mealSessionId  String
+  mealSession    MealSession  @relation(fields: [mealSessionId], references: [id], onDelete: Cascade)
+  registrationId String
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  redeemedAt     DateTime     @default(now())
+  byUserId       String?
+
+  @@unique([mealSessionId, registrationId])
+  @@index([registrationId])
 }
 
 /// 管理员另存的场景模板。内置六套写在 src/lib/meeting-templates.ts 常量里，不入库

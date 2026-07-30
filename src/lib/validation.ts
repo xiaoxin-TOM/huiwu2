@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { HOME_GRID_ICON_KEYS, HOME_GRID_SIZE_KEYS } from "@/lib/home-grid-config";
 import { RECEPTION_BULK_FIELDS, RECEPTION_BULK_MODES, type ReceptionBulkField } from "@/lib/reception-bulk";
+import { MEAL_SLOTS } from "@/lib/meals";
 
 export const registerSchema = z.object({
   name: z.string().min(1, "请填写姓名"),
@@ -254,6 +255,24 @@ export const applyTemplateSchema = z.object({
 export const saveTemplateSchema = z.object({
   name: z.string().trim().min(1, "请填写模板名称").max(40, "模板名称过长"),
   description: z.string().trim().max(200, "说明过长").optional().default(""),
+});
+
+export const mealSessionSchema = z.object({
+  day: z.string().trim().min(1, "请选择日期").max(20, "日期格式不正确"),
+  slot: z.enum(MEAL_SLOTS),
+  name: z.string().trim().max(60, "名称过长").optional().default(""),
+  venue: z.string().trim().max(100, "地点过长").optional().default(""),
+  startTime: z.string().trim().max(10, "时间格式不正确").optional().default(""),
+  endTime: z.string().trim().max(10, "时间格式不正确").optional().default(""),
+  // 空数组表示不限参会类型
+  typeIds: z.array(z.string().trim().min(1)).max(50, "参会类型过多").optional().default([]),
+  isVisible: z.boolean().optional().default(true),
+});
+export type MealSessionInput = z.infer<typeof mealSessionSchema>;
+
+export const mealRedeemSchema = z.object({
+  mealSessionId: z.string().trim().min(1, "请选择餐次"),
+  token: z.string().trim().min(1, "请扫描或输入签到凭证"),
 });
 
 export const guestSchema = z.object({

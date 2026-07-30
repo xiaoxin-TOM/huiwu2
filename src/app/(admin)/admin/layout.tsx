@@ -23,6 +23,7 @@ import {
   BellIcon,
   PhoneIcon,
   MessageIcon,
+  UtensilsIcon,
 } from "@/components/icons";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import AdminShell from "@/components/AdminShell";
@@ -44,6 +45,7 @@ const MENU = [
   { href: "/admin/albums", label: "直播图片", icon: ImageIcon },
   { href: "/admin/guests", label: "嘉宾管理", icon: StarIcon },
   { href: "/admin/receptions", label: "接待管理", icon: UsersIcon },
+  { href: "/admin/meals", label: "用餐管理", icon: UtensilsIcon },
   { href: "/admin/channels", label: "渠道推广", icon: LinkIcon },
   { href: "/admin/badge-template", label: "胸卡模板", icon: FileTextIcon },
   { href: "/admin/users", label: "会议授权", icon: UserCogIcon },
